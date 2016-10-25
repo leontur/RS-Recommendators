@@ -10,17 +10,9 @@ namespace RS_Engine
     {
         public static void getTopRecommendations()
         {
-
-            RManager.outLog("  ..processing");
-            RManager.outLog("");
-            RManager.outLog("");
-            RManager.outLog("");
-            RManager.outLog("");
-
-
             //MAX COUNT
-
-            Console.WriteLine("  Computing most selected > ");
+            RManager.outLog("  + processing..");
+            RManager.outLog("  + computing most selected.. ");
 
             //get all values
             List<int> interactions_item_id = new List<int>();
@@ -38,7 +30,7 @@ namespace RS_Engine
             foreach (var grp in interactions_item_id_group_by)
             {
                 interactions_top.Add(int.Parse(grp.Key.ToString())); //clone
-                Console.WriteLine("   +  item_id {0} has {1} interactions", grp.Key, grp.Count());
+                RManager.outLog(string.Format("   +  item_id {0} has {1} interactions", grp.Key, grp.Count()));
                 if (grpc == 4) break;
                 grpc++;
             }
