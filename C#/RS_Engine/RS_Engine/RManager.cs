@@ -93,6 +93,7 @@ namespace RS_Engine
             outLog("    1) calculate TOP recommendations");
             outLog("    2) CBF");
             outLog("    3) ..");
+            outLog("    4) ..");
 
             //notices
             outLog("    (long running program)");
@@ -121,21 +122,31 @@ namespace RS_Engine
         }
 
         //CSV OUTPUT FILE CREATION
-        public static void exportRecToSubmit(List<int> users, List<int> items)
+        public static void exportRecToSubmit(List<int> users, List<List<int>> useritems)
         {
-
             //output string
             var sub_otpt = string.Empty;
+
+            //info
+            outLog(" >>>>>> generating output file, wait a minute..");
 
             //generating header
             sub_otpt += "user_id,recommended_items";
             sub_otpt += Environment.NewLine;
 
-            //generating users and collecting items to recommend
-            foreach (var u in users)
+            //check lists correctness
+            if (users.Count != useritems.Count)
             {
-                sub_otpt += u + ",";
-                foreach (var r in items)
+                outLog("ERROR: the two list users and useritems have not the same length");
+                outLog("ABORTING submission output file creation");
+                return;
+            }
+
+            //generating users and collecting items to recommend
+            for(int i=0; i<users.Count; i++)
+            {
+                sub_otpt += users[i] + ",";
+                foreach (var r in useritems[i])
                     sub_otpt += string.Format("{0}\t", r);
                 sub_otpt += Environment.NewLine;
             }
@@ -147,6 +158,7 @@ namespace RS_Engine
             try
             {
                 File.AppendAllText(sub_outputFileName, sub_otpt);
+                outLog(" >>>>>> output submission file created: " + sub_outputFileName);
             }
             catch
             {

@@ -9,9 +9,18 @@ namespace RS_Engine
     class REngineCBF
     {
 
+        public static void getRecommendations()
+        {
+            //MAX COUNT
+            RManager.outLog("  + processing..");
+            RManager.outLog("  + computing xxxxxxx.. ");
 
 
-        /* TEMP::
+
+
+        }
+
+               /* TEMP::
                 //Progress counter
                 float counter = 1;
                 int total = item_profile_f.Count();

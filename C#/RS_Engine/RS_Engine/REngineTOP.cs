@@ -8,7 +8,7 @@ namespace RS_Engine
 {
     class REngineTOP
     {
-        public static void getTopRecommendations()
+        public static void getRecommendations()
         {
             //MAX COUNT
             RManager.outLog("  + processing..");
@@ -31,7 +31,7 @@ namespace RS_Engine
             {
                 interactions_top.Add(int.Parse(grp.Key.ToString())); //clone
                 RManager.outLog(string.Format("   +  item_id {0} has {1} interactions", grp.Key, grp.Count()));
-                if (grpc == 4) break;
+                if (grpc == 4) break; //limit to 5 recommendations
                 grpc++;
             }
 
@@ -43,8 +43,16 @@ namespace RS_Engine
 
             //////////////////////////////////////////////////////////////////////
 
+            //generating items to recommend for each user
+            List<List<int>> interactions_top_out = new List<List<int>>();
+            foreach(var u in RManager.target_users)
+            {
+                //in this case all recommendations are the same
+                interactions_top_out.Add(interactions_top);
+            }
+
             //OUTPUT_SUBMISSION
-            RManager.exportRecToSubmit(RManager.target_users, interactions_top);
+            RManager.exportRecToSubmit(RManager.target_users, interactions_top_out);
 
         }
     }

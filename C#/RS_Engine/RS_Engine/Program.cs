@@ -32,12 +32,17 @@ namespace RS_Engine
             if (RManager.EXEMODE == 1)
             {
                 //PROCESSING - TOP 
-                REngineTOP.getTopRecommendations();
+                REngineTOP.getRecommendations();
             }
             else if (RManager.EXEMODE == 2)
             {
                 //PROCESSING - CBF
-                ; 
+                REngineCBF.getRecommendations();
+            }
+            else if (RManager.EXEMODE == 3)
+            {
+                //PROCESSING - XXX
+                ;
             }
             else { ; }
 
