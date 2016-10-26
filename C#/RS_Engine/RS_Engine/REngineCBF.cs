@@ -27,17 +27,48 @@ namespace RS_Engine
 
 
             //cos sim
-            Console.WriteLine(GetCosineSimilarity(RManager.user_profile[0], RManager.user_profile[1]));
+            List<double> cos1a = new List<double>();
+            List<double> cos1b = new List<double>();
+            List<double> cos2a = new List<double>();
+            List<double> cos2b = new List<double>();
+            List<double> cos3a = new List<double>();
+            List<double> cos3b = new List<double>();
 
+            for (int i = 0; i < 11; i++)
+            {
+                if (i == 1)
+                {
+                    List<List<double>> t = ResizeOrderList(RManager.user_profile[0][i], RManager.user_profile[1][i]));
+                    cos1a.Add(t[0]);
+                    cos1b.Add(t[1]);
+                }
+                if (i>=2 && i<=10)
+                {
+                    cos2a.Add(Convert.ToDouble(RManager.user_profile[0][i]));
+                    cos2b.Add(Convert.ToDouble(RManager.user_profile[1][i]));
+                }
+                if (i == 11)
+                {
+                    cos3a.Add(Convert.ToDouble(RManager.user_profile[0][i]));
+                    cos3b.Add(Convert.ToDouble(RManager.user_profile[1][i]));
+                }
+            }
 
+            double cos1 = GetCosineSimilarity(cos1a, cos1b);
+            double cos2 = GetCosineSimilarity(cos2a, cos2b);
+            double cos3 = GetCosineSimilarity(cos3a, cos3b);
 
-
+            Console.WriteLine();
+            Console.WriteLine(cos1 + "  " + cos2 + "  " + cos3);
+            Console.WriteLine(" somma " + cos1 + cos2 + cos3);
+            Console.WriteLine(" media " + (cos1 + cos2 + cos3)/3);
+            Console.WriteLine();
 
         }
 
 
         //Cosine similarity
-        public static double GetCosineSimilarity(List<double> V1, List<double> V2)
+        private static double GetCosineSimilarity(List<double> V1, List<double> V2)
         {
             int shrink = 0;
             int N = 0;
@@ -52,8 +83,17 @@ namespace RS_Engine
                 mag2 += Math.Pow(V2[n], 2);
             }
 
-            return dot / (Math.Sqrt(mag1) * Math.Sqrt(mag2) + shrink);
+            return dot / ((Math.Sqrt(mag1) * Math.Sqrt(mag2)) + shrink);
         }
+
+        //resize and order lists
+        private static List<List<double>> ResizeOrderList(List<object> L)
+        {
+            List<List<double>>
+
+            return;
+        }
+
 
         /* TEMP::
          //Progress counter

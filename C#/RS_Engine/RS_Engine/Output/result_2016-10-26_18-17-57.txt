@@ -1,0 +1,27 @@
+ ** RECOMMENDATORS ENGINE **
+-----------------------------------------------------------------
+    1) calculate TOP recommendations
+    2) CBF
+    3) ..
+    4) ..
+    (long running program)
+-----------------------------------------------------------------
+
+    ==> selected program (2)
+-----------------------------------------------------------------
+ + reading entire dataset
+ + dataset read OK
+  -total lines | interactions_f >>> 546865
+  -total lines | item_profile_f >>> 167957
+  -total lines | target_users_f >>> 10001
+  -total lines | user_profile_f >>> 40001
+ + dataset conversion
+ + dataset conversion OK
+  -total lines | interactions >>> 546864
+  -total lines | item_profile >>> 0
+  -total lines | target_users >>> 10000
+  -total lines | user_profile >>> 40000
+  + processing..
+  + computing CBF.. 
+ >>>>>> halting RS..
+ >>>>>> log saved to ../../Output/result_2016-10-26_18-17-57.txt  :) 
