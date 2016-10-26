@@ -14,7 +14,7 @@ namespace RS_Engine
         public static List<List<int>> interactions = new List<List<int>>();
         public static List<List<int>> item_profile = new List<List<int>>();
         public static List<int> target_users = new List<int>();
-        public static List<List<int>> user_profile = new List<List<int>>();
+        public static List<List<object>> user_profile = new List<List<object>>();
 
         //Global vars
         public static int EXEMODE = 0;
@@ -22,6 +22,7 @@ namespace RS_Engine
         //Unique path vars
         private static string DATASETPATH = @"../../Datasets/";
         private static string LOGPATH = "../../Output/result_" + DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss", CultureInfo.InvariantCulture) + ".txt"; //@"C:\RS_out\result_";
+        private static string SERIALTPATH = @"../../Serialized/";
 
         //INITIALIZE RECOMMENDER SYSTEM
         public static void initRS()
@@ -44,20 +45,108 @@ namespace RS_Engine
             outLog(" + dataset conversion");
 
             //Converting.. (starting from 1 to remove header)
-            for (int i = 1; i < interactions_f.Length; i++)
+            int i, j;
+            //interactions
+            for (i = 1; i < interactions_f.Length; i++)
                 interactions.Add(interactions_f[i].Split('\t').Select(Int32.Parse).ToList());
+            //target_users
+            for (i = 1; i < target_users_f.Length; i++)
+                target_users.Add(Int32.Parse(target_users_f[i]));
 
-            for (int i = 1; i < target_users_f.Length; i++)
-                target_users.Add(int.Parse(target_users_f[i]));
+            //check if already serialized (for fast fetching)
+            if (!File.Exists(Path.Combine(SERIALTPATH, "user_profile.bin"))) {
+                //user_profile
+                for (i = 1; i < user_profile_f.Length; i++)
+                {
+                    List<string> tmpIN = user_profile_f[i].Split('\t').Select(x => x).ToList();
+                    List<object> tmpOUT = new List<object>();
+                    for (j = 0; j < 12; j++)
+                    {
+                        if (j == 1 || j == 11)
+                        {
+                            //from obj to list
+                            try
+                            {
+                                tmpOUT.Add(tmpIN[j].Split(',').Select(Int32.Parse).ToList().Cast<Int32>().ToList());
+                            }
+                            catch
+                            {
+                                tmpOUT.Add(0);
+                            }
+                        }
+                        else if (j == 5)
+                        {
+                            //from str to int
+                            // de -> 1
+                            // at -> 2
+                            // ch -> 3
+                            // non_dach -> 0
+                            tmpOUT.Add(
+                                tmpIN[j] == "de" ? 1 :
+                                tmpIN[j] == "at" ? 2 :
+                                tmpIN[j] == "ch" ? 3 :
+                                tmpIN[j] == "non_dach" ? 0 : 0
+                                );
+                        }
+                        else
+                        {
+                            try
+                            {
+                                tmpOUT.Add(Int32.Parse(tmpIN[j]));
+                            }
+                            catch
+                            {
+                                tmpOUT.Add(0);
+                            }
+                        }
+                    }
 
-            for (int i = 1; i < item_profile_f.Length; i++)
+                    user_profile.Add(tmpOUT);
+
+                    //counter
+                    if (i % 1000 == 0)
+                        Console.WriteLine(i);
+
+                    /*
+                    //debug
+                    foreach (var d in tmpOUT)
+                        Console.WriteLine("list i=" + i + "  " + d.ToString());
+
+                    foreach (var d in (List<int>)tmpOUT[1])
+                        Console.WriteLine("list i=" + i + " [1] " + d.ToString());
+
+                    foreach (var d in (List<int>)tmpOUT[11])
+                        Console.WriteLine("list i=" + i + " [11] " + d.ToString());
+
+                    Console.ReadKey();
+                    */
+                }
+
+
+                //serialize
+                using (Stream stream = File.Open(Path.Combine(SERIALTPATH, "user_profile.bin"), FileMode.Create))
+                {
+                    var bformatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+                    bformatter.Serialize(stream, user_profile);
+                }
+
+            } else {
+
+                //deserialize
+                using (Stream stream = File.Open(Path.Combine(SERIALTPATH, "user_profile.bin"), FileMode.Open))
+                {
+                    var bformatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+
+                    user_profile = (List<List<Object>>)bformatter.Deserialize(stream);
+                }
+            }
+
+            for (i = 1; i < item_profile_f.Length; i++)
             {
                 //lineList = item_profile_f[i].Split('\t').Select(Int32.Parse).ToList(); <<<attenzione ai tipi!
                 //item_profile.Add(lineList);
                 //lineList.Clear();
             }
-
-            //TODO!!! finire conversione altri file
 
             outLog(" + dataset conversion OK");
 
