@@ -66,11 +66,15 @@ namespace RS_Engine
                         if(g.Count()>=2)
                             dup_count_cos1++;
 
+                    //if there are only 0 in common the similarity is 0, else compute duplicate/tot
+                    if ((v1 == 1 && v2 == 1) && groups.First().Key == 0 && groups.First().Count() == 2)
+                        cos1 = 0;
+                    else
+                        cos1 = dup_count_cos1 / ((v1 > v2) ? v1 : v2);
+
                     //debug
-                    //foreach (var group in groups)
-                        //Console.WriteLine("i==1 > Value {0} has {1} items", group.Key, group.Count());
-                    
-                    cos1 = dup_count_cos1 / ((v1 > v2) ? v1 : v2);
+                    //foreach (var g in groups)
+                        //Console.WriteLine("i==1 > Value {0} has {1} items", g.Key, g.Count());
 
                     /* cosine calculus
                     List<List<Int32>> orderedLists = new List<List<Int32>>(ResizeOrderList((List<Int32>)RManager.user_profile[r1][i], (List<Int32>)RManager.user_profile[r2][i]));
@@ -101,11 +105,15 @@ namespace RS_Engine
                         if (g.Count() >= 2)
                             dup_count_cos3++;
 
-                    //debug
-                    //foreach (var group in groups)
-                        //Console.WriteLine("i==11 > Value {0} has {1} items", group.Key, group.Count());
+                    //if there are only 0 in common the similarity is 0, else compute duplicate/tot
+                    if ((v1 == 1 && v2 == 1) && groups.First().Key == 0 && groups.First().Count() == 2)
+                        cos3 = 0;
+                    else
+                        cos3 = dup_count_cos3 / ((v1 > v2) ? v1 : v2);
 
-                    cos3 = dup_count_cos3 / ((v1 > v2) ? v1 : v2);
+                    //debug
+                    //foreach (var g in groups)
+                        //Console.WriteLine("i==1 > Value {0} has {1} items", g.Key, g.Count());
 
                     /* cosine calculus
                     List<List<Int32>> orderedLists = new List<List<Int32>>(ResizeOrderList((List<Int32>)RManager.user_profile[r1][i], (List<Int32>)RManager.user_profile[r2][i]));
@@ -121,11 +129,18 @@ namespace RS_Engine
             //cos1 = GetCosineSimilarity(cos1a, cos1b);
             //cos3 = GetCosineSimilarity(cos3a, cos3b);
 
+            //compute total cos sim for the couples of passed rows
+            double cos_sum = cos1 + cos2 + cos3;
+            double cos_w_avg = (cos1 * w_cos1 + cos2 * w_cos2 + cos3 * w_cos3) / 3;
+
+            /*
+            //debug
             Console.WriteLine();
-            Console.WriteLine(" cos1=" + cos1 + " | cos2=" + cos2 + " | cos3=" + cos3);
-            Console.WriteLine(" cos sum= " + cos1 + cos2 + cos3);
-            Console.WriteLine(" weighted avg= " + (cos1*w_cos1 + cos2*w_cos2 + cos3*w_cos3)/3);
+            Console.WriteLine(" | cos1=" + cos1 + " | cos2=" + cos2 + " | cos3=" + cos3);
+            Console.WriteLine(" | cos sum= " + cos_sum);
+            Console.WriteLine(" | weighted avg= " + cos_w_avg);
             Console.WriteLine();
+            */
 
         }
 
