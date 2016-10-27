@@ -58,9 +58,9 @@ namespace RS_Engine
                 //user_profile
                 for (i = 1; i < user_profile_f.Length; i++)
                 {
-                    List<string> tmpIN = user_profile_f[i].Split('\t').Select(x => x).ToList();
+                    List<string> tmpIN = user_profile_f[i].Split('\t').Select(x => (string.IsNullOrEmpty(x)) ? 0.ToString() : x).ToList();
                     List<object> tmpOUT = new List<object>();
-                    for (j = 0; j < 12; j++)
+                    for (j = 0; j <= 11; j++)
                     {
                         if (j == 1 || j == 11)
                         {
@@ -71,7 +71,7 @@ namespace RS_Engine
                             }
                             catch
                             {
-                                tmpOUT.Add(0);
+                                tmpOUT.Add(new List<Int32>{ 0 });
                             }
                         }
                         else if (j == 5)

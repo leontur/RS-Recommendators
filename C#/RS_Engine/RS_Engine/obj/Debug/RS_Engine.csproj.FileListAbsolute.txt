@@ -5,3 +5,9 @@ C:\Users\leont\Documents\GitHub\RS-Recommendators\C#\RS_Engine\RS_Engine\bin\Deb
 C:\Users\leont\Documents\GitHub\RS-Recommendators\C#\RS_Engine\RS_Engine\obj\Debug\RS_Engine.csprojResolveAssemblyReference.cache
 C:\Users\leont\Documents\GitHub\RS-Recommendators\C#\RS_Engine\RS_Engine\obj\Debug\RS_Engine.exe
 C:\Users\leont\Documents\GitHub\RS-Recommendators\C#\RS_Engine\RS_Engine\obj\Debug\RS_Engine.pdb
+F:\Repository\GitHub\RS-Recommendators\C#\RS_Engine\RS_Engine\bin\Debug\RS_Engine.exe.config
+F:\Repository\GitHub\RS-Recommendators\C#\RS_Engine\RS_Engine\obj\Debug\RS_Engine.exe
+F:\Repository\GitHub\RS-Recommendators\C#\RS_Engine\RS_Engine\obj\Debug\RS_Engine.pdb
+F:\Repository\GitHub\RS-Recommendators\C#\RS_Engine\RS_Engine\obj\Debug\RS_Engine.csprojResolveAssemblyReference.cache
+F:\Repository\GitHub\RS-Recommendators\C#\RS_Engine\RS_Engine\bin\Debug\RS_Engine.exe
+F:\Repository\GitHub\RS-Recommendators\C#\RS_Engine\RS_Engine\bin\Debug\RS_Engine.pdb
