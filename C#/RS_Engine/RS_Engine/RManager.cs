@@ -127,6 +127,7 @@ namespace RS_Engine
                 //serialize
                 using (Stream stream = File.Open(Path.Combine(SERIALTPATH, "user_profile.bin"), FileMode.Create))
                 {
+                    RManager.outLog(" + writing serialized file " + "user_profile.bin");
                     var bformatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
                     bformatter.Serialize(stream, user_profile);
                 }
@@ -136,8 +137,8 @@ namespace RS_Engine
                 //deserialize
                 using (Stream stream = File.Open(Path.Combine(SERIALTPATH, "user_profile.bin"), FileMode.Open))
                 {
+                    RManager.outLog(" + reading serialized file " + "user_profile.bin");
                     var bformatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
-
                     user_profile = (List<List<Object>>)bformatter.Deserialize(stream);
                 }
             }

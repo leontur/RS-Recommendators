@@ -21,55 +21,69 @@ namespace RS_Engine
 
             //Creating user-user matrix
             float[][] user_user_cossim = new float[u_size][];
-            
-            //generate user row
-            for (int u = 0; u < u_size; u++)
-                user_user_cossim[u] = new float[u_size];
 
-            //POPULATE user-user matrix
-            //NOTE: triangular matrix
-            //    \  u2..
-            //  u1   ...  ...  ...
-            //  :
 
-            //info
-            RManager.outLog(" + computing user-user cos sim");
-
-            //foreach u1, u2 === user_id
-            float tmp;
-            int u1, u2;
-            for (u1 = 0; u1 < u_size; u1++)
+            //deserialize
+            using (Stream stream = File.Open(Path.Combine(RManager.SERIALTPATH, "user_user_cossim.bin"), FileMode.Open))
             {
-                //populating the row
-                for (u2 = u1; u2 < u_size; u2++)
-                {
-                    if (u1 == u2)
-                    {
-                        user_user_cossim[u1][u2] = 1;
-                    }
-                    else
-                    {
-                        tmp = computeCosineSimilarity(u1, u2);
-                        user_user_cossim[u1][u2] = tmp;
-                        user_user_cossim[u2][u1] = tmp;
-                    }
-                }
-
-                //counter
-                if (u1 % 100 == 0)
-                    Console.WriteLine(u1);
-            }
-
-            //serialize
-            using (Stream stream = File.Open(Path.Combine(RManager.SERIALTPATH, "user_user_cossim.bin"), FileMode.Create))
-            {
+                RManager.outLog(" + reading serialized file " + "user_user_cossim.bin");
                 var bformatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
-                bformatter.Serialize(stream, user_user_cossim);
+                user_user_cossim = (float[][])bformatter.Deserialize(stream);
             }
 
             /*
+
+                //generate user row
+                for (int u = 0; u < u_size; u++)
+                    user_user_cossim[u] = new float[u_size];
+
+                //POPULATE user-user matrix
+                //NOTE: triangular matrix
+                //    \  u2..
+                //  u1   ...  ...  ...
+                //  :
+
+                //info
+                RManager.outLog(" + computing user-user cos sim");
+
+                //foreach u1, u2 === user_id
+                float tmp;
+                int u1, u2;
+                for (u1 = 0; u1 < u_size; u1++)
+                {
+                    //populating the row
+                    for (u2 = u1; u2 < u_size; u2++)
+                    {
+                        if (u1 == u2)
+                        {
+                            user_user_cossim[u1][u2] = (float)1;
+                        }
+                        else
+                        {
+                            tmp = computeCosineSimilarity(u1, u2);
+                            user_user_cossim[u1][u2] = tmp;
+                            user_user_cossim[u2][u1] = tmp;
+                        }
+                    }
+
+                    //counter
+                    if (u1 % 100 == 0)
+                        Console.WriteLine(u1);
+                }
+
+                //serialize
+                using (Stream stream = File.Open(Path.Combine(RManager.SERIALTPATH, "user_user_cossim.bin"), FileMode.Create))
+                {
+                RManager.outLog(" + writing serialized file " + "user_user_cossim.bin");
+                    var bformatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+                    bformatter.Serialize(stream, user_user_cossim);
+                }
+
+                */
+
+
             //debug
-            for(int i=0; i<5; i++)
+            for (int i=0; i<5; i++)
             {
                 Console.WriteLine("\n\nROW " + i);
                 for(int j=0; j< user_user_cossim[i].Length; j++)
@@ -77,7 +91,7 @@ namespace RS_Engine
                     Console.Write(" \t " + user_user_cossim[i][j]);
                 }
             }
-            */
+            
         }
 
         //COMPUTE COSINE SIMILARITY FOR PASSED COUPLE OF ROWS IN user_profile
