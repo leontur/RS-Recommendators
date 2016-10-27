@@ -10,7 +10,7 @@ namespace RS_Engine
 {
     class RManager
     {
-        //Data structures
+        //MAIN DATA STRUCTURES (cleaned from datasets)
         public static List<List<int>> interactions = new List<List<int>>();
         public static List<List<int>> item_profile = new List<List<int>>();
         public static List<int> target_users = new List<int>();
@@ -20,9 +20,10 @@ namespace RS_Engine
         public static int EXEMODE = 0;
 
         //Unique path vars
-        private static string DATASETPATH = @"../../Datasets/";
-        private static string LOGPATH = "../../Output/result_" + DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss", CultureInfo.InvariantCulture) + ".txt"; //@"C:\RS_out\result_";
-        private static string SERIALTPATH = @"../../Serialized/";
+        private static string BACKPATH = "../../../";
+        private static string DATASETPATH = BACKPATH + "Datasets/";
+        private static string LOGPATH = BACKPATH + "Output/result_" + DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss", CultureInfo.InvariantCulture) + ".txt";
+        public static string SERIALTPATH = BACKPATH + "Serialized/";
 
         //INITIALIZE RECOMMENDER SYSTEM
         public static void initRS()
@@ -241,7 +242,7 @@ namespace RS_Engine
             }
 
             //output file name creation
-            string sub_outputFileName = "../../Output/submission_" + DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss", CultureInfo.InvariantCulture) + ".csv";
+            string sub_outputFileName = BACKPATH + "Output/submission_" + DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss", CultureInfo.InvariantCulture) + ".csv";
 
             //try to create
             try
