@@ -55,7 +55,9 @@ namespace RS_Engine
                 target_users.Add(Int32.Parse(target_users_f[i]));
 
             //check if already serialized (for fast fetching)
-            if (!File.Exists(Path.Combine(SERIALTPATH, "user_profile.bin"))) {
+            if (!File.Exists(Path.Combine(SERIALTPATH, "user_profile.bin")))
+
+            {
                 //user_profile
                 for (i = 1; i < user_profile_f.Length; i++)
                 {
@@ -127,7 +129,7 @@ namespace RS_Engine
                 //serialize
                 using (Stream stream = File.Open(Path.Combine(SERIALTPATH, "user_profile.bin"), FileMode.Create))
                 {
-                    RManager.outLog(" + writing serialized file " + "user_profile.bin");
+                    RManager.outLog("  + writing serialized file " + "user_profile.bin");
                     var bformatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
                     bformatter.Serialize(stream, user_profile);
                 }
@@ -137,7 +139,7 @@ namespace RS_Engine
                 //deserialize
                 using (Stream stream = File.Open(Path.Combine(SERIALTPATH, "user_profile.bin"), FileMode.Open))
                 {
-                    RManager.outLog(" + reading serialized file " + "user_profile.bin");
+                    RManager.outLog("  + reading serialized file " + "user_profile.bin");
                     var bformatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
                     user_profile = (List<List<Object>>)bformatter.Deserialize(stream);
                 }
@@ -150,7 +152,7 @@ namespace RS_Engine
                 //lineList.Clear();
             }
 
-            outLog(" + dataset conversion OK");
+            outLog("  + dataset conversion OK");
 
             //Info
             outLog("  -total lines | interactions >>> " + interactions.Count());
@@ -261,7 +263,7 @@ namespace RS_Engine
         //CALCULATOR
         public static void showCalculator()
         {
-            outLog(" CALCULATOR for float mxn matrices dimensions ");
+            outLog("\n CALCULATOR for float mxn matrices dimensions ");
             outLog(" >>>>>> please insert the rows number: ");
             int rn = Convert.ToInt32(Console.ReadLine());
             outLog(" >>>>>> please insert the columns number: ");

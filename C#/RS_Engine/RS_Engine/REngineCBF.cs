@@ -19,32 +19,27 @@ namespace RS_Engine
             //Getting user_profile count
             int u_size = RManager.user_profile.Count;
 
-            //Creating user-user matrix
+            //Instantiating user-user matrix
             float[][] user_user_cossim = new float[u_size][];
 
-
-            //deserialize
-            using (Stream stream = File.Open(Path.Combine(RManager.SERIALTPATH, "user_user_cossim.bin"), FileMode.Open))
+            //check if already serialized (for fast fetching)
+            if (!File.Exists(Path.Combine(RManager.SERIALTPATH, "user_user_cossim.bin")))
             {
-                RManager.outLog(" + reading serialized file " + "user_user_cossim.bin");
-                var bformatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
-                user_user_cossim = (float[][])bformatter.Deserialize(stream);
-            }
+                //alert and info
+                RManager.outLog("  >>>>>> ARE YOU SURE TO CONTINUE?  THIS IS A VERY LONG RUNNING PROGRAM (1h)");
+                Console.ReadKey();
+                RManager.outLog("  + computing user-user cos sim");
 
-            /*
+                //POPULATE user-user matrix
+                //NOTE: triangular matrix
+                //    \      ..u2..
+                //  :     1   ---  +++
+                //  u1   ---   1   ...
+                //  :    +++  ...   1
 
                 //generate user row
                 for (int u = 0; u < u_size; u++)
                     user_user_cossim[u] = new float[u_size];
-
-                //POPULATE user-user matrix
-                //NOTE: triangular matrix
-                //    \  u2..
-                //  u1   ...  ...  ...
-                //  :
-
-                //info
-                RManager.outLog(" + computing user-user cos sim");
 
                 //foreach u1, u2 === user_id
                 float tmp;
@@ -60,7 +55,10 @@ namespace RS_Engine
                         }
                         else
                         {
+                            //compute cosine similarity for these two vectors
                             tmp = computeCosineSimilarity(u1, u2);
+
+                            //copy triangular (note: memory request is double)
                             user_user_cossim[u1][u2] = tmp;
                             user_user_cossim[u2][u1] = tmp;
                         }
@@ -74,24 +72,86 @@ namespace RS_Engine
                 //serialize
                 using (Stream stream = File.Open(Path.Combine(RManager.SERIALTPATH, "user_user_cossim.bin"), FileMode.Create))
                 {
-                RManager.outLog(" + writing serialized file " + "user_user_cossim.bin");
+                    RManager.outLog("  + writing serialized file " + "user_user_cossim.bin");
                     var bformatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
                     bformatter.Serialize(stream, user_user_cossim);
                 }
 
-                */
+            }
+            else
+            {
+                //deserialize
+                using (Stream stream = File.Open(Path.Combine(RManager.SERIALTPATH, "user_user_cossim.bin"), FileMode.Open))
+                {
+                    RManager.outLog("  + reading serialized file " + "user_user_cossim.bin");
+                    var bformatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+                    user_user_cossim = (float[][])bformatter.Deserialize(stream);
+                }
+            }
 
-
+            /*
             //debug
-            for (int i=0; i<5; i++)
+            for (int i=0; i<1; i++)
             {
                 Console.WriteLine("\n\nROW " + i);
                 for(int j=0; j< user_user_cossim[i].Length; j++)
                 {
-                    Console.Write(" \t " + user_user_cossim[i][j]);
+                    Console.Write(" | " + user_user_cossim[i][j]);
                 }
             }
-            
+            */
+
+
+            //////////////////////////////////////////////////////////////////////
+
+            //generating items to recommend for each user
+            List<List<int>> user_user_cossim_out = new List<List<int>>();
+
+            //for each user to recommend
+            foreach (var u in RManager.target_users)
+            {
+                //getting index of this user
+                int uix = RManager.user_profile.FindIndex(x => (int)x[0] == u);
+
+                //getting top 5 for this user (without considering 1=himself in first position)
+                // transforming the line to a pair (value, index) array
+                // the value is a float, the index a int
+                // the index is used to find the id of the matched user
+                var sorted_curr_user_line = user_user_cossim[uix]
+                                            .Select((x, i) => new KeyValuePair<float, int>(x, i))
+                                            .OrderByDescending(x => x.Key)
+                                            .Take(6)
+                                            .ToList();
+                sorted_curr_user_line.RemoveAt(0);
+                List<float> topforuser = sorted_curr_user_line.Select(x => x.Key).ToList();
+                List<int> useroriginalindex = sorted_curr_user_line.Select(x => x.Value).ToList();
+
+                //retrieving indexes of the users to recommend
+                List<int> rix = new List<int>();
+                foreach (var i in useroriginalindex)
+                    rix.Add((int)RManager.user_profile[i][0]);
+
+                /*
+                //debug
+                Console.WriteLine("\n  >>> index of " + u + " in the cossim array is " + uix);
+                Console.WriteLine("\n  >>> recommendations:");
+                foreach(var z in topforuser)
+                    Console.Write(" " + z);
+                Console.WriteLine("\n  >>> original index:");
+                foreach (var z in useroriginalindex)
+                    Console.Write(" " + z);
+                Console.WriteLine("\n  >>> retrieved users:");
+                foreach (var z in rix)
+                    Console.Write(" " + z);
+                Console.ReadKey();
+                */
+
+                //saving for output
+                user_user_cossim_out.Add(rix);
+            }
+
+            //OUTPUT_SUBMISSION
+            RManager.exportRecToSubmit(RManager.target_users, user_user_cossim_out);
         }
 
         //COMPUTE COSINE SIMILARITY FOR PASSED COUPLE OF ROWS IN user_profile

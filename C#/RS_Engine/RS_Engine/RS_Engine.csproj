@@ -78,6 +78,7 @@
     <None Include="Datasets\user_profile.csv" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Output\" />
     <Folder Include="Serialized\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
