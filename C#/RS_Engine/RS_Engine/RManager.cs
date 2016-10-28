@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -28,41 +29,88 @@ namespace RS_Engine
         //INITIALIZE RECOMMENDER SYSTEM
         public static void initRS()
         {
-            //Data init
-            outLog(" + reading entire dataset");
-            var interactions_f = File.ReadAllLines(DATASETPATH + "interactions" + ".csv");
-            var item_profile_f = File.ReadAllLines(DATASETPATH + "item_profile" + ".csv");
-            var target_users_f = File.ReadAllLines(DATASETPATH + "target_users" + ".csv");
-            var user_profile_f = File.ReadAllLines(DATASETPATH + "user_profile" + ".csv");
-            outLog(" + dataset read OK");
-
-            //Info
-            outLog("  -total lines | interactions_f >>> " + interactions_f.Count());
-            outLog("  -total lines | item_profile_f >>> " + item_profile_f.Count());
-            outLog("  -total lines | target_users_f >>> " + target_users_f.Count());
-            outLog("  -total lines | user_profile_f >>> " + user_profile_f.Count());
-
             //Data conversion
-            outLog(" + dataset conversion");
-
-            //Converting.. (starting from 1 to remove header)
             int i, j;
+            var bformatter = new BinaryFormatter();
+            outLog("  + initializing dataset retrievement ");
+
+            //CONVERSIONS.. (starting from 1 to remove header)
+            // for someone: check if already serialized (for fast fetching)
+
+            //////////////
             //interactions
-            for (i = 1; i < interactions_f.Length; i++)
-                interactions.Add(interactions_f[i].Split('\t').Select(Int32.Parse).ToList());
-            //target_users
-            for (i = 1; i < target_users_f.Length; i++)
-                target_users.Add(Int32.Parse(target_users_f[i]));
-
-            //check if already serialized (for fast fetching)
-            if (!File.Exists(Path.Combine(SERIALTPATH, "user_profile.bin")))
-
+            if (!File.Exists(Path.Combine(SERIALTPATH, "interactions.bin")))
             {
-                //user_profile
+                //Data init
+                outLog("  + reading dataset: " + "interactions");
+                var interactions_f = File.ReadAllLines(DATASETPATH + "interactions" + ".csv");
+                outLog("  + dataset read OK | interactions_f count= " + interactions_f.Count() + " | conversion..");
+
+                //scroll file
+                for (i = 1; i < interactions_f.Length; i++)
+                    interactions.Add(interactions_f[i].Split('\t').Select(Int32.Parse).ToList());
+
+                //serialize
+                using (Stream stream = File.Open(Path.Combine(SERIALTPATH, "interactions.bin"), FileMode.Create))
+                {
+                    RManager.outLog("  + writing serialized file " + "interactions.bin");
+                    bformatter.Serialize(stream, interactions);
+                }
+            }
+            else
+            {
+                //deserialize
+                using (Stream stream = File.Open(Path.Combine(SERIALTPATH, "interactions.bin"), FileMode.Open))
+                {
+                    RManager.outLog("  + reading serialized file " + "interactions.bin");
+                    interactions = (List<List<int>>)bformatter.Deserialize(stream);
+                }
+            }
+
+            //////////////
+            //target_users
+            if (!File.Exists(Path.Combine(SERIALTPATH, "target_users.bin")))
+            {
+                //Data init
+                outLog("  + reading dataset: " + "target_users");
+                var target_users_f = File.ReadAllLines(DATASETPATH + "target_users" + ".csv");
+                outLog("  + dataset read OK | target_users_f count= " + target_users_f.Count() + " | conversion..");
+
+                //scroll file
+                for (i = 1; i < target_users_f.Length; i++)
+                    target_users.Add(Int32.Parse(target_users_f[i]));
+
+                //serialize
+                using (Stream stream = File.Open(Path.Combine(SERIALTPATH, "target_users.bin"), FileMode.Create))
+                {
+                    RManager.outLog("  + writing serialized file " + "target_users.bin");
+                    bformatter.Serialize(stream, target_users);
+                }
+            }
+            else
+            {
+                //deserialize
+                using (Stream stream = File.Open(Path.Combine(SERIALTPATH, "target_users.bin"), FileMode.Open))
+                {
+                    RManager.outLog("  + reading serialized file " + "target_users.bin");
+                    target_users = (List<int>)bformatter.Deserialize(stream);
+                }
+            }
+
+            //////////////
+            //user_profile
+            if (!File.Exists(Path.Combine(SERIALTPATH, "user_profile.bin")))
+            {
+                //Data init
+                outLog("  + reading dataset: " + "user_profile");
+                var user_profile_f = File.ReadAllLines(DATASETPATH + "user_profile" + ".csv");
+                outLog("  + dataset read OK | user_profile_f count= " + user_profile_f.Count() + " | conversion..");
+
+                //scroll file
                 for (i = 1; i < user_profile_f.Length; i++)
                 {
-                    List<string> tmpIN = user_profile_f[i].Split('\t').Select(x => (string.IsNullOrEmpty(x)) ? 0.ToString() : x).ToList();
-                    List<object> tmpOUT = new List<object>();
+                    List<string> usr_row_tmpIN = user_profile_f[i].Split('\t').Select(x => (string.IsNullOrEmpty(x)) ? 0.ToString() : x).ToList();
+                    List<object> usr_row_tmpOUT = new List<object>();
                     for (j = 0; j <= 11; j++)
                     {
                         if (j == 1 || j == 11)
@@ -70,11 +118,11 @@ namespace RS_Engine
                             //from obj to list
                             try
                             {
-                                tmpOUT.Add(tmpIN[j].Split(',').Select(Int32.Parse).ToList().Cast<Int32>().ToList());
+                                usr_row_tmpOUT.Add(usr_row_tmpIN[j].Split(',').Select(Int32.Parse).ToList().Cast<Int32>().ToList());
                             }
                             catch
                             {
-                                tmpOUT.Add(new List<Int32>{ 0 });
+                                usr_row_tmpOUT.Add(new List<Int32>{ 0 });
                             }
                         }
                         else if (j == 5)
@@ -84,27 +132,28 @@ namespace RS_Engine
                             // at -> 2
                             // ch -> 3
                             // non_dach -> 0
-                            tmpOUT.Add(
-                                tmpIN[j] == "de" ? 1 :
-                                tmpIN[j] == "at" ? 2 :
-                                tmpIN[j] == "ch" ? 3 :
-                                tmpIN[j] == "non_dach" ? 0 : 0
+                            usr_row_tmpOUT.Add(
+                                usr_row_tmpIN[j] == "de" ? 1 :
+                                usr_row_tmpIN[j] == "at" ? 2 :
+                                usr_row_tmpIN[j] == "ch" ? 3 :
+                                usr_row_tmpIN[j] == "non_dach" ? 0 : 0
                                 );
                         }
                         else
                         {
                             try
                             {
-                                tmpOUT.Add(Int32.Parse(tmpIN[j]));
+                                usr_row_tmpOUT.Add(Int32.Parse(usr_row_tmpIN[j]));
                             }
                             catch
                             {
-                                tmpOUT.Add(0);
+                                usr_row_tmpOUT.Add(0);
                             }
                         }
                     }
 
-                    user_profile.Add(tmpOUT);
+                    //add tmp to data structure
+                    user_profile.Add(usr_row_tmpOUT);
 
                     //counter
                     if (i % 1000 == 0)
@@ -125,40 +174,66 @@ namespace RS_Engine
                     */
                 }
 
-
                 //serialize
                 using (Stream stream = File.Open(Path.Combine(SERIALTPATH, "user_profile.bin"), FileMode.Create))
                 {
                     RManager.outLog("  + writing serialized file " + "user_profile.bin");
-                    var bformatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
                     bformatter.Serialize(stream, user_profile);
                 }
 
-            } else {
-
+            }
+            else
+            {
                 //deserialize
                 using (Stream stream = File.Open(Path.Combine(SERIALTPATH, "user_profile.bin"), FileMode.Open))
                 {
                     RManager.outLog("  + reading serialized file " + "user_profile.bin");
-                    var bformatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
                     user_profile = (List<List<Object>>)bformatter.Deserialize(stream);
                 }
             }
 
-            for (i = 1; i < item_profile_f.Length; i++)
+            /*
+            //////////////
+            //item_profile
+            if (!File.Exists(Path.Combine(SERIALTPATH, "item_profile.bin")))
             {
-                //lineList = item_profile_f[i].Split('\t').Select(Int32.Parse).ToList(); <<<attenzione ai tipi!
-                //item_profile.Add(lineList);
-                //lineList.Clear();
-            }
+                //Data init
+                outLog("  + reading dataset: " + "item_profile");
+                var item_profile_f = File.ReadAllLines(DATASETPATH + "item_profile" + ".csv");
+                outLog("  + dataset read OK | item_profile_f count= " + item_profile_f.Count() + " | conversion..");    
 
-            outLog("  + dataset conversion OK");
+                //scroll file
+                for (i = 1; i < item_profile_f.Length; i++)
+                {
+                    ///TODO
+                    ///item_profile.Add(...)
+                }
+
+                //serialize
+                using (Stream stream = File.Open(Path.Combine(SERIALTPATH, "item_profile.bin"), FileMode.Create))
+                {
+                    RManager.outLog("  + writing serialized file " + "item_profile.bin");
+                    bformatter.Serialize(stream, item_profile);
+                }
+            }
+            else
+            {
+                //deserialize
+                using (Stream stream = File.Open(Path.Combine(SERIALTPATH, "item_profile.bin"), FileMode.Open))
+                {
+                    RManager.outLog("  + reading serialized file " + "item_profile.bin");
+                    item_profile = (List<List<Object>>)bformatter.Deserialize(stream);
+                }
+            }
+            */
 
             //Info
+            outLog("  + all datasets conversion: OK");
             outLog("  -total lines | interactions >>> " + interactions.Count());
             outLog("  -total lines | item_profile >>> " + item_profile.Count());
             outLog("  -total lines | target_users >>> " + target_users.Count());
             outLog("  -total lines | user_profile >>> " + user_profile.Count());
+            outLog("");
 
             /*
             //debug
@@ -184,10 +259,11 @@ namespace RS_Engine
 
             //display menu
             outLog("    1) calculate TOP recommendations");
-            outLog("    2) CBF");
+            outLog("    2) CF");
             outLog("    3) ..");
             outLog("     ) ..");
-            outLog("    9) bin calculator");
+            outLog("     ) ..");
+            outLog("    9) .bin size calculator");
 
             //notices
             outLog("    (long running program)");
@@ -197,7 +273,6 @@ namespace RS_Engine
             EXEMODE = Convert.ToInt32(Console.ReadLine());
 
             //display selection
-            outLog("");
             outLog(string.Format("    ==> selected program ({0})", EXEMODE));
             outLog("-----------------------------------------------------------------");
         }

@@ -7,14 +7,22 @@ using System.Threading.Tasks;
 
 namespace RS_Engine
 {
-    class REngineCBF
+    class REngineCF
     {
+        //ALGORITHM PARAMETERS
+        //number of cosine to select (for each user to be recommended)
+        private const int COS_RANGE = 50;
+        //weights for cosine similarity (weighted average)
+        private const double COS_W_1 = 0.05;
+        private const double COS_W_2 = 0.80;
+        private const double COS_W_3 = 0.15;
 
+        //MAIN ALGORITHM METHOD
         public static void getRecommendations()
         {
             //info
             RManager.outLog("  + processing..");
-            RManager.outLog("  + computing CBF.. ");
+            RManager.outLog("  + computing CF.. ");
 
             //Getting user_profile count
             int u_size = RManager.user_profile.Count;
@@ -30,12 +38,14 @@ namespace RS_Engine
                 Console.ReadKey();
                 RManager.outLog("  + computing user-user cos sim");
 
-                //POPULATE user-user matrix
-                //NOTE: triangular matrix
-                //    \      ..u2..
-                //  :     1   ---  +++
-                //  u1   ---   1   ...
-                //  :    +++  ...   1
+                //POPULATE user_user matrix
+                // NOTE:
+                //  triangular matrix 
+                //  create a jagged matrix to have half memory consumption
+                //    \  u2..
+                //  u1    1   ...   ...
+                //  :          1    ...
+                //                   1
 
                 //generate user row
                 for (int u = 0; u < u_size; u++)
@@ -110,7 +120,7 @@ namespace RS_Engine
             //generating items to recommend for each user
             List<List<int>> user_user_cossim_out = new List<List<int>>();
 
-            //for each user to recommend
+            //for each user to recommend (u: is the id of the target user)
             int c = 0;
             foreach (var u in RManager.target_users)
             {
@@ -122,14 +132,14 @@ namespace RS_Engine
                 //getting index of this user
                 int uix = RManager.user_profile.FindIndex(x => (int)x[0] == u);
 
-                //getting top 5 for this user (without considering 1=himself in first position)
+                //getting top 'take_cos' for this user (without considering 1=himself in first position)
                 // transforming the line to a pair (value, index) array
                 // the value is a float, the index a int
                 // the index is used to find the id of the matched user
                 var sorted_curr_user_line = user_user_cossim[uix]
                                             .Select((x, i) => new KeyValuePair<float, int>(x, i))
                                             .OrderByDescending(x => x.Key)
-                                            .Take(6)
+                                            .Take(COS_RANGE)
                                             .ToList();
                 sorted_curr_user_line.RemoveAt(0);
                 List<float> topforuser = sorted_curr_user_line.Select(x => x.Key).ToList();
@@ -140,12 +150,18 @@ namespace RS_Engine
                 foreach (var i in useroriginalindex)
                     similar_users.Add((int)RManager.user_profile[i][0]);
 
-                //retrieving interactions of each user to recommend (and merging)
+                //retrieving interactions done by each user to recommend (and merging to select most populars)
                 List<int> interactions_of_similar_users = new List<int>();
                 foreach (var i in similar_users)
                     foreach (var j in RManager.interactions)
                         if (j[0] == i)
                             interactions_of_similar_users.Add(j[1]);
+
+                //ADVANCED FILTER
+                //retrieving interactions already clicked by the current user (not recommendig an item already clicked)
+                List<int> already_clicked = RManager.interactions.Where(i => i[0] == u).Select(i => i[1]).ToList();
+                //removing already clicked
+                interactions_of_similar_users = interactions_of_similar_users.Except(already_clicked).ToList();
 
                 //selecting most clicked items (top 5)
                 var interactions_of_similar_users_group_by = interactions_of_similar_users
@@ -183,11 +199,6 @@ namespace RS_Engine
         //COMPUTE COSINE SIMILARITY FOR PASSED COUPLE OF ROWS IN user_profile
         private static float computeCosineSimilarity(int r1, int r2) {
             
-            //weights for cosine similarity weighted average
-            double w_cos1 = 0.2;
-            double w_cos2 = 0.5;
-            double w_cos3 = 0.3;
-
             //COS SIMILARITY
             //for calculation of: user_profile[row][1]
             double cos1 = 0;
@@ -291,7 +302,7 @@ namespace RS_Engine
 
             //compute total cos sim for the couples of passed rows
             //double cos_sum = cos1 + cos2 + cos3;
-            double cos_w_avg = (cos1 * w_cos1 + cos2 * w_cos2 + cos3 * w_cos3) / 3;
+            double cos_w_avg = (cos1 * COS_W_1 + cos2 * COS_W_2 + cos3 * COS_W_3) / 3;
 
             /*
             //debug

@@ -27,7 +27,6 @@
   + computing CBF.. 
   + reading serialized file user_user_cossim.bin
   + generating output recommendation structured data
-  - user: 0
   - user: 100
   - user: 200
   - user: 300
@@ -127,7 +126,8 @@
   - user: 9700
   - user: 9800
   - user: 9900
+  - user: 10000
  >>>>>> generating output file, wait a minute..
- >>>>>> output submission file created: ../../../Output/submission_2016-10-28_19-06-07.csv
+ >>>>>> output submission file created: ../../../Output/submission_2016-10-28_19-54-18.csv
  >>>>>> halting RS..
- >>>>>> log saved to ../../../Output/result_2016-10-28_18-59-17.txt  :) 
+ >>>>>> log saved to ../../../Output/result_2016-10-28_19-43-26.txt  :) 

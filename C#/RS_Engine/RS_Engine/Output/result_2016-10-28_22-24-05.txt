@@ -1,9 +1,14 @@
  ** RECOMMENDATORS ENGINE **
 -----------------------------------------------------------------
     1) calculate TOP recommendations
-    2) CBF
+    2) CF
     3) ..
      ) ..
-    9) bin calculator
+     ) ..
+    9) .bin size calculator
     (long running program)
 -----------------------------------------------------------------
+    ==> selected program (2)
+-----------------------------------------------------------------
+  + initializing dataset retrievement 
+  + reading serialized file interactions.bin

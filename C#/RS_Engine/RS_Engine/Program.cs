@@ -36,8 +36,8 @@ namespace RS_Engine
             }
             else if (RManager.EXEMODE == 2)
             {
-                //PROCESSING - CBF
-                REngineCBF.getRecommendations();
+                //PROCESSING - CF
+                REngineCF.getRecommendations();
             }
             else if (RManager.EXEMODE == 3)
             {

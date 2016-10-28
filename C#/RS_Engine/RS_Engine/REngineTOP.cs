@@ -8,6 +8,7 @@ namespace RS_Engine
 {
     class REngineTOP
     {
+        //MAIN ALGORITHM METHOD
         public static void getRecommendations()
         {
             //MAX COUNT
