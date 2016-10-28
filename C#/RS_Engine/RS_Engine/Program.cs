@@ -44,6 +44,11 @@ namespace RS_Engine
                 //PROCESSING - XXX
                 ;
             }
+            else if (RManager.EXEMODE == 9)
+            {
+                //PROCESSING - CALCULATOR
+                RManager.showCalculator();
+            }
             else { ; }
 
             //HALT RS

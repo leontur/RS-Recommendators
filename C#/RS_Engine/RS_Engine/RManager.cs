@@ -184,7 +184,8 @@ namespace RS_Engine
             outLog("    1) calculate TOP recommendations");
             outLog("    2) CBF");
             outLog("    3) ..");
-            outLog("    4) ..");
+            outLog("     ) ..");
+            outLog("    9) bin calculator");
 
             //notices
             outLog("    (long running program)");
@@ -257,6 +258,17 @@ namespace RS_Engine
             }
         }
 
+        //CALCULATOR
+        public static void showCalculator()
+        {
+            outLog(" CALCULATOR for float mxn matrices dimensions ");
+            outLog(" >>>>>> please insert the rows number: ");
+            int rn = Convert.ToInt32(Console.ReadLine());
+            outLog(" >>>>>> please insert the columns number: ");
+            int cn = Convert.ToInt32(Console.ReadLine());
+            long mb = (32L * rn * cn) / (8 * 1000 * 1000);
+            outLog(" >>>>>> output bin dimension (about): " + mb + " MB");
+        }
 
         //LOGGER
         //log in console and in file for every program run
