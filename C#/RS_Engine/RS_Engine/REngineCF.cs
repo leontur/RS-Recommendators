@@ -40,24 +40,22 @@ namespace RS_Engine
 
                 //POPULATE user_user matrix
                 // NOTE:
-                //  triangular matrix 
-                //  create a jagged matrix to have half memory consumption
+                //  triangular matrix: create a jagged matrix to have half memory consumption
                 //    \  u2..
-                //  u1    1   ...   ...
-                //  :          1    ...
-                //                   1
+                //  u1     1   
+                //  :     ...      1    
+                //        ...     ...      1
 
-                //generate user row
-                for (int u = 0; u < u_size; u++)
-                    user_user_cossim[u] = new float[u_size];
-
-                //foreach u1, u2 === user_id
-                float tmp;
-                int u1, u2;
+                //foreach u1, u2 === user_profile list index
+                int u1, u2, r_sz;
                 for (u1 = 0; u1 < u_size; u1++)
                 {
+                    //generate user row
+                    r_sz = u1 + 1;
+                    user_user_cossim[u1] = new float[r_sz];
+
                     //populating the row
-                    for (u2 = u1; u2 < u_size; u2++)
+                    for (u2 = 0; u2 < r_sz; u2++)
                     {
                         if (u1 == u2)
                         {
@@ -66,11 +64,7 @@ namespace RS_Engine
                         else
                         {
                             //compute cosine similarity for these two vectors
-                            tmp = computeCosineSimilarity(u1, u2);
-
-                            //copy triangular (note: memory request is double)
-                            user_user_cossim[u1][u2] = tmp;
-                            user_user_cossim[u2][u1] = tmp;
+                            user_user_cossim[u1][u2] = computeCosineSimilarity(u1, u2);
                         }
                     }
 
@@ -121,7 +115,7 @@ namespace RS_Engine
             List<List<int>> user_user_cossim_out = new List<List<int>>();
 
             //for each user to recommend (u: is the id of the target user)
-            int c = 0;
+            int c = 0, m;
             foreach (var u in RManager.target_users)
             {
                 //couter
@@ -132,11 +126,16 @@ namespace RS_Engine
                 //getting index of this user
                 int uix = RManager.user_profile.FindIndex(x => (int)x[0] == u);
 
-                //getting top 'take_cos' for this user (without considering 1=himself in first position)
+                //from the triangular jagged matrix, retrieve the complete list of cosines for the current user
+                float[] curr_user_line = new float[u_size];
+                for (m = 0; m < u_size; m++)
+                    curr_user_line[m] = (m <= uix) ? user_user_cossim[uix][m] : user_user_cossim[m][uix];
+
+                //getting top COS_RANGE for this user (without considering 1=himself in first position)
                 // transforming the line to a pair (value, index) array
                 // the value is a float, the index a int
                 // the index is used to find the id of the matched user
-                var sorted_curr_user_line = user_user_cossim[uix]
+                var sorted_curr_user_line = curr_user_line
                                             .Select((x, i) => new KeyValuePair<float, int>(x, i))
                                             .OrderByDescending(x => x.Key)
                                             .Take(COS_RANGE)
