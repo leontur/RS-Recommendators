@@ -43,6 +43,9 @@ namespace RS_Engine
 
             //////////////////////////////////////////////////////////////////////
 
+            //info
+            RManager.outLog("  + generating output recommendation structured data");
+
             //generating items to recommend for each user
             List<List<int>> interactions_top_out = new List<List<int>>();
             foreach(var u in RManager.target_users)

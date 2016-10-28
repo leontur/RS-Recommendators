@@ -104,12 +104,20 @@ namespace RS_Engine
 
             //////////////////////////////////////////////////////////////////////
 
+            //info
+            RManager.outLog("  + generating output recommendation structured data");
+
             //generating items to recommend for each user
             List<List<int>> user_user_cossim_out = new List<List<int>>();
 
             //for each user to recommend
+            int c = 0;
             foreach (var u in RManager.target_users)
             {
+                //couter
+                if (c % 100 == 0)
+                    RManager.outLog("  - user: " + c);
+
                 //getting index of this user
                 int uix = RManager.user_profile.FindIndex(x => (int)x[0] == u);
 
@@ -148,6 +156,9 @@ namespace RS_Engine
 
                 //saving for output
                 user_user_cossim_out.Add(rix);
+
+                //counter
+                c++;
             }
 
             //OUTPUT_SUBMISSION
