@@ -115,6 +115,7 @@ namespace RS_Engine
             foreach (var u in RManager.target_users)
             {
                 //couter
+                c++;
                 if (c % 100 == 0)
                     RManager.outLog("  - user: " + c);
 
@@ -135,9 +136,23 @@ namespace RS_Engine
                 List<int> useroriginalindex = sorted_curr_user_line.Select(x => x.Value).ToList();
 
                 //retrieving indexes of the users to recommend
-                List<int> rix = new List<int>();
+                List<int> similar_users = new List<int>();
                 foreach (var i in useroriginalindex)
-                    rix.Add((int)RManager.user_profile[i][0]);
+                    similar_users.Add((int)RManager.user_profile[i][0]);
+
+                //retrieving interactions of each user to recommend (and merging)
+                List<int> interactions_of_similar_users = new List<int>();
+                foreach (var i in similar_users)
+                    foreach (var j in RManager.interactions)
+                        if (j[0] == i)
+                            interactions_of_similar_users.Add(j[1]);
+
+                //selecting most clicked items (top 5)
+                var interactions_of_similar_users_group_by = interactions_of_similar_users
+                                                            .GroupBy(i => i)
+                                                            .OrderByDescending(grp => grp.Count())
+                                                            .Take(5);
+                List<int> interactions_of_similar_users_top = interactions_of_similar_users_group_by.Select(x => x.Key).ToList();
 
                 /*
                 //debug
@@ -149,16 +164,16 @@ namespace RS_Engine
                 foreach (var z in useroriginalindex)
                     Console.Write(" " + z);
                 Console.WriteLine("\n  >>> retrieved users:");
-                foreach (var z in rix)
+                foreach (var z in similar_users)
+                    Console.Write(" " + z);
+                Console.WriteLine("\n  >>> retrieved top items:");
+                foreach (var z in interactions_of_similar_users_top)
                     Console.Write(" " + z);
                 Console.ReadKey();
                 */
 
                 //saving for output
-                user_user_cossim_out.Add(rix);
-
-                //counter
-                c++;
+                user_user_cossim_out.Add(interactions_of_similar_users_top);
             }
 
             //OUTPUT_SUBMISSION
