@@ -1,31 +1,36 @@
  ** RECOMMENDATORS ENGINE **
 -----------------------------------------------------------------
     1) calculate TOP recommendations
-    2) CBF
+    2) CF
     3) ..
      ) ..
-    9) bin calculator
+     ) ..
+    9) .bin size calculator
     (long running program)
 -----------------------------------------------------------------
-
     ==> selected program (2)
 -----------------------------------------------------------------
- + reading entire dataset
- + dataset read OK
-  -total lines | interactions_f >>> 546865
-  -total lines | item_profile_f >>> 167957
-  -total lines | target_users_f >>> 10001
-  -total lines | user_profile_f >>> 40001
- + dataset conversion
-  + reading serialized file user_profile.bin
-  + dataset conversion OK
+  + initializing dataset retrievement 
+  + reading dataset: interactions
+  + dataset read OK | interactions_f count= 546865 | conversion..
+  + writing serialized file interactions.bin
+  + reading dataset: target_users
+  + dataset read OK | target_users_f count= 10001 | conversion..
+  + writing serialized file target_users.bin
+  + reading dataset: user_profile
+  + dataset read OK | user_profile_f count= 40001 | conversion..
+  + writing serialized file user_profile.bin
+  + all datasets conversion: OK
   -total lines | interactions >>> 546864
   -total lines | item_profile >>> 0
   -total lines | target_users >>> 10000
   -total lines | user_profile >>> 40000
+
   + processing..
-  + computing CBF.. 
-  + reading serialized file user_user_cossim.bin
+  + computing CF.. 
+  >>>>>> ARE YOU SURE TO CONTINUE?  THIS IS A VERY LONG RUNNING PROGRAM (1h)
+  + computing user-user cos sim
+  + writing serialized file user_user_cossim.bin
   + generating output recommendation structured data
   - user: 100
   - user: 200
@@ -128,6 +133,6 @@
   - user: 9900
   - user: 10000
  >>>>>> generating output file, wait a minute..
- >>>>>> output submission file created: ../../../Output/submission_2016-10-28_19-54-18.csv
+ >>>>>> output submission file created: ../../../Output/submission_2016-10-29_02-00-55.csv
  >>>>>> halting RS..
- >>>>>> log saved to ../../../Output/result_2016-10-28_19-43-26.txt  :) 
+ >>>>>> log saved to ../../../Output/result_2016-10-28_23-40-56.txt  :) 

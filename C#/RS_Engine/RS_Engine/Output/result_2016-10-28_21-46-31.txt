@@ -1,9 +1,0 @@
- ** RECOMMENDATORS ENGINE **
------------------------------------------------------------------
-    1) calculate TOP recommendations
-    2) CF
-    3) ..
-     ) ..
-    9) bin calculator
-    (long running program)
------------------------------------------------------------------
