@@ -109,7 +109,7 @@ namespace RS_Engine
             //////////////////////////////////////////////////////////////////////
 
             //info
-            RManager.outLog("  + generating output recommendation structured data");
+            RManager.outLog("  + generating output structured data");
 
             //generating items to recommend for each user
             List<List<int>> user_user_cossim_out = new List<List<int>>();
@@ -118,10 +118,12 @@ namespace RS_Engine
             int c = 0, m;
             foreach (var u in RManager.target_users)
             {
-                //couter
-                c++;
-                if (c % 100 == 0)
-                    RManager.outLog("  - user: " + c);
+                //timer
+                //RTimer.TimerStart();
+
+                //counter
+                if (++c % 100 == 0)
+                    RManager.outLog(string.Format("\r - user: {0}", c), true);
 
                 //getting index of this user
                 int uix = RManager.user_profile.FindIndex(x => (int)x[0] == u);
@@ -169,6 +171,9 @@ namespace RS_Engine
                                                             .Take(5);
                 List<int> interactions_of_similar_users_top = interactions_of_similar_users_group_by.Select(x => x.Key).ToList();
 
+                //saving for output
+                user_user_cossim_out.Add(interactions_of_similar_users_top);
+
                 /*
                 //debug
                 Console.WriteLine("\n  >>> index of " + u + " in the cossim array is " + uix);
@@ -185,10 +190,10 @@ namespace RS_Engine
                 foreach (var z in interactions_of_similar_users_top)
                     Console.Write(" " + z);
                 Console.ReadKey();
+                
+                //timer
+                RTimer.TimerEndResult("foreach user_user_cossim_out");
                 */
-
-                //saving for output
-                user_user_cossim_out.Add(interactions_of_similar_users_top);
             }
 
             //OUTPUT_SUBMISSION
@@ -398,41 +403,6 @@ namespace RS_Engine
             return output;
         }
         */
-
-        /* TEMP::
-         //Progress counter
-         float counter = 1;
-         int total = item_profile_f.Count();
-         float progress = 0;
-
-         //SCROLLING
-         foreach (var ip_line in item_profile)
-         {
-             //avoiding blank lines
-             if (ip_line == "") continue;
-
-             //progress status
-             progress = (float)(counter * 100 / total);
-             Console.Write("\r     ..running: line {1} of {2}  |  {0}%", progress.ToString("0.00"), counter, total);
-
-             //debug
-             Console.WriteLine(" >>>> LINE = " + ip_line);
-
-             //DO STUFF
-
-             //cycle counter
-             counter++;
-
-             //debug, only first line run
-             //break;
-         }
-         //line > next
-
-
-         //preparing top matches matrices
-         List<List<object>> valuesMatrix10 = new List<List<object>>();
-         */
-
 
     }
 }

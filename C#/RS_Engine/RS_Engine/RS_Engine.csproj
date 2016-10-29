@@ -66,8 +66,10 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="REngineCF.cs" />
+    <Compile Include="REngineEVAL.cs" />
     <Compile Include="REngineTOP.cs" />
     <Compile Include="RManager.cs" />
+    <Compile Include="RUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

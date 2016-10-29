@@ -27,6 +27,9 @@ namespace RS_Engine
             //START RS
             RManager.initRS();
 
+            //Info
+            RManager.outLog("  + running program " + RManager.EXEMODE);
+
             //CHOICE SELECTOR
             //ALGORITHM INVOKER
             if (RManager.EXEMODE == 1)

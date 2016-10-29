@@ -32,40 +32,22 @@ namespace RS_Engine
             //Data conversion
             int i, j;
             var bformatter = new BinaryFormatter();
+            outLog("  + initializing RS ");
             outLog("  + initializing dataset retrievement ");
 
             //CONVERSIONS.. (starting from 1 to remove header)
             // for someone: check if already serialized (for fast fetching)
 
             //////////////
-            //interactions
-            if (!File.Exists(Path.Combine(SERIALTPATH, "interactions.bin")))
-            {
-                //Data init
-                outLog("  + reading dataset: " + "interactions");
-                var interactions_f = File.ReadAllLines(DATASETPATH + "interactions" + ".csv");
-                outLog("  + dataset read OK | interactions_f count= " + interactions_f.Count() + " | conversion..");
+            //interactions (not serialized due to poor performances)
+            //Data init
+            outLog("  + reading dataset: " + "interactions");
+            var interactions_f = File.ReadAllLines(DATASETPATH + "interactions" + ".csv");
+            outLog("  + dataset read OK | interactions_f count= " + interactions_f.Count() + " | conversion..");
 
-                //scroll file
-                for (i = 1; i < interactions_f.Length; i++)
-                    interactions.Add(interactions_f[i].Split('\t').Select(Int32.Parse).ToList());
-
-                //serialize
-                using (Stream stream = File.Open(Path.Combine(SERIALTPATH, "interactions.bin"), FileMode.Create))
-                {
-                    RManager.outLog("  + writing serialized file " + "interactions.bin");
-                    bformatter.Serialize(stream, interactions);
-                }
-            }
-            else
-            {
-                //deserialize
-                using (Stream stream = File.Open(Path.Combine(SERIALTPATH, "interactions.bin"), FileMode.Open))
-                {
-                    RManager.outLog("  + reading serialized file " + "interactions.bin");
-                    interactions = (List<List<int>>)bformatter.Deserialize(stream);
-                }
-            }
+            //scroll file
+            for (i = 1; i < interactions_f.Length; i++)
+                interactions.Add(interactions_f[i].Split('\t').Select(Int32.Parse).ToList());
 
             //////////////
             //target_users
@@ -349,15 +331,21 @@ namespace RS_Engine
 
         //LOGGER
         //log in console and in file for every program run
-        public static void outLog(string s)
+        public static void outLog(string s, bool inline = false)
         {
             //write on console
-            Console.WriteLine(s);
+            if(inline)
+                Console.Write(s);
+            else
+                Console.WriteLine(s);
 
             //try to append
             try
             {
-                File.AppendAllText(LOGPATH, s + Environment.NewLine);
+                if (inline)
+                    File.AppendAllText(LOGPATH, s);
+                else
+                    File.AppendAllText(LOGPATH, s + Environment.NewLine);
             }
             catch
             {
