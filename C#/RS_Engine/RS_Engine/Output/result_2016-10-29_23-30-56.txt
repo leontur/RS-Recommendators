@@ -1,0 +1,69 @@
+ ** RECOMMENDATORS ENGINE **
+-----------------------------------------------------------------
+    1) calculate TOP recommendations
+    2) CBF
+    3) CF
+     ) ..
+     ) ..
+     ) ..
+    9) .bin size calculator
+    (long running program)
+-----------------------------------------------------------------
+    ==> selected program (2)
+-----------------------------------------------------------------
+  + initializing RS 
+  + initializing dataset retrievement 
+  + reading dataset: interactions
+  + dataset read OK | interactions_f count= 546865 | conversion..
+  + reading serialized file target_users.bin
+  + reading dataset: user_profile
+  + dataset read OK | user_profile_f count= 40001 | conversion..
+ -line: 1000 -line: 2000 -line: 3000 -line: 4000 -line: 5000 -line: 6000 -line: 7000 -line: 8000 -line: 9000 -line: 10000 -line: 11000 -line: 12000 -line: 13000 -line: 14000 -line: 15000 -line: 16000 -line: 17000 -line: 18000 -line: 19000 -line: 20000 -line: 21000 -line: 22000 -line: 23000 -line: 24000 -line: 25000 -line: 26000 -line: 27000 -line: 28000 -line: 29000 -line: 30000 -line: 31000 -line: 32000 -line: 33000 -line: 34000 -line: 35000 -line: 36000 -line: 37000 -line: 38000 -line: 39000 -line: 40000  + writing serialized file user_profile.bin
+  + reading dataset: item_profile
+  + dataset read OK | item_profile_f count= 167957 | conversion..
+ -line: 
+1000 -line: 
+2000 -line: 
+3000 -line: 
+4000 -line: 
+5000 -line: 
+6000 -line: 
+7000 -line: 
+8000 -line: 
+9000 -line: 
+10000 -line: 
+11000 -line: 
+12000 -line: 
+13000 -line: 
+14000 -line: 
+15000 -line: 
+16000 -line: 
+17000 -line: 
+18000 -line: 
+19000 -line: 
+20000 -line: 
+21000 -line: 
+22000 -line: 
+23000 -line: 
+24000 -line: 
+25000 -line: 
+26000 -line: 
+27000 -line: 
+28000 -line: 
+29000 -line: 
+30000 -line: 
+31000 -line: 
+32000 -line: 
+33000 -line: 
+34000 -line: 
+35000 -line: 
+36000 -line: 
+37000 -line: 
+38000 -line: 
+39000 -line: 
+40000 -line: 
+41000 -line: 
+42000 -line: 
+43000 -line: 
+44000 -line: 
+45000

@@ -13,9 +13,9 @@ namespace RS_Engine
     {
         //MAIN DATA STRUCTURES (cleaned from datasets)
         public static List<List<int>> interactions = new List<List<int>>();
-        public static List<List<int>> item_profile = new List<List<int>>();
         public static List<int> target_users = new List<int>();
         public static List<List<object>> user_profile = new List<List<object>>();
+        public static List<List<object>> item_profile = new List<List<object>>();
 
         //Global vars
         public static int EXEMODE = 0;
@@ -93,6 +93,8 @@ namespace RS_Engine
                 {
                     List<string> usr_row_tmpIN = user_profile_f[i].Split('\t').Select(x => (string.IsNullOrEmpty(x)) ? 0.ToString() : x).ToList();
                     List<object> usr_row_tmpOUT = new List<object>();
+
+                    //12 columns (0-11)
                     for (j = 0; j <= 11; j++)
                     {
                         if (j == 1 || j == 11)
@@ -139,7 +141,7 @@ namespace RS_Engine
 
                     //counter
                     if (i % 1000 == 0)
-                        Console.WriteLine(i);
+                        outLog("\r -line: " + i, true);
 
                     /*
                     //debug
@@ -159,7 +161,7 @@ namespace RS_Engine
                 //serialize
                 using (Stream stream = File.Open(Path.Combine(SERIALTPATH, "user_profile.bin"), FileMode.Create))
                 {
-                    RManager.outLog("  + writing serialized file " + "user_profile.bin");
+                    RManager.outLog("\n  + writing serialized file " + "user_profile.bin");
                     bformatter.Serialize(stream, user_profile);
                 }
 
@@ -174,7 +176,7 @@ namespace RS_Engine
                 }
             }
 
-            /*
+            
             //////////////
             //item_profile
             if (!File.Exists(Path.Combine(SERIALTPATH, "item_profile.bin")))
@@ -187,14 +189,66 @@ namespace RS_Engine
                 //scroll file
                 for (i = 1; i < item_profile_f.Length; i++)
                 {
-                    ///TODO
-                    ///item_profile.Add(...)
+                    List<string> itm_row_tmpIN = item_profile_f[i].Split('\t').Select(x => (string.IsNullOrEmpty(x)) ? 0.ToString() : x).ToList();
+                    List<object> itm_row_tmpOUT = new List<object>();
+
+                    //13 columns (0-12)
+                    for (j = 0; j <= 12; j++)
+                    {
+                        if (j == 1 || j == 10)
+                        {
+                            //from obj to list
+                            try
+                            {
+                                itm_row_tmpOUT.Add(itm_row_tmpIN[j].Split(',').Select(Int32.Parse).ToList().Cast<Int32>().ToList());
+                            }
+                            catch
+                            {
+                                itm_row_tmpOUT.Add(new List<Int32> { 0 });
+                            }
+                        }
+                        else if (j == 5)
+                        {
+                            //from str to int
+                            // de -> 1
+                            // at -> 2
+                            // ch -> 3
+                            // non_dach -> 0
+                            itm_row_tmpOUT.Add(
+                                itm_row_tmpIN[j] == "de" ? 1 :
+                                itm_row_tmpIN[j] == "at" ? 2 :
+                                itm_row_tmpIN[j] == "ch" ? 3 :
+                                itm_row_tmpIN[j] == "non_dach" ? 0 : 0
+                                );
+                        }
+                        else
+                        {
+                            try
+                            {
+                                itm_row_tmpOUT.Add(Int32.Parse(itm_row_tmpIN[j]));
+                            }
+                            catch
+                            {
+                                itm_row_tmpOUT.Add(0);
+                            }
+                        }
+                    }
+
+                    //ADVANCED FILTER
+                    //not storing not recommendable items
+                    if ((int)itm_row_tmpOUT.Last() != 0)
+                        //add tmp to data structure
+                        item_profile.Add(itm_row_tmpOUT);
+
+                    //counter
+                    if (i % 1000 == 0)
+                        outLog("\r -line: " + i, true);
                 }
 
                 //serialize
                 using (Stream stream = File.Open(Path.Combine(SERIALTPATH, "item_profile.bin"), FileMode.Create))
                 {
-                    RManager.outLog("  + writing serialized file " + "item_profile.bin");
+                    RManager.outLog("\n  + writing serialized file " + "item_profile.bin");
                     bformatter.Serialize(stream, item_profile);
                 }
             }
@@ -207,9 +261,9 @@ namespace RS_Engine
                     item_profile = (List<List<Object>>)bformatter.Deserialize(stream);
                 }
             }
-            */
 
             //Info
+            outLog("");
             outLog("  + all datasets conversion: OK");
             outLog("  -total lines | interactions >>> " + interactions.Count());
             outLog("  -total lines | item_profile >>> " + item_profile.Count());
@@ -241,8 +295,9 @@ namespace RS_Engine
 
             //display menu
             outLog("    1) calculate TOP recommendations");
-            outLog("    2) CF");
-            outLog("    3) ..");
+            outLog("    2) CBF");
+            outLog("    3) CF");
+            outLog("     ) ..");
             outLog("     ) ..");
             outLog("     ) ..");
             outLog("    9) .bin size calculator");
@@ -252,6 +307,7 @@ namespace RS_Engine
             outLog("-----------------------------------------------------------------");
 
             //get choice
+            outLog("    > ", true);
             EXEMODE = Convert.ToInt32(Console.ReadLine());
 
             //display selection
@@ -263,6 +319,7 @@ namespace RS_Engine
         public static void haltRS()
         {
             //Halting
+            outLog("-----------------------------------------------------------------");
             outLog(" >>>>>> halting RS..");
 
             //Final message
@@ -296,6 +353,8 @@ namespace RS_Engine
             //generating users and collecting items to recommend
             for(int i=0; i<users.Count; i++)
             {
+                if(useritems[i].Count != 5)
+                    outLog("ERROR: the list useritems have not the length=5 !   ..INDEX: " + i);
                 sub_otpt += users[i] + ",";
                 foreach (var r in useritems[i])
                     sub_otpt += string.Format("{0}\t", r);

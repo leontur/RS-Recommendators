@@ -1,0 +1,12 @@
+ ** RECOMMENDATORS ENGINE **
+-----------------------------------------------------------------
+    1) calculate TOP recommendations
+    2) CBF
+    3) CF
+     ) ..
+     ) ..
+     ) ..
+    9) .bin size calculator
+    (long running program)
+-----------------------------------------------------------------
+    > 

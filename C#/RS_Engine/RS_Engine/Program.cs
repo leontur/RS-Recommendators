@@ -28,6 +28,7 @@ namespace RS_Engine
             RManager.initRS();
 
             //Info
+            RManager.outLog("-----------------------------------------------------------------");
             RManager.outLog("  + running program " + RManager.EXEMODE);
 
             //CHOICE SELECTOR
@@ -39,10 +40,20 @@ namespace RS_Engine
             }
             else if (RManager.EXEMODE == 2)
             {
+                //PROCESSING - CBF
+                REngineCBF.getRecommendations();
+            }
+            else if (RManager.EXEMODE == 3)
+            {
                 //PROCESSING - CF
                 REngineCF.getRecommendations();
             }
-            else if (RManager.EXEMODE == 3)
+            else if (RManager.EXEMODE == 4)
+            {
+                //PROCESSING - XXX
+                ;
+            }
+            else if (RManager.EXEMODE == 5)
             {
                 //PROCESSING - XXX
                 ;

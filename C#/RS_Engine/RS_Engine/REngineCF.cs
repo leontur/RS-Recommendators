@@ -10,8 +10,8 @@ namespace RS_Engine
     class REngineCF
     {
         //ALGORITHM PARAMETERS
-        //number of cosine to select (for each user to be recommended)
-        private const int COS_RANGE = 50;
+        //number of similarities to select (for each user to be recommended)
+        private const int SIM_RANGE = 50;
 
         //weights for average similarity (weight are 1-10)
         private static int[] SIM_WEIGHTS = new int[11];
@@ -24,17 +24,17 @@ namespace RS_Engine
         //MAIN ALGORITHM METHOD
         public static void getRecommendations()
         {
-            //Assigning wieghts
-            SIM_WEIGHTS[0] = 2; //jobroles	
-            SIM_WEIGHTS[1] = 7; //career_level	
-            SIM_WEIGHTS[2] = 10;//discipline_id	
-            SIM_WEIGHTS[3] = 8; //industry_id	
-            SIM_WEIGHTS[4] = 6; //country	
-            SIM_WEIGHTS[5] = 4; //region	
-            SIM_WEIGHTS[6] = 3; //experience_n_entries_class	
-            SIM_WEIGHTS[7] = 7; //experience_years_experience	
-            SIM_WEIGHTS[8] = 1; //experience_years_in_current
-            SIM_WEIGHTS[9] = 10; //edu_degree	
+            //Assigning weights
+            SIM_WEIGHTS[0] = 2;   //jobroles	
+            SIM_WEIGHTS[1] = 7;   //career_level	
+            SIM_WEIGHTS[2] = 10;  //discipline_id	
+            SIM_WEIGHTS[3] = 8;   //industry_id	
+            SIM_WEIGHTS[4] = 6;   //country	
+            SIM_WEIGHTS[5] = 4;   //region	
+            SIM_WEIGHTS[6] = 3;   //experience_n_entries_class	
+            SIM_WEIGHTS[7] = 7;   //experience_years_experience	
+            SIM_WEIGHTS[8] = 1;   //experience_years_in_current
+            SIM_WEIGHTS[9] = 10;  //edu_degree	
             SIM_WEIGHTS[10] = 10; //edu_fieldofstudies
 
             //info
@@ -45,15 +45,15 @@ namespace RS_Engine
             int u_size = RManager.user_profile.Count;
 
             //Instantiating user-user matrix
-            float[][] user_user_cossim = new float[u_size][];
+            float[][] user_user_simil = new float[u_size][];
 
             //check if already serialized (for fast fetching)
-            if (!File.Exists(Path.Combine(RManager.SERIALTPATH, "user_user_cossim.bin")))
+            if (!File.Exists(Path.Combine(RManager.SERIALTPATH, "user_user_simil.bin")))
             {
                 //alert and info
                 RManager.outLog("  >>>>>> ARE YOU SURE TO CONTINUE?  THIS IS A VERY LONG RUNNING PROGRAM (1h)");
                 Console.ReadKey();
-                RManager.outLog("  + computing user-user cos sim");
+                RManager.outLog("  + computing user-user similarity matrix");
 
                 //POPULATE user_user matrix
                 // NOTE:
@@ -69,45 +69,45 @@ namespace RS_Engine
                 {
                     //generate user row
                     r_sz = u1 + 1;
-                    user_user_cossim[u1] = new float[r_sz];
+                    user_user_simil[u1] = new float[r_sz];
 
                     //populating the row
                     for (u2 = 0; u2 < r_sz; u2++)
                     {
                         if (u1 == u2)
                         {
-                            user_user_cossim[u1][u2] = (float)1;
+                            user_user_simil[u1][u2] = (float)1;
                         }
                         else
                         {
                             //compute similarity for these two vectors
-                            //user_user_cossim[u1][u2] = computeCosineSimilarity(u1, u2);
-                            user_user_cossim[u1][u2] = computeWeightAvgSimilarity(u1, u2);
+                            //user_user_simil[u1][u2] = computeCosineSimilarity(u1, u2);
+                            user_user_simil[u1][u2] = computeWeightAvgSimilarity(u1, u2);
                         }
                     }
 
                     //counter
                     if (u1 % 100 == 0)
-                        Console.WriteLine(" - compute cosine, line: " + u1);
+                        RManager.outLog("\r - compute similarity, line: " + u1, true);
                 }
 
                 //serialize
-                using (Stream stream = File.Open(Path.Combine(RManager.SERIALTPATH, "user_user_cossim.bin"), FileMode.Create))
+                using (Stream stream = File.Open(Path.Combine(RManager.SERIALTPATH, "user_user_simil.bin"), FileMode.Create))
                 {
-                    RManager.outLog("  + writing serialized file " + "user_user_cossim.bin");
+                    RManager.outLog("\n  + writing serialized file " + "user_user_simil.bin");
                     var bformatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
-                    bformatter.Serialize(stream, user_user_cossim);
+                    bformatter.Serialize(stream, user_user_simil);
                 }
 
             }
             else
             {
                 //deserialize
-                using (Stream stream = File.Open(Path.Combine(RManager.SERIALTPATH, "user_user_cossim.bin"), FileMode.Open))
+                using (Stream stream = File.Open(Path.Combine(RManager.SERIALTPATH, "user_user_simil.bin"), FileMode.Open))
                 {
-                    RManager.outLog("  + reading serialized file " + "user_user_cossim.bin");
+                    RManager.outLog("  + reading serialized file " + "user_user_simil.bin");
                     var bformatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
-                    user_user_cossim = (float[][])bformatter.Deserialize(stream);
+                    user_user_simil = (float[][])bformatter.Deserialize(stream);
                 }
             }
 
@@ -116,9 +116,9 @@ namespace RS_Engine
             for (int i=0; i<1; i++)
             {
                 Console.WriteLine("\n\nROW " + i);
-                for(int j=0; j< user_user_cossim[i].Length; j++)
+                for(int j=0; j< user_user_simil[i].Length; j++)
                 {
-                    Console.Write(" | " + user_user_cossim[i][j]);
+                    Console.Write(" | " + user_user_simil[i][j]);
                 }
             }
             */
@@ -130,7 +130,7 @@ namespace RS_Engine
             RManager.outLog("  + generating output structured data");
 
             //generating items to recommend for each user
-            List<List<int>> user_user_cossim_out = new List<List<int>>();
+            List<List<int>> user_user_simil_out = new List<List<int>>();
 
             //for each user to recommend (u: is the id of the target user)
             int c = 0, m;
@@ -146,19 +146,19 @@ namespace RS_Engine
                 //getting index of this user
                 int uix = RManager.user_profile.FindIndex(x => (int)x[0] == u);
 
-                //from the triangular jagged matrix, retrieve the complete list of cosines for the current user
+                //from the triangular jagged matrix, retrieve the complete list of similarities for the current user
                 float[] curr_user_line = new float[u_size];
                 for (m = 0; m < u_size; m++)
-                    curr_user_line[m] = (m <= uix) ? user_user_cossim[uix][m] : user_user_cossim[m][uix];
+                    curr_user_line[m] = (m <= uix) ? user_user_simil[uix][m] : user_user_simil[m][uix];
 
-                //getting top COS_RANGE for this user (without considering 1=himself in first position)
+                //getting top SIM_RANGE for this user (without considering 1=himself in first position)
                 // transforming the line to a pair (value, index) array
                 // the value is a float, the index a int
                 // the index is used to find the id of the matched user
                 var sorted_curr_user_line = curr_user_line
                                             .Select((x, i) => new KeyValuePair<float, int>(x, i))
                                             .OrderByDescending(x => x.Key)
-                                            .Take(COS_RANGE)
+                                            .Take(SIM_RANGE)
                                             .ToList();
                 sorted_curr_user_line.RemoveAt(0);
                 List<float> topforuser = sorted_curr_user_line.Select(x => x.Key).ToList();
@@ -190,11 +190,11 @@ namespace RS_Engine
                 List<int> interactions_of_similar_users_top = interactions_of_similar_users_group_by.Select(x => x.Key).ToList();
 
                 //saving for output
-                user_user_cossim_out.Add(interactions_of_similar_users_top);
+                user_user_simil_out.Add(interactions_of_similar_users_top);
 
                 /*
                 //debug
-                Console.WriteLine("\n  >>> index of " + u + " in the cossim array is " + uix);
+                Console.WriteLine("\n  >>> index of " + u + " in the simil array is " + uix);
                 Console.WriteLine("\n  >>> recommendations:");
                 foreach(var z in topforuser)
                     Console.Write(" " + z);
@@ -210,12 +210,12 @@ namespace RS_Engine
                 Console.ReadKey();
                 
                 //timer
-                RTimer.TimerEndResult("foreach user_user_cossim_out");
+                RTimer.TimerEndResult("foreach user_user_simil_out");
                 */
             }
 
             //OUTPUT_SUBMISSION
-            RManager.exportRecToSubmit(RManager.target_users, user_user_cossim_out);
+            RManager.exportRecToSubmit(RManager.target_users, user_user_simil_out);
         }
 
 
@@ -285,9 +285,9 @@ namespace RS_Engine
                 //Console.ReadKey();
             }
 
-            //compute average similarity the couples of passed rows
+            //compute average similarity for the couple of passed rows
             double num = 0, den = 0;
-            for(i=0; i<=10; i++)
+            for (i = 0; i < 11; i++)
             {
                 num += similarities[i] * SIM_WEIGHTS[i];
                 den += SIM_WEIGHTS[i];

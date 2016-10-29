@@ -1,0 +1,37 @@
+ ** RECOMMENDATORS ENGINE **
+-----------------------------------------------------------------
+    1) calculate TOP recommendations
+    2) CBF
+    3) CF
+     ) ..
+     ) ..
+     ) ..
+    9) .bin size calculator
+    (long running program)
+-----------------------------------------------------------------
+    >     ==> selected program (9)
+-----------------------------------------------------------------
+  + initializing RS 
+  + initializing dataset retrievement 
+  + reading dataset: interactions
+  + dataset read OK | interactions_f count= 546865 | conversion..
+  + reading serialized file target_users.bin
+  + reading serialized file user_profile.bin
+  + reading serialized file item_profile.bin
+
+  + all datasets conversion: OK
+  -total lines | interactions >>> 546864
+  -total lines | item_profile >>> 167956
+  -total lines | target_users >>> 10000
+  -total lines | user_profile >>> 40000
+
+-----------------------------------------------------------------
+  + running program 9
+
+ CALCULATOR for float mxn matrices dimensions 
+ >>>>>> please insert the rows number: 
+ >>>>>> please insert the columns number: 
+ >>>>>> output bin dimension (about): 115600 MB
+-----------------------------------------------------------------
+ >>>>>> halting RS..
+ >>>>>> log saved to ../../../Output/result_2016-10-30_01-37-57.txt  :) 
