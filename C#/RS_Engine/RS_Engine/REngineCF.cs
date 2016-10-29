@@ -12,6 +12,10 @@ namespace RS_Engine
         //ALGORITHM PARAMETERS
         //number of cosine to select (for each user to be recommended)
         private const int COS_RANGE = 50;
+
+        //weights for average similarity (weight are 1-10)
+        private static int[] SIM_WEIGHTS = new int[11];
+
         //weights for cosine similarity (weighted average)
         private const double COS_W_1 = 0.05;
         private const double COS_W_2 = 0.80;
@@ -20,6 +24,19 @@ namespace RS_Engine
         //MAIN ALGORITHM METHOD
         public static void getRecommendations()
         {
+            //Assigning wieghts
+            SIM_WEIGHTS[0] = 2; //jobroles	
+            SIM_WEIGHTS[1] = 7; //career_level	
+            SIM_WEIGHTS[2] = 10;//discipline_id	
+            SIM_WEIGHTS[3] = 8; //industry_id	
+            SIM_WEIGHTS[4] = 6; //country	
+            SIM_WEIGHTS[5] = 4; //region	
+            SIM_WEIGHTS[6] = 3; //experience_n_entries_class	
+            SIM_WEIGHTS[7] = 7; //experience_years_experience	
+            SIM_WEIGHTS[8] = 1; //experience_years_in_current
+            SIM_WEIGHTS[9] = 10; //edu_degree	
+            SIM_WEIGHTS[10] = 10; //edu_fieldofstudies
+
             //info
             RManager.outLog("  + processing..");
             RManager.outLog("  + computing CF.. ");
@@ -63,14 +80,15 @@ namespace RS_Engine
                         }
                         else
                         {
-                            //compute cosine similarity for these two vectors
-                            user_user_cossim[u1][u2] = computeCosineSimilarity(u1, u2);
+                            //compute similarity for these two vectors
+                            //user_user_cossim[u1][u2] = computeCosineSimilarity(u1, u2);
+                            user_user_cossim[u1][u2] = computeWeightAvgSimilarity(u1, u2);
                         }
                     }
 
                     //counter
                     if (u1 % 100 == 0)
-                        Console.WriteLine(u1);
+                        Console.WriteLine(" - compute cosine, line: " + u1);
                 }
 
                 //serialize
@@ -200,15 +218,109 @@ namespace RS_Engine
             RManager.exportRecToSubmit(RManager.target_users, user_user_cossim_out);
         }
 
-        //COMPUTE COSINE SIMILARITY FOR PASSED COUPLE OF ROWS IN user_profile
+
+        //COMPUTE WEIGHTED AVERAGE SIMILARITY FOR PASSED COUPLE OF ROWS of user_profile
+        private static float computeWeightAvgSimilarity(int r1, int r2)
+        {
+            /*
+            //debug override
+            r1 = 2;
+            r2 = 3;
+            Console.WriteLine("OVERRIDE > r1=" + r1 + " r2=" + r2);
+            */
+
+            //SIMILARITIES
+            double[] similarities = new double[11];
+
+            //call count calculation for a couple of rows (for starts from 1 to avoid user_id)
+            double dup_count, sim;
+            int v1, v2, i, c1, c2;
+            for (i = 1; i <= 11; i++)
+            {
+                //duplicate counter
+                dup_count = 0;
+
+                //the cell content is a list
+                if (i == 1 || i == 11)
+                {
+                    //get the length of the current row
+                    v1 = ((List<Int32>)RManager.user_profile[r1][i]).Count;
+                    v2 = ((List<Int32>)RManager.user_profile[r2][i]).Count;
+
+                    //count duplicates
+                    List<Int32> merge = new List<int>();
+                    merge = merge.Concat((List<Int32>)RManager.user_profile[r1][i]).Concat((List<Int32>)RManager.user_profile[r2][i]).ToList();
+                    var groups = merge.GroupBy(v => v);
+                    foreach (var g in groups)
+                        if (g.Count() >= 2)
+                            dup_count++;
+
+                    //if there are only 0 in common the similarity is 0, else compute duplicate/tot
+                    if ((v1 == 1 && v2 == 1) && groups.First().Key == 0 && groups.First().Count() == 2)
+                        sim = 0;
+                    else
+                        sim = dup_count / ((v1 > v2) ? v1 : v2);
+                }
+                //the cell content is an int
+                else
+                {
+                    //temp
+                    c1 = (int)RManager.user_profile[r1][i];
+                    c2 = (int)RManager.user_profile[r2][i];
+
+                    //discard 0 values
+                    if (c1 > 0 && c2 > 0)
+                        sim = (c1 == c2) ? 1 : 0;
+                    else
+                        sim = 0;
+                }
+
+                //add to the collection of similatiries
+                similarities[i-1] = sim;
+
+                //debug
+                //foreach (var g in groups)
+                //Console.WriteLine("i==1 > Value {0} has {1} items", g.Key, g.Count());
+                //Console.WriteLine("sim > " + sim);
+                //Console.ReadKey();
+            }
+
+            //compute average similarity the couples of passed rows
+            double num = 0, den = 0;
+            for(i=0; i<=10; i++)
+            {
+                num += similarities[i] * SIM_WEIGHTS[i];
+                den += SIM_WEIGHTS[i];
+            }
+            den *= similarities.Length;
+            double w_avg = num / den;
+
+            /*
+            //debug
+            for (i = 0; i <= 10; i++)
+                Console.WriteLine(" sim array > " + similarities[i]);
+            for (i = 0; i <= 10; i++)
+                Console.WriteLine(" weights array > " + SIM_WEIGHTS[i]);
+            Console.WriteLine(" weighted avg = " + w_avg);
+            Console.ReadKey();
+            */
+
+            return (float)w_avg;
+        }
+
+        //COMPUTE COSINE SIMILARITY FOR PASSED COUPLE OF ROWS of user_profile
         private static float computeCosineSimilarity(int r1, int r2) {
-            
+
+            //debug override
+            //r1 = 2;
+            //r2 = 3;
+            //Console.WriteLine("OVERRIDE > r1=" + r1 + " r2=" + r2);
+
             //COS SIMILARITY
             //for calculation of: user_profile[row][1]
             double cos1 = 0;
-            double dup_count_cos1 = 0;
-            //List<double> cos1a = new List<double>();
-            //List<double> cos1b = new List<double>();
+            List<double> cos1a = new List<double>();
+            List<double> cos1b = new List<double>();
             
             //for calculation of: user_profile[row][2>>10]
             double cos2 = 0;
@@ -217,45 +329,18 @@ namespace RS_Engine
 
             //for calculation of: user_profile[row][11]
             double cos3 = 0;
-            double dup_count_cos3 = 0;
-            //List<double> cos3a = new List<double>();
-            //List<double> cos3b = new List<double>();
+            List<double> cos3a = new List<double>();
+            List<double> cos3b = new List<double>();
 
             //call cosine or count calculation for a couple of rows
             for (int i = 0; i <= 11; i++)
             {
                 if (i == 1)
                 {
-                    //duplicate counter
-                    dup_count_cos1 = 0;
-
-                    //count bigger
-                    int v1 = ((List<Int32>)RManager.user_profile[r1][i]).Count;
-                    int v2 = ((List<Int32>)RManager.user_profile[r2][i]).Count;
-
-                    //count duplicate
-                    List<Int32> merge = new List<int>();
-                    merge = merge.Concat((List<Int32>)RManager.user_profile[r1][i]).Concat((List<Int32>)RManager.user_profile[r2][i]).ToList();
-                    var groups = merge.GroupBy(v => v);
-                    foreach (var g in groups)
-                        if(g.Count()>=2)
-                            dup_count_cos1++;
-
-                    //if there are only 0 in common the similarity is 0, else compute duplicate/tot
-                    if ((v1 == 1 && v2 == 1) && groups.First().Key == 0 && groups.First().Count() == 2)
-                        cos1 = 0;
-                    else
-                        cos1 = dup_count_cos1 / ((v1 > v2) ? v1 : v2);
-
-                    //debug
-                    //foreach (var g in groups)
-                        //Console.WriteLine("i==1 > Value {0} has {1} items", g.Key, g.Count());
-
-                    /* cosine calculus
+                    //create vectors for cosine computation
                     List<List<Int32>> orderedLists = new List<List<Int32>>(ResizeOrderList((List<Int32>)RManager.user_profile[r1][i], (List<Int32>)RManager.user_profile[r2][i]));
                     cos1a = orderedLists[0].Select(x => (double)x).ToList();
                     cos1b = orderedLists[1].Select(x => (double)x).ToList();
-                    */
                 }
                 if (i>=2 && i<=10)
                 {
@@ -265,44 +350,17 @@ namespace RS_Engine
                 }
                 if (i == 11)
                 {
-                    //duplicate counter
-                    dup_count_cos3 = 0;
-
-                    //count bigger
-                    int v1 = ((List<Int32>)RManager.user_profile[r1][i]).Count;
-                    int v2 = ((List<Int32>)RManager.user_profile[r2][i]).Count;
-
-                    //count duplicate
-                    List<Int32> merge = new List<int>();
-                    merge = merge.Concat((List<Int32>)RManager.user_profile[r1][i]).Concat((List<Int32>)RManager.user_profile[r2][i]).ToList();
-                    var groups = merge.GroupBy(v => v);
-                    foreach (var g in groups)
-                        if (g.Count() >= 2)
-                            dup_count_cos3++;
-
-                    //if there are only 0 in common the similarity is 0, else compute duplicate/tot
-                    if ((v1 == 1 && v2 == 1) && groups.First().Key == 0 && groups.First().Count() == 2)
-                        cos3 = 0;
-                    else
-                        cos3 = dup_count_cos3 / ((v1 > v2) ? v1 : v2);
-
-                    //debug
-                    //foreach (var g in groups)
-                        //Console.WriteLine("i==1 > Value {0} has {1} items", g.Key, g.Count());
-
-                    /* cosine calculus
+                    //create vectors for cosine computation
                     List<List<Int32>> orderedLists = new List<List<Int32>>(ResizeOrderList((List<Int32>)RManager.user_profile[r1][i], (List<Int32>)RManager.user_profile[r2][i]));
                     cos3a = orderedLists[0].Select(x => (double)x).ToList();
                     cos3b = orderedLists[1].Select(x => (double)x).ToList();
-                    */
                 }
             }
 
             //invoke cosine vector similarity computation
+            cos1 = GetCosineSimilarity(cos1a, cos1b);
             cos2 = GetCosineSimilarity(cos2a, cos2b);
-            //not in use, we are currently checking duplicates:
-            //cos1 = GetCosineSimilarity(cos1a, cos1b);
-            //cos3 = GetCosineSimilarity(cos3a, cos3b);
+            cos3 = GetCosineSimilarity(cos3a, cos3b);
 
             //compute total cos sim for the couples of passed rows
             //double cos_sum = cos1 + cos2 + cos3;
@@ -339,7 +397,6 @@ namespace RS_Engine
             return dot / ((Math.Sqrt(mag1) * Math.Sqrt(mag2)) + shrink);
         }
 
-        /*
         //resize and order lists
         private static List<List<Int32>> ResizeOrderList(List<Int32> L1, List<Int32> L2)
         {
@@ -402,7 +459,6 @@ namespace RS_Engine
 
             return output;
         }
-        */
 
     }
 }
