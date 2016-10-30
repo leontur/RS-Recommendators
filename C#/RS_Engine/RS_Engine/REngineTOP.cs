@@ -24,6 +24,9 @@ namespace RS_Engine
             //info
             RManager.outLog("  + generating output recommendation structured data");
 
+            //evaluate TOP
+            top5 = getTOP5List();
+
             //generating items to recommend for each user
             List<List<int>> interactions_top_out = new List<List<int>>();
             foreach(var u in RManager.target_users)
@@ -56,11 +59,11 @@ namespace RS_Engine
                 //save and print
                 List<int> interactions_top = interactions_item_id_group_by.Select(x => x.Key).Take(5).ToList();
 
-                /*
+                
                 //debug
                 foreach(var i in interactions_top)
-                    Console.WriteLine("  saved top 5 > " + i);
-                */
+                    RManager.outLog("   -saved top 5 > " + i);
+                
 
                 return interactions_top;
             }

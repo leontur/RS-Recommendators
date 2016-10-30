@@ -306,23 +306,29 @@ namespace RS_Engine
         public static void menuRS()
         {
             //program header
+            outLog("");
+            outLog("-----------------------------------------------------------------");
             outLog(" ** RECOMMENDATORS ENGINE **");
             outLog("-----------------------------------------------------------------");
 
             //display menu
-            outLog("    1) calculate TOP recommendations");
-            outLog("    2) CBF");
-            outLog("    3) CF");
-            outLog("     ) ..");
-            outLog("     ) ..");
-            outLog("     ) ..");
+            outLog("    ____________________________");
+            outLog("    Algorithms");
+            outLog("    1) TOP");
+            outLog("    2) CB-F");
+            outLog("    3) U-CF");
+            outLog("    4) I-CF");
+            outLog("    ____________________________");
+            outLog("    8) EVALUATE TRAIN-TEST");
             outLog("    9) .bin size calculator");
+            outLog("    ____________________________");
+            outLog("    0) exit");
 
             //notices
-            outLog("    (long running program)");
             outLog("-----------------------------------------------------------------");
 
             //get choice
+            outLog("");
             outLog("    > ", true);
             EXEMODE = Convert.ToInt32(Console.ReadLine());
 
@@ -396,8 +402,11 @@ namespace RS_Engine
         //log in console and in file for every program run
         public static void outLog(string s, bool inline = false)
         {
+            //left margin
+            s = "RS:> " + s;
+
             //write on console
-            if(inline)
+            if (inline)
                 Console.Write(s);
             else
                 Console.WriteLine(s);

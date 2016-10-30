@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace RS_Engine
 {
-    class REngineCF
+    class REngineUCF
     {
         //ALGORITHM PARAMETERS
         //number of similarities to select (for each user to be recommended)

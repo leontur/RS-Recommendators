@@ -1,15 +1,19 @@
  ** RECOMMENDATORS ENGINE **
 -----------------------------------------------------------------
-    1) calculate TOP recommendations
-    2) CBF
-    3) CF
+    Algorithms
+    1) TOP
+    2) CB-F
+    3) U-CF
+    4) I-CF
      ) ..
      ) ..
-     ) ..
+    
+    8) EVALUATE TRAIN-TEST
     9) .bin size calculator
-    (long running program)
+    
+    0) exit
 -----------------------------------------------------------------
-    >     ==> selected program (2)
+    >     ==> selected program (1)
 -----------------------------------------------------------------
   + initializing RS 
   + initializing dataset retrievement 
@@ -26,11 +30,26 @@
   -total lines | target_users >>> 10000
   -total lines | user_profile >>> 40000
 
------------------------------------------------------------------
-  + running program 2
   + processing..
-  + computing CBF.. 
-  + reading serialized file item_item_simil.bin
-  + generating output structured data
-   # TIMER:foreach item_item_simil_out => 128,0 ms (0,1 seconds) 
-   # TIMER:foreach item_item_simil_out => 63,0 ms (0,1 seconds) 
+  + computing most selected.. 
+  + generating output recommendation structured data
+ >>>>>> generating output file, wait a minute..
+ >>>>>> output submission file created: ../../../Output/submission_2016-10-30_16-15-42.csv
+-----------------------------------------------------------------
+  + running program 1
+ ** RECOMMENDATORS ENGINE **
+-----------------------------------------------------------------
+    Algorithms
+    1) TOP
+    2) CB-F
+    3) U-CF
+    4) I-CF
+     ) ..
+     ) ..
+    
+    8) EVALUATE TRAIN-TEST
+    9) .bin size calculator
+    
+    0) exit
+-----------------------------------------------------------------
+    > 

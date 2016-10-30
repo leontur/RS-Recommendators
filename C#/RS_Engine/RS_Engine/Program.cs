@@ -11,6 +11,11 @@ namespace RS_Engine
 {
     class Program
     {
+        //global
+        private static bool running = true;
+        private static bool initialized = false;
+
+        //MAIN
         static void Main(string[] args)
         {
             ///////////////////////////////////////////////////////////////
@@ -21,17 +26,37 @@ namespace RS_Engine
             Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
             String Root = Directory.GetCurrentDirectory();
 
-            //SHOW MENU
-            RManager.menuRS();
+            while (running)
+            {
+                //SHOW MENU
+                RManager.menuRS();
 
-            //START RS
-            RManager.initRS();
+                //START RS
+                if (!initialized)
+                {
+                    RManager.initRS();
+                    initialized = true;
+                }
+                    
+                //USER CHOICE
+                runUserChoice();
+            }
+
+
+            //HALT RS
+            RManager.haltRS();
+
+        }
+
+        //GET CHOICE
+        private static void runUserChoice()
+        {
 
             //Info
             RManager.outLog("-----------------------------------------------------------------");
-            RManager.outLog("  + running program " + RManager.EXEMODE);
+            RManager.outLog("  # running program " + RManager.EXEMODE);
 
-            //CHOICE SELECTOR
+            //CHOICE INVOKER
             //ALGORITHM INVOKER
             if (RManager.EXEMODE == 1)
             {
@@ -45,28 +70,44 @@ namespace RS_Engine
             }
             else if (RManager.EXEMODE == 3)
             {
-                //PROCESSING - CF
-                REngineCF.getRecommendations();
+                //PROCESSING - UCF
+                REngineUCF.getRecommendations();
             }
             else if (RManager.EXEMODE == 4)
             {
-                //PROCESSING - XXX
-                ;
+                //PROCESSING - ICF
+                REngineICF.getRecommendations();
             }
             else if (RManager.EXEMODE == 5)
             {
                 //PROCESSING - XXX
                 ;
             }
+            else if (RManager.EXEMODE == 6)
+            {
+                //PROCESSING - XXX
+                ;
+            }
+            else if (RManager.EXEMODE == 7)
+            {
+                //PROCESSING - XXX
+                ;
+            }
+            else if (RManager.EXEMODE == 8)
+            {
+                //PROCESSING - EVAL
+                //REngineEVAL.getEval();
+            }
             else if (RManager.EXEMODE == 9)
             {
                 //PROCESSING - CALCULATOR
                 RUtils.showCalculator();
             }
-            else { ; }
-
-            //HALT RS
-            RManager.haltRS();
+            else if (RManager.EXEMODE == 0)
+            {
+                //PROCESSING - EXIT
+                running = false;
+            }
 
         }
     }

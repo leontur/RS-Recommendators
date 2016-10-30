@@ -1,0 +1,61 @@
+ ** RECOMMENDATORS ENGINE **
+-----------------------------------------------------------------
+    Algorithms
+    1) TOP
+    2) CB-F
+    3) U-CF
+    4) I-CF
+     ) ..
+     ) ..
+    
+    8) EVALUATE TRAIN-TEST
+    9) .bin size calculator
+    
+    0) exit
+-----------------------------------------------------------------
+    >     ==> selected program (1)
+-----------------------------------------------------------------
+  + initializing RS 
+  + initializing dataset retrievement 
+  + reading dataset: interactions
+  + dataset read OK | interactions_f count= 546865 | conversion..
+  + reading serialized file target_users.bin
+  + reading serialized file user_profile.bin
+  + reading serialized file item_profile.bin
+  + reading serialized file item_profile_disabled.bin
+
+  + all datasets conversion: OK
+  -total lines | interactions >>> 546864
+  -total lines | item_profile >>> 63446
+  -total lines | target_users >>> 10000
+  -total lines | user_profile >>> 40000
+
+-----------------------------------------------------------------
+  + running program 1
+  + processing..
+  + computing most selected.. 
+  + generating output recommendation structured data
+ >>>>>> generating output file, wait a minute..
+ >>>>>> output submission file created: ../../../Output/submission_2016-10-30_16-16-41.csv
+ ** RECOMMENDATORS ENGINE **
+-----------------------------------------------------------------
+    Algorithms
+    1) TOP
+    2) CB-F
+    3) U-CF
+    4) I-CF
+     ) ..
+     ) ..
+    
+    8) EVALUATE TRAIN-TEST
+    9) .bin size calculator
+    
+    0) exit
+-----------------------------------------------------------------
+    >     ==> selected program (0)
+-----------------------------------------------------------------
+-----------------------------------------------------------------
+  + running program 0
+-----------------------------------------------------------------
+ >>>>>> halting RS..
+ >>>>>> log saved to ../../../Output/result_2016-10-30_16-16-08.txt  :) 
