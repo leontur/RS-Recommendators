@@ -7,6 +7,17 @@ using System.Threading.Tasks;
 
 namespace RS_Engine
 {
+    /**
+     * |USER BASED COLLABORATIVE FILTERING
+     * |ALGORITHM EXECUTION SUMMARY
+     * -compute all similarities for users
+     * -for each user to recommend
+     * -select n users most similars
+     * -for each
+     * -select his most clicked items
+     * -get top 5 clicked
+     * -output
+     */
     class REngineUCF
     {
         //ALGORITHM PARAMETERS
@@ -39,7 +50,7 @@ namespace RS_Engine
 
             //info
             RManager.outLog("  + processing..");
-            RManager.outLog("  + computing CF.. ");
+            RManager.outLog("  + computing UCF.. ");
 
             //Getting user_profile count
             int u_size = RManager.user_profile.Count;

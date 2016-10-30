@@ -7,6 +7,18 @@ using System.Threading.Tasks;
 
 namespace RS_Engine
 {
+    /**
+     * |CONTENT BASED FILTERING          //////////////////////////// SICURI sia questo?!
+     * |ALGORITHM EXECUTION SUMMARY
+     * -compute all similarities for items
+     * -for each user to recommend
+     * -get his interactions assigning weights
+     * -select most clicked
+     * -remove disabled
+     * -select similar items
+     * -get top 5
+     * -output
+     */
     class REngineCBF
     {
         //ALGORITHM PARAMETERS

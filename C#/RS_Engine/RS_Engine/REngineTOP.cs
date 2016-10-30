@@ -6,6 +6,12 @@ using System.Threading.Tasks;
 
 namespace RS_Engine
 {
+    /**
+     * |MOST POPULAR
+     * |ALGORITHM EXECUTION SUMMARY
+     * -select most clicked in the interactions
+     * -output
+     */
     class REngineTOP
     {
         //STORED VALUE FOR FAST FETCHING
