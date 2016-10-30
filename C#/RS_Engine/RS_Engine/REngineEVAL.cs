@@ -10,8 +10,12 @@ namespace RS_Engine
     {
 
         //TRAIN AND TEST SET SPLIT
+        public void splitTrainTestData()
+        {
 
-        //TODO
+
+
+        }
 
 
     }
