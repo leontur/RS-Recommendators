@@ -17,7 +17,7 @@ namespace RS_Engine
         public static List<List<object>> user_profile = new List<List<object>>();
         public static List<List<object>> item_profile = new List<List<object>>();
 
-        //AUXILIARY DATA STRUCTURE
+        //AUXILIARY DATA STRUCTURES
         public static List<int> item_profile_disabled = new List<int>();
 
         //Global vars
@@ -300,6 +300,9 @@ namespace RS_Engine
             Console.WriteLine(" .targetUser 2 ---> " + target_users[2]);
             Console.WriteLine(" .targetUser last ---> " + target_users.Last());
             */
+
+            //SPLITTING TRAIN AD TEST DATA
+            REngineSPLIT.splitTrainTestData();
         }
 
         //MENU SELECTOR

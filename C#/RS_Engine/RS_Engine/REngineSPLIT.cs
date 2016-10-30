@@ -8,13 +8,18 @@ namespace RS_Engine
 {
     class REngineSPLIT
     {
-
-
         //TRAIN AND TEST SET SPLIT
-        public void splitTrainTestData()
+        public static void splitTrainTestData()
         {
-
-            //FACCIO
+            //Removing 
+            // from the 
+            //  train dataset (user_profile) 
+            // all the rows of the 
+            //  test dataset (target_users)
+            foreach(var i in RManager.target_users)
+            {
+                RManager.user_profile.RemoveAll(x => (int)x[0] == i);
+            }
 
         }
     }
