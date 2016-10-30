@@ -61,7 +61,7 @@ namespace RS_Engine
             else if (RManager.EXEMODE == 9)
             {
                 //PROCESSING - CALCULATOR
-                RManager.showCalculator();
+                RUtils.showCalculator();
             }
             else { ; }
 

@@ -10,6 +10,19 @@ namespace RS_Engine
     {
         //VARIOUS UTILS
         //...
+
+
+        //CALCULATOR
+        public static void showCalculator()
+        {
+            RManager.outLog("\n CALCULATOR for float mxn matrices dimensions ");
+            RManager.outLog(" >>>>>> please insert the rows number: ");
+            int rn = Convert.ToInt32(Console.ReadLine());
+            RManager.outLog(" >>>>>> please insert the columns number: ");
+            int cn = Convert.ToInt32(Console.ReadLine());
+            long mb = (32L * rn * cn) / (8 * 1000 * 1000);
+            RManager.outLog(" >>>>>> output .bin dimensions and RAM consumption (about): " + mb + " MB" + " | for a jagged array use (about): " + mb/2 + " MB");
+        }
     }
 
     ////////////////////////////////////////////////////////

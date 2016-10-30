@@ -30,3 +30,8 @@
 
  CALCULATOR for float mxn matrices dimensions 
  >>>>>> please insert the rows number: 
+ >>>>>> please insert the columns number: 
+ >>>>>> output bin dimension (about): 16384 MB
+-----------------------------------------------------------------
+ >>>>>> halting RS..
+ >>>>>> log saved to ../../../Output/result_2016-10-30_01-46-39.txt  :) 

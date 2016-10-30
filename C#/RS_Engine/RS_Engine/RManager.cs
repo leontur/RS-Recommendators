@@ -376,18 +376,6 @@ namespace RS_Engine
             }
         }
 
-        //CALCULATOR
-        public static void showCalculator()
-        {
-            outLog("\n CALCULATOR for float mxn matrices dimensions ");
-            outLog(" >>>>>> please insert the rows number: ");
-            int rn = Convert.ToInt32(Console.ReadLine());
-            outLog(" >>>>>> please insert the columns number: ");
-            int cn = Convert.ToInt32(Console.ReadLine());
-            long mb = (32L * rn * cn) / (8 * 1000 * 1000);
-            outLog(" >>>>>> output bin dimension (about): " + mb + " MB");
-        }
-
         //LOGGER
         //log in console and in file for every program run
         public static void outLog(string s, bool inline = false)
