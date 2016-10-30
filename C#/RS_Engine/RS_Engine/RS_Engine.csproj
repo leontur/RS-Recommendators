@@ -68,6 +68,7 @@
     <Compile Include="REngineCBF.cs" />
     <Compile Include="REngineCF.cs" />
     <Compile Include="REngineEVAL.cs" />
+    <Compile Include="REngineSPLIT.cs" />
     <Compile Include="REngineTOP.cs" />
     <Compile Include="RManager.cs" />
     <Compile Include="RUtils.cs" />
