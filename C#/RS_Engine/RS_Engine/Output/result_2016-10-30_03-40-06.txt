@@ -1,0 +1,33 @@
+ ** RECOMMENDATORS ENGINE **
+-----------------------------------------------------------------
+    1) calculate TOP recommendations
+    2) CBF
+    3) CF
+     ) ..
+     ) ..
+     ) ..
+    9) .bin size calculator
+    (long running program)
+-----------------------------------------------------------------
+    >     ==> selected program (2)
+-----------------------------------------------------------------
+  + initializing RS 
+  + initializing dataset retrievement 
+  + reading dataset: interactions
+  + dataset read OK | interactions_f count= 546865 | conversion..
+  + reading serialized file target_users.bin
+  + reading serialized file user_profile.bin
+  + reading serialized file item_profile.bin
+
+  + all datasets conversion: OK
+  -total lines | interactions >>> 546864
+  -total lines | item_profile >>> 63446
+  -total lines | target_users >>> 10000
+  -total lines | user_profile >>> 40000
+
+-----------------------------------------------------------------
+  + running program 2
+  + processing..
+  + computing CBF.. 
+  + reading serialized file item_item_simil.bin
+  + generating output structured data

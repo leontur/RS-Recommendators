@@ -1,0 +1,171 @@
+ ** RECOMMENDATORS ENGINE **
+-----------------------------------------------------------------
+    1) calculate TOP recommendations
+    2) CBF
+    3) CF
+     ) ..
+     ) ..
+     ) ..
+    9) .bin size calculator
+    (long running program)
+-----------------------------------------------------------------
+    >     ==> selected program (2)
+-----------------------------------------------------------------
+  + initializing RS 
+  + initializing dataset retrievement 
+  + reading dataset: interactions
+  + dataset read OK | interactions_f count= 546865 | conversion..
+  + reading serialized file target_users.bin
+  + reading serialized file user_profile.bin
+  + reading serialized file item_profile.bin
+  + reading serialized file item_profile_disabled.bin
+
+  + all datasets conversion: OK
+  -total lines | interactions >>> 546864
+  -total lines | item_profile >>> 63446
+  -total lines | target_users >>> 10000
+  -total lines | user_profile >>> 40000
+
+-----------------------------------------------------------------
+  + running program 2
+  + processing..
+  + computing CBF.. 
+  + reading serialized file item_item_simil.bin
+  + generating output structured data
+   # TIMER:foreach item_item_simil_out => 122,9 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 62,1 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 309,7 ms (0,3 seconds) 
+   # TIMER:foreach item_item_simil_out => 75,0 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 381,5 ms (0,4 seconds) 
+   # TIMER:foreach item_item_simil_out => 68,5 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 71,0 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 540,1 ms (0,5 seconds) 
+   # TIMER:foreach item_item_simil_out => 414,0 ms (0,4 seconds) 
+   # TIMER:foreach item_item_simil_out => 96,0 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 94,0 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 94,0 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 373,1 ms (0,4 seconds) 
+   # TIMER:foreach item_item_simil_out => 77,0 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 64,0 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 345,6 ms (0,3 seconds) 
+   # TIMER:foreach item_item_simil_out => 371,0 ms (0,4 seconds) 
+   # TIMER:foreach item_item_simil_out => 72,0 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 82,0 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 81,0 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 74,7 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 77,5 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 399,6 ms (0,4 seconds) 
+   # TIMER:foreach item_item_simil_out => 580,8 ms (0,6 seconds) 
+   # TIMER:foreach item_item_simil_out => 72,5 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 84,0 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 79,0 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 71,5 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 88,0 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 62,0 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 70,0 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 374,1 ms (0,4 seconds) 
+   # TIMER:foreach item_item_simil_out => 69,0 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 80,0 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 211,5 ms (0,2 seconds) 
+   # TIMER:foreach item_item_simil_out => 338,8 ms (0,3 seconds) 
+   # TIMER:foreach item_item_simil_out => 74,1 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 61,0 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 78,0 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 436,1 ms (0,4 seconds) 
+   # TIMER:foreach item_item_simil_out => 66,5 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 73,0 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 81,0 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 66,0 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 63,0 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 71,0 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 192,0 ms (0,2 seconds) 
+   # TIMER:foreach item_item_simil_out => 356,1 ms (0,4 seconds) 
+   # TIMER:foreach item_item_simil_out => 89,7 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 78,0 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 67,0 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 77,0 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 95,0 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 368,6 ms (0,4 seconds) 
+   # TIMER:foreach item_item_simil_out => 69,5 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 68,0 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 656,1 ms (0,7 seconds) 
+   # TIMER:foreach item_item_simil_out => 230,6 ms (0,2 seconds) 
+   # TIMER:foreach item_item_simil_out => 76,0 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 74,5 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 65,0 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 67,5 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 61,5 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 104,0 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 66,0 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 76,5 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 69,0 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 318,1 ms (0,3 seconds) 
+   # TIMER:foreach item_item_simil_out => 66,0 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 219,5 ms (0,2 seconds) 
+   # TIMER:foreach item_item_simil_out => 74,5 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 67,0 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 330,1 ms (0,3 seconds) 
+   # TIMER:foreach item_item_simil_out => 59,5 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 71,0 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 101,0 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 63,5 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 88,0 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 67,0 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 78,0 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 370,6 ms (0,4 seconds) 
+   # TIMER:foreach item_item_simil_out => 59,5 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 66,5 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 77,5 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 78,0 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 86,0 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 321,1 ms (0,3 seconds) 
+   # TIMER:foreach item_item_simil_out => 91,5 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 65,0 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 67,0 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 80,0 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 70,0 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 71,0 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 67,0 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 78,5 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 98,0 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 91,0 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 64,0 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 67,0 ms (0,1 seconds) 
+ - user: 100   # TIMER:foreach item_item_simil_out => 71,5 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 61,5 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 74,0 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 74,0 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 166,0 ms (0,2 seconds) 
+   # TIMER:foreach item_item_simil_out => 68,0 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 76,0 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 68,0 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 92,0 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 94,8 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 324,1 ms (0,3 seconds) 
+   # TIMER:foreach item_item_simil_out => 400,5 ms (0,4 seconds) 
+   # TIMER:foreach item_item_simil_out => 284,5 ms (0,3 seconds) 
+   # TIMER:foreach item_item_simil_out => 61,0 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 336,3 ms (0,3 seconds) 
+   # TIMER:foreach item_item_simil_out => 81,0 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 65,0 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 379,6 ms (0,4 seconds) 
+   # TIMER:foreach item_item_simil_out => 67,0 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 65,0 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 480,7 ms (0,5 seconds) 
+   # TIMER:foreach item_item_simil_out => 68,5 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 69,0 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 84,0 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 68,0 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 69,0 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 69,5 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 385,1 ms (0,4 seconds) 
+   # TIMER:foreach item_item_simil_out => 64,5 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 524,6 ms (0,5 seconds) 
+   # TIMER:foreach item_item_simil_out => 61,5 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 63,5 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 78,0 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 70,7 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 61,0 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 63,5 ms (0,1 seconds) 
+   # TIMER:foreach item_item_simil_out => 174,6 ms (0,2 seconds) 
+   # TIMER:foreach item_item_simil_out => 366,1 ms (0,4 seconds) 

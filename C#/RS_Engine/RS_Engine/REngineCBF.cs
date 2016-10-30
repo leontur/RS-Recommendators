@@ -106,9 +106,9 @@ namespace RS_Engine
                 }
             }
 
-            
+            /*
             //debug
-            for (int i=0; i<1; i++)
+            for (int i=1; i<2; i++)
             {
                 Console.WriteLine("\n\nROW " + i);
                 for(int j=0; j< item_item_simil[i].Length; j++)
@@ -116,8 +116,7 @@ namespace RS_Engine
                     Console.Write(" | " + item_item_simil[i][j]);
                 }
             }
-            
-
+            */
 
             //////////////////////////////////////////////////////////////////////
 
@@ -132,7 +131,7 @@ namespace RS_Engine
             foreach (var u in RManager.target_users)
             {
                 //timer
-                RTimer.TimerStart();
+                //RTimer.TimerStart();
 
                 //counter
                 if (++c % 100 == 0)
@@ -168,65 +167,82 @@ namespace RS_Engine
                 //select best clicked
                 List<int> interactions_of_user_top = interactions_of_user_weighted.Select(x => x[0]).ToList();
 
-                //getting similar items (basing on the best clicked by this user)
-                //foreach (var best in interactions_of_user_top) { } this is to use in case if want to select similarities foreach top clicked item and not only for the absolute best
-                int best = interactions_of_user_top.First();
+                //remove the disabled items
+                interactions_of_user_top = interactions_of_user_top.Except(RManager.item_profile_disabled).ToList();
+                //NOTE: this could remove EVERY candidate
 
-                //getting index of this item
-                int iix = RManager.item_profile.FindIndex(x => (int)x[0] == best);
+                //check if is empty
+                if (interactions_of_user_top.Count == 0)
+                {
+                    //override
+                    //recommend TOP for this user
 
-                //from the triangular jagged matrix, retrieve the complete list of similarities for this item
-                float[] curr_item_line = new float[i_size];
-                for (m = 0; m < i_size; m++)
-                    curr_item_line[m] = (m <= iix) ? item_item_simil[iix][m] : item_item_simil[m][iix];
+                    //saving for output
+                    item_item_simil_out.Add(REngineTOP.getTOP5List());
+                }
+                else
+                {
 
-                //getting top SIM_RANGE for this item (without considering 1=himself in first position)
-                // transforming the line to a pair (value, index) array
-                // the value is a float, the index a int
-                // the index is used to find the id of the matched item
-                var sorted_curr_item_line = curr_item_line
-                                            .Select((x, i) => new KeyValuePair<float, int>(x, i))
-                                            .OrderByDescending(x => x.Key)
-                                            .Take(SIM_RANGE)
-                                            .ToList();
-                sorted_curr_item_line.RemoveAt(0);
-                List<float> topforitem = sorted_curr_item_line.Select(x => x.Key).ToList();
-                List<int> itemoriginalindex = sorted_curr_item_line.Select(x => x.Value).ToList();
+                    //getting similar items (basing on the best clicked by this user)
+                    //foreach (var best in interactions_of_user_top) { } this is to use in case if want to select similarities foreach top clicked item and not only for the absolute best
+                    int best = interactions_of_user_top.First();
 
-                //retrieving indexes of the item to recommend
-                List<int> similar_items = new List<int>();
-                foreach (var i in itemoriginalindex)
-                    similar_items.Add((int)RManager.item_profile[i][0]);
+                    //getting index of this item
+                    int iix = RManager.item_profile.FindIndex(x => (int)x[0] == best);
 
-                //ADVANCED FILTER
-                //-retrieving interactions already clicked by the current user (not recommendig an item already clicked)
-                //-removing already clicked
-                similar_items = similar_items.Except(interactions_of_user).ToList();
-                similar_items = similar_items.Take(5).ToList();
+                    //from the triangular jagged matrix, retrieve the complete list of similarities for this item
+                    float[] curr_item_line = new float[i_size];
+                    for (m = 0; m < i_size; m++)
+                        curr_item_line[m] = (m <= iix) ? item_item_simil[iix][m] : item_item_simil[m][iix];
 
-                //saving for output
-                item_item_simil_out.Add(similar_items);
+                    //getting top SIM_RANGE for this item (without considering 1=himself in first position)
+                    // transforming the line to a pair (value, index) array
+                    // the value is a float, the index a int
+                    // the index is used to find the id of the matched item
+                    var sorted_curr_item_line = curr_item_line
+                                                .Select((x, i) => new KeyValuePair<float, int>(x, i))
+                                                .OrderByDescending(x => x.Key)
+                                                .Take(SIM_RANGE)
+                                                .ToList();
+                    sorted_curr_item_line.RemoveAt(0);
+                    List<float> topforitem = sorted_curr_item_line.Select(x => x.Key).ToList();
+                    List<int> itemoriginalindex = sorted_curr_item_line.Select(x => x.Value).ToList();
 
-                
-                //debug
-                Console.WriteLine("\n  >>> index of " + u + " in the simil array is " + iix);
-                Console.WriteLine("\n  >>> recommendations:");
-                foreach(var z in topforitem)
-                    Console.Write(" " + z);
-                Console.WriteLine("\n  >>> original index:");
-                foreach (var z in itemoriginalindex)
-                    Console.Write(" " + z);
-                Console.WriteLine("\n  >>> retrieved users:");
-                foreach (var z in similar_items)
-                    Console.Write(" " + z);
-                Console.WriteLine("\n  >>> retrieved interactions_of_user_top:");
-                foreach (var z in interactions_of_user_top)
-                    Console.Write(" " + z);
-                Console.ReadKey();
-                
+                    //retrieving indexes of the item to recommend
+                    List<int> similar_items = new List<int>();
+                    foreach (var i in itemoriginalindex)
+                        similar_items.Add((int)RManager.item_profile[i][0]);
+
+                    //ADVANCED FILTER
+                    //-retrieving interactions already clicked by the current user (not recommendig an item already clicked)
+                    //-removing already clicked
+                    similar_items = similar_items.Except(interactions_of_user).ToList();
+                    similar_items = similar_items.Take(5).ToList();
+
+                    //saving for output
+                    item_item_simil_out.Add(similar_items);
+
+                    /*
+                    //debug
+                    Console.WriteLine("\n  >>> index of " + u + " in the simil array is " + iix);
+                    Console.WriteLine("\n  >>> retrieved interactions_of_user_top:");
+                    foreach (var z in interactions_of_user_top)
+                        Console.Write(" " + z);
+                    Console.WriteLine("\n  >>> recommendations:");
+                    foreach (var z in topforitem)
+                        Console.Write(" " + z);
+                    Console.WriteLine("\n  >>> original index:");
+                    foreach (var z in itemoriginalindex)
+                        Console.Write(" " + z);
+                    Console.WriteLine("\n  >>> retrieved users:");
+                    foreach (var z in similar_items)
+                        Console.Write(" " + z);
+                    //Console.ReadKey();
+                    */
+                }
+
                 //timer
-                RTimer.TimerEndResult("foreach item_item_simil_out");
-                
+                //RTimer.TimerEndResult("foreach item_item_simil_out");
             }
 
             //OUTPUT_SUBMISSION

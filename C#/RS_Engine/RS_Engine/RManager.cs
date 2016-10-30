@@ -17,6 +17,9 @@ namespace RS_Engine
         public static List<List<object>> user_profile = new List<List<object>>();
         public static List<List<object>> item_profile = new List<List<object>>();
 
+        //AUXILIARY DATA STRUCTURE
+        public static List<int> item_profile_disabled = new List<int>();
+
         //Global vars
         public static int EXEMODE = 0;
 
@@ -239,6 +242,9 @@ namespace RS_Engine
                     if ((int)itm_row_tmpOUT.Last() != 0)
                         //add tmp to data structure
                         item_profile.Add(itm_row_tmpOUT);
+                    else
+                        //add id of disabled item to data structure
+                        item_profile_disabled.Add((int)itm_row_tmpOUT.First());
 
                     //counter
                     if (i % 1000 == 0)
@@ -251,6 +257,11 @@ namespace RS_Engine
                     RManager.outLog("\n  + writing serialized file " + "item_profile.bin");
                     bformatter.Serialize(stream, item_profile);
                 }
+                using (Stream stream = File.Open(Path.Combine(SERIALTPATH, "item_profile_disabled.bin"), FileMode.Create))
+                {
+                    RManager.outLog("\n  + writing serialized file " + "item_profile_disabled.bin");
+                    bformatter.Serialize(stream, item_profile_disabled);
+                }
             }
             else
             {
@@ -259,6 +270,11 @@ namespace RS_Engine
                 {
                     RManager.outLog("  + reading serialized file " + "item_profile.bin");
                     item_profile = (List<List<Object>>)bformatter.Deserialize(stream);
+                }
+                using (Stream stream = File.Open(Path.Combine(SERIALTPATH, "item_profile_disabled.bin"), FileMode.Open))
+                {
+                    RManager.outLog("  + reading serialized file " + "item_profile_disabled.bin");
+                    item_profile_disabled = (List<int>)bformatter.Deserialize(stream);
                 }
             }
 
