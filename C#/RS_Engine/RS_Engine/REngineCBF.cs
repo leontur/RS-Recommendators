@@ -95,7 +95,7 @@ namespace RS_Engine
 
                     //counter
                     if (i1 % 100 == 0)
-                        RManager.outLog("\r - compute similarity, line: " + i1, true);
+                        RManager.outLog(" - compute similarity, line: " + i1, true, true);
                 }
 
                 //serialize
@@ -180,7 +180,8 @@ namespace RS_Engine
                 List<int> interactions_of_user_top = interactions_of_user_weighted.Select(x => x[0]).ToList();
 
                 //remove the disabled items
-                interactions_of_user_top = interactions_of_user_top.Except(RManager.item_profile_disabled).ToList();
+                List<int> disabled_items = RManager.item_profile_disabled.Select(x => x[0]).Cast<Int32>().ToList();
+                interactions_of_user_top = interactions_of_user_top.Except(disabled_items).ToList();
                 //NOTE: this could remove EVERY candidate
 
                 //check if is empty

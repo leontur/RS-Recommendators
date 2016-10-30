@@ -99,7 +99,7 @@ namespace RS_Engine
 
                     //counter
                     if (u1 % 100 == 0)
-                        RManager.outLog("\r - compute similarity, line: " + u1, true);
+                        RManager.outLog(" - compute similarity, line: " + u1, true, true);
                 }
 
                 //serialize

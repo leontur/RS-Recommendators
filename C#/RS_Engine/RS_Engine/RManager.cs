@@ -18,7 +18,7 @@ namespace RS_Engine
         public static List<List<object>> item_profile = new List<List<object>>();
 
         //AUXILIARY DATA STRUCTURES
-        public static List<int> item_profile_disabled = new List<int>();
+        public static List<List<object>> item_profile_disabled = new List<List<object>>();
 
         //Global vars
         public static int EXEMODE = 0;
@@ -144,7 +144,7 @@ namespace RS_Engine
 
                     //counter
                     if (i % 1000 == 0)
-                        outLog("\r -line: " + i, true);
+                        outLog(" -line: " + i, true, true);
 
                     /*
                     //debug
@@ -244,11 +244,11 @@ namespace RS_Engine
                         item_profile.Add(itm_row_tmpOUT);
                     else
                         //add id of disabled item to data structure
-                        item_profile_disabled.Add((int)itm_row_tmpOUT.First());
+                        item_profile_disabled.Add(itm_row_tmpOUT);
 
                     //counter
                     if (i % 1000 == 0)
-                        outLog("\r -line: " + i, true);
+                        outLog(" -line: " + i, true, true);
                 }
 
                 //serialize
@@ -274,7 +274,7 @@ namespace RS_Engine
                 using (Stream stream = File.Open(Path.Combine(SERIALTPATH, "item_profile_disabled.bin"), FileMode.Open))
                 {
                     RManager.outLog("  + reading serialized file " + "item_profile_disabled.bin");
-                    item_profile_disabled = (List<int>)bformatter.Deserialize(stream);
+                    item_profile_disabled = (List<List<object>>)bformatter.Deserialize(stream);
                 }
             }
 
@@ -403,10 +403,13 @@ namespace RS_Engine
 
         //LOGGER
         //log in console and in file for every program run
-        public static void outLog(string s, bool inline = false)
+        public static void outLog(string s, bool inline = false, bool carriageret = false)
         {
             //left margin
-            s = "RS:> " + s;
+            if (carriageret)
+                s = "\rRS: " + s;
+            else
+                s = "RS:> " + s;
 
             //write on console
             if (inline)
