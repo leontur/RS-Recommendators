@@ -18,6 +18,7 @@ namespace RS_Engine
         public static List<List<object>> item_profile = new List<List<object>>();
 
         //AUXILIARY DATA STRUCTURES
+        public static List<int> item_profile_enabled_list = new List<int>();
         public static List<List<object>> item_profile_disabled = new List<List<object>>();
 
         //Global vars
@@ -278,7 +279,13 @@ namespace RS_Engine
                 }
             }
 
-            //Info
+            //AUXILIARY DATA STRUCTURES
+            outLog("  + populating auxiliary data structures ");
+
+            //Populate item_profile_enabled_list
+            item_profile_enabled_list = item_profile.Select(x => (int)x[0]).ToList();
+
+            //INFO
             outLog("");
             outLog("  + all datasets conversion: OK");
             outLog("  -total lines | interactions >>> " + interactions.Count());
@@ -407,6 +414,7 @@ namespace RS_Engine
         //log in console and in file for every program run
         private static string[] runChars = new string[] { "|", "/", "-", "\\" };
         private static int runCharsPos = 0;
+        private static bool lastWasInline = false;
         public static void outLog(string s, bool inline = false, bool carriageret = false)
         {
             //update runchars
@@ -417,7 +425,16 @@ namespace RS_Engine
             if (carriageret)
                 s = "\rRS:>(" + runChars[runCharsPos] + ") " + s;
             else
-                s = "RS:> " + s;
+            {
+                if(lastWasInline)
+                {
+                    s = "\nRS:> " + s;
+                    lastWasInline = false;
+                }
+                else
+                    s = "RS:> " + s;
+            }
+                
 
             //write on console
             if (inline)
@@ -437,6 +454,9 @@ namespace RS_Engine
             {
                 Console.WriteLine("ERROR: unable to append text to output_log");
             }
+
+            //memory
+            lastWasInline = carriageret;
         }
 
     }

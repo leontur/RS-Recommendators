@@ -34,7 +34,7 @@ namespace RS_Engine
 
         //ALGORITHM PARAMETERS
         //number of similarities to select (for each item to be recommended)
-        private const int SIM_RANGE = 20;
+        private const int SIM_RANGE = 5;
 
         //MAIN ALGORITHM METHOD
         public static void getRecommendations()
@@ -244,6 +244,9 @@ namespace RS_Engine
                     //for each user in dataset
                     for (u2 = 0; u2 < RManager.user_profile.Count(); u2++)
                     {
+                        //testing override
+                        //u2 = 30744; //(=index of id 285)
+
                         //user 2 titles
                         List<int> u2T = all_user_interactions_titles[u2];
 
@@ -288,6 +291,7 @@ namespace RS_Engine
 
             //for each user to recommend (u: is the id of the target user)
             //finding recommended items
+            int s;
             for (int u = 0; u < RManager.target_users.Count; u++)
             {
                 //recommending top 5 similar items
@@ -307,11 +311,14 @@ namespace RS_Engine
                 var sorted_curr_user_line = curr_user_line
                                             .Select((x, i) => new KeyValuePair<double, int>(x, i))
                                             .OrderByDescending(x => x.Key)
-                                            .Take(SIM_RANGE)
                                             .ToList();
                 sorted_curr_user_line.RemoveAt(0);
+                //trim line to best SIM_RANGE matches
+                var sorted_curr_user_line_top = sorted_curr_user_line
+                                            .Take(SIM_RANGE)
+                                            .ToList();
                 //List<float> topforuser = sorted_curr_user_line.Select(x => x.Key).ToList();
-                List<int> useroriginalindex = sorted_curr_user_line.Select(x => x.Value).ToList();
+                List<int> useroriginalindex = sorted_curr_user_line_top.Select(x => x.Value).ToList();
 
                 //retrieving indexes of the users to recommend
                 List<int> similar_users = new List<int>();
@@ -326,10 +333,31 @@ namespace RS_Engine
                             interactions_of_similar_users.Add(j[1]);
 
                 //ADVANCED FILTER
-                //retrieving interactions already used by the current user (not recommendig a job already applied or bookmarked)
-                List<int> already_clicked = RManager.interactions.Where(i => i[0] == u && i[2] == 1).Select(i => i[1]).ToList();
+                //retrieving interactions already used by the current user (not recommendig a job already applied)
+                List<int> already_clicked = RManager.interactions.Where(i => i[0] == RManager.target_users[u] && i[2] < 3).Select(i => i[1]).ToList();
+                
                 //removing already clicked
                 interactions_of_similar_users = interactions_of_similar_users.Except(already_clicked).ToList();
+
+                //removing not recommendable
+                for (s = interactions_of_similar_users.Count - 1; s >= 0; s--)
+                    if (!RManager.item_profile_enabled_list.Contains(interactions_of_similar_users[s]))
+                        interactions_of_similar_users.RemoveAt(s);
+                
+                //CHECK
+                //if recommendations are not enough
+                while (interactions_of_similar_users.Count < 5)
+                {
+                    //take the first recommendable item from the next similar user (all the same procedure as above)
+                    int newuserIndex = sorted_curr_user_line.Skip(SIM_RANGE).Take(1).Select(x => x.Value).First();
+                    int newuserId = (int)RManager.user_profile[newuserIndex][0];
+                    List<int> interactions_of_newuser = RManager.interactions.Where(x => x[0] == newuserId).Select(x => x[1]).ToList();
+                    interactions_of_newuser = interactions_of_newuser.Except(already_clicked).ToList();
+                    for (s = interactions_of_newuser.Count - 1; s >= 0; s--)
+                        if (!RManager.item_profile_enabled_list.Contains(interactions_of_newuser[s]))
+                            interactions_of_newuser.RemoveAt(s);
+                    interactions_of_similar_users = interactions_of_similar_users.Concat(interactions_of_newuser).ToList();
+                }
 
                 //selecting most clicked items (top 5)
                 var interactions_of_similar_users_group_by = interactions_of_similar_users
@@ -373,7 +401,7 @@ namespace RS_Engine
         {
             //compute the distance
             double intersect = titleU1.Intersect(titleU2).Count();
-            double union = titleU1.Concat(titleU2).ToList().Count();
+            double union = titleU1.Union(titleU2).ToList().Count();
 
             //check if no one in common
             if (intersect == 0)
