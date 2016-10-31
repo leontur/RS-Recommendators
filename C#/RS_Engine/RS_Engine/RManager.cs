@@ -302,7 +302,7 @@ namespace RS_Engine
             */
 
             //SPLITTING TRAIN AD TEST DATA
-            REngineSPLIT.splitTrainTestData();
+            //REngineSPLIT.splitTrainTestData();
         }
 
         //MENU SELECTOR
@@ -403,11 +403,17 @@ namespace RS_Engine
 
         //LOGGER
         //log in console and in file for every program run
+        private static string[] runChars = new string[] { "|", "/", "-", "\\" };
+        private static int runCharsPos = 0;
         public static void outLog(string s, bool inline = false, bool carriageret = false)
         {
+            //update runchars
+            if(runCharsPos == 3) runCharsPos = 0;
+            else runCharsPos++;
+
             //left margin
             if (carriageret)
-                s = "\rRS: " + s;
+                s = "\rRS: (" + runChars[runCharsPos] + ") " + s;
             else
                 s = "RS:> " + s;
 

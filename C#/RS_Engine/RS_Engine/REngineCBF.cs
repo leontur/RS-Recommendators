@@ -147,7 +147,7 @@ namespace RS_Engine
 
                 //counter
                 if (++c % 100 == 0)
-                    RManager.outLog(string.Format("\r - user: {0}", c), true);
+                    RManager.outLog(string.Format("  - user: {0}", c), true, true);
 
                 //retrieving interactions done by current user to recommend (and merging to select most populars)
                 List<int> interactions_of_user = RManager.interactions.Where(i => i[0] == u).Select(i => i[1]).ToList();

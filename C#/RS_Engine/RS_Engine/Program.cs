@@ -32,7 +32,7 @@ namespace RS_Engine
                 RManager.menuRS();
 
                 //START RS
-                if (!initialized)
+                if (!initialized && running)
                 {
                     RManager.initRS();
                     initialized = true;
