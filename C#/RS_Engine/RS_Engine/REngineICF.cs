@@ -298,7 +298,7 @@ namespace RS_Engine
                 //!! <> da gIT
 
                 //counter
-                if (u % 100 == 0)
+                if (u % 50 == 0)
                     RManager.outLog("  - user: " + u, true, true);
 
                 //retrieve the complete list of similarities for the current user
@@ -343,13 +343,14 @@ namespace RS_Engine
                 for (s = interactions_of_similar_users.Count - 1; s >= 0; s--)
                     if (!RManager.item_profile_enabled_list.Contains(interactions_of_similar_users[s]))
                         interactions_of_similar_users.RemoveAt(s);
-                
+
                 //CHECK
                 //if recommendations are not enough
+                int iteraction = 0;
                 while (interactions_of_similar_users.Count < 5)
                 {
                     //take the first recommendable item from the next similar user (all the same procedure as above)
-                    int newuserIndex = sorted_curr_user_line.Skip(SIM_RANGE).Take(1).Select(x => x.Value).First();
+                    int newuserIndex = sorted_curr_user_line.Skip(SIM_RANGE + iteraction).Take(1).Select(x => x.Value).First();
                     int newuserId = (int)RManager.user_profile[newuserIndex][0];
                     List<int> interactions_of_newuser = RManager.interactions.Where(x => x[0] == newuserId).Select(x => x[1]).ToList();
                     interactions_of_newuser = interactions_of_newuser.Except(already_clicked).ToList();
@@ -357,6 +358,7 @@ namespace RS_Engine
                         if (!RManager.item_profile_enabled_list.Contains(interactions_of_newuser[s]))
                             interactions_of_newuser.RemoveAt(s);
                     interactions_of_similar_users = interactions_of_similar_users.Concat(interactions_of_newuser).ToList();
+                    iteraction++;
                 }
 
                 //selecting most clicked items (top 5)
