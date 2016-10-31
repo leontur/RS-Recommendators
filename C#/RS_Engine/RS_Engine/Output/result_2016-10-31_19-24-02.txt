@@ -32,10 +32,13 @@ RS:>   -total lines | item_profile >>> 63446
 RS:>   -total lines | target_users >>> 10000
 RS:>   -total lines | user_profile >>> 40000
 RS:> 
-RS:>   + splitting data into train and test..
-RS:>   -total lines | user_profile (trained) >>> 30000
 RS:> -----------------------------------------------------------------
 RS:>   # running program 4
 RS:>   + processing..
 RS:>   + computing ICF.. 
-RS:>  - copy interactions titles, line: 0RS:>  - copy interactions titles, line: 0
+RS:>   >>>>>> ARE YOU SURE TO CONTINUE?  THIS IS A VERY LONG RUNNING PROGRAM (1h)
+RS:>   + reading serialized file ICF_interaction_titles.bin
+RS:>   + computing all_user_interactions_titles..
+RS:>   + reading serialized file ICF_all_user_interactions_titles.bin
+RS:>   + computing TGTuser-ALLuser distance similarity matrix
+RS:>(/)   - user: 0

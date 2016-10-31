@@ -376,13 +376,15 @@ namespace RS_Engine
             }
 
             //generating users and collecting items to recommend
+            int islast;
             for(int i=0; i<users.Count; i++)
             {
-                if(useritems[i].Count != 5)
-                    outLog("ERROR: the list useritems have not the length=5 !   ..INDEX: " + i);
+                if (useritems[i].Count != 5)
+                    outLog("ERROR: the list useritems have not the length (5)!   INDEX: " + i + "  ROWVALUE: " + users[i]);
                 sub_otpt += users[i] + ",";
+                islast = useritems[i].Count;
                 foreach (var r in useritems[i])
-                    sub_otpt += string.Format("{0}\t", r);
+                    sub_otpt += --islast > 0 ? string.Format("{0}\t", r) : string.Format("{0}", r);
                 sub_otpt += Environment.NewLine;
             }
 
@@ -413,7 +415,7 @@ namespace RS_Engine
 
             //left margin
             if (carriageret)
-                s = "\rRS: (" + runChars[runCharsPos] + ") " + s;
+                s = "\rRS:>(" + runChars[runCharsPos] + ") " + s;
             else
                 s = "RS:> " + s;
 

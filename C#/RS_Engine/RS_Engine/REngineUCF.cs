@@ -152,7 +152,7 @@ namespace RS_Engine
 
                 //counter
                 if (++c % 100 == 0)
-                    RManager.outLog("  - user: {0}" + c, true, true);
+                    RManager.outLog("  - user: " + c, true, true);
 
                 //getting index of this user
                 int uix = RManager.user_profile.FindIndex(x => (int)x[0] == u);

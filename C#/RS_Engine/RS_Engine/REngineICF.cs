@@ -34,7 +34,7 @@ namespace RS_Engine
 
         //ALGORITHM PARAMETERS
         //number of similarities to select (for each item to be recommended)
-        private const int SIM_RANGE = 15;
+        private const int SIM_RANGE = 20;
 
         //MAIN ALGORITHM METHOD
         public static void getRecommendations()
@@ -248,7 +248,8 @@ namespace RS_Engine
                         List<int> u2T = all_user_interactions_titles[u2];
 
                         //compute similarity between u1 and u2
-                        sim = computeDistanceBasedSimilarity(u1T, u2T);
+                        //sim = computeDistanceBasedSimilarity(u1T, u2T);
+                        sim = computeJaccardSimilarity(u1T, u2T); 
 
                         //storing sim
                         tmpSim.Add(sim);
@@ -294,7 +295,7 @@ namespace RS_Engine
 
                 //counter
                 if (u % 100 == 0)
-                    RManager.outLog("  - user: {0}" + u, true, true);
+                    RManager.outLog("  - user: " + u, true, true);
 
                 //retrieve the complete list of similarities for the current user
                 List<double> curr_user_line = tgtuser_to_allusers_distance_similarity[u];
@@ -340,6 +341,9 @@ namespace RS_Engine
                 //saving for output
                 user_user_simil_out.Add(interactions_of_similar_users_top);
             }
+
+            //OUTPUT_SUBMISSION
+            RManager.exportRecToSubmit(RManager.target_users, user_user_simil_out);
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////
@@ -350,7 +354,7 @@ namespace RS_Engine
         {
             //check if no one in common
             if (titleU1.Intersect(titleU2).Count() == 0)
-                return (double)0;
+                return 0;
 
             //compute the distance
             double num = 1, den = 0, squares_sum = 0;
@@ -360,7 +364,23 @@ namespace RS_Engine
                         squares_sum += Math.Pow(titleU1[i1] - titleU2[i2], 2);
 
             den = 1 + squares_sum;
-            return (double)(num / den);
+            return (num / den);
+        }
+
+        //JOBS TITLES
+        //JACCARD SIMILARITY
+        private static double computeJaccardSimilarity(List<int> titleU1, List<int> titleU2)
+        {
+            //compute the distance
+            double intersect = titleU1.Intersect(titleU2).Count();
+            double union = titleU1.Concat(titleU2).ToList().Count();
+
+            //check if no one in common
+            if (intersect == 0)
+                return 0;
+
+            //compute the similarity
+            return intersect / union;
         }
 
     }
