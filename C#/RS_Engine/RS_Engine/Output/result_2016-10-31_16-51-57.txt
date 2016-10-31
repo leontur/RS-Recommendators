@@ -1,0 +1,42 @@
+RS:> 
+RS:> -----------------------------------------------------------------
+RS:>  ** RECOMMENDATORS ENGINE **
+RS:> -----------------------------------------------------------------
+RS:>     ____________________________
+RS:>     Algorithms
+RS:>     1) TOP
+RS:>     2) CB-F
+RS:>     3) U-CF
+RS:>     4) I-CF
+RS:>     ____________________________
+RS:>     8) EVALUATE TRAIN-TEST
+RS:>     9) .bin size calculator
+RS:>     ____________________________
+RS:>     0) exit
+RS:> -----------------------------------------------------------------
+RS:> 
+RS:>     > RS:>     ==> selected program (4)
+RS:> -----------------------------------------------------------------
+RS:>   + initializing RS 
+RS:>   + initializing dataset retrievement 
+RS:>   + reading dataset: interactions
+RS:>   + dataset read OK | interactions_f count= 546865 | conversion..
+RS:>   + reading serialized file target_users.bin
+RS:>   + reading serialized file user_profile.bin
+RS:>   + reading serialized file item_profile.bin
+RS:>   + reading serialized file item_profile_disabled.bin
+RS:> 
+RS:>   + all datasets conversion: OK
+RS:>   -total lines | interactions >>> 546864
+RS:>   -total lines | item_profile >>> 63446
+RS:>   -total lines | target_users >>> 10000
+RS:>   -total lines | user_profile >>> 40000
+RS:> 
+RS:> -----------------------------------------------------------------
+RS:>   # running program 4
+RS:>   + processing..
+RS:>   + computing ICF.. 
+RS:>   >>>>>> ARE YOU SURE TO CONTINUE?  THIS IS A VERY LONG RUNNING PROGRAM (1h)
+RS:>   + reading serialized file ICF_interaction_titles.bin
+RS:>   + computing all_user_interactions_titles..
+RS:>   + reading serialized file ICF_all_user_interactions_titles.bin
