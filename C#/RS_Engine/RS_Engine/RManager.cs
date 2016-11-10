@@ -23,6 +23,8 @@ namespace RS_Engine
 
         //TEST DATA STRUCTURES
         public static List<List<object>> user_profile_test = new List<List<object>>();
+        public static List<int> output_users = new List<int>();
+        public static List<List<int>> output_useritems = new List<List<int>>();
 
         //Global vars
         public static int EXEMODE = 0;
@@ -430,8 +432,13 @@ namespace RS_Engine
             //try to create
             try
             {
+                //file csv
                 File.AppendAllText(sub_outputFileName, sub_otpt);
                 outLog(" >>>>>> output submission file created: " + sub_outputFileName);
+
+                //data structures for test purpose (passing reference)
+                output_users = users;
+                output_useritems = useritems;
             }
             catch
             {

@@ -303,7 +303,6 @@ namespace RS_Engine
                 num += similarities[i] * SIM_WEIGHTS[i];
                 den += SIM_WEIGHTS[i];
             }
-            den *= similarities.Length;
             double w_avg = num / den;
 
             /*
