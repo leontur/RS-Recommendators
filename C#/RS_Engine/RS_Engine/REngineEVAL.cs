@@ -15,18 +15,22 @@ namespace RS_Engine
         private static double RECALL;
         private static double K;
 
-        
-        public void computePrecision(int user_id, List<int> recommended)
+        public static void computePrecision()
         {
+            (int user_id, List<int> recommended)
             //nota la lista ha count()==5
+
+            RManager.outLog("-----------------------------------------------------------------");
+            RManager.outLog(" >>>>>> TEST MODE GENERATING PRECISION ");
 
 
         }
 
+        
         /*
-
         //TUTTO DA RIVEDERE
-        //NON SI INTERFACCIA NIENTE CON MANAGER
+        //NON C'E' UNA RIGA DI COMMENTO
+        //>>> CHIEDERE SARA
 
         string[] raws;
         int u_id;
@@ -135,5 +139,6 @@ namespace RS_Engine
             return r / j_id.Length;
         }
         */
+
     }
 }

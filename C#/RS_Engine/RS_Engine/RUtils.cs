@@ -15,7 +15,8 @@ namespace RS_Engine
         //CALCULATOR
         public static void showCalculator()
         {
-            RManager.outLog("\n CALCULATOR for float mxn matrices dimensions ");
+            RManager.outLog("");
+            RManager.outLog("CALCULATOR for float mxn matrices dimensions ");
             RManager.outLog(" >>>>>> please insert the rows number: ");
             int rn = Convert.ToInt32(Console.ReadLine());
             RManager.outLog(" >>>>>> please insert the columns number: ");

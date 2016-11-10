@@ -14,15 +14,19 @@ namespace RS_Engine
         //MAIN DATA STRUCTURES (cleaned from datasets)
         public static List<List<int>> interactions = new List<List<int>>();
         public static List<int> target_users = new List<int>();
-        public static List<List<object>> user_profile = new List<List<object>>();
+        public static List<List<object>> user_profile = new List<List<object>>(); //train matrix
         public static List<List<object>> item_profile = new List<List<object>>();
 
         //AUXILIARY DATA STRUCTURES
         public static List<int> item_profile_enabled_list = new List<int>();
         public static List<List<object>> item_profile_disabled = new List<List<object>>();
 
+        //TEST DATA STRUCTURES
+        public static List<List<object>> user_profile_test = new List<List<object>>();
+
         //Global vars
         public static int EXEMODE = 0;
+        public static bool ISTESTMODE = false;
 
         //Unique path vars
         private static string BACKPATH = "../../../";
@@ -309,7 +313,8 @@ namespace RS_Engine
             */
 
             //SPLITTING TRAIN AD TEST DATA
-            //REngineSPLIT.splitTrainTestData();
+            if(ISTESTMODE)
+                REngineSPLIT.splitTrainTestData();
         }
 
         //MENU SELECTOR
@@ -321,6 +326,19 @@ namespace RS_Engine
             outLog(" ** RECOMMENDATORS ENGINE **");
             outLog("-----------------------------------------------------------------");
 
+            //display mode
+            outLog("    ____________________________");
+            if (ISTESTMODE)
+            {
+                outLog("    ++ TEST MODE ++");
+                outLog("    datasets are initialized as train/test (not use for kaggle scope)");
+            }
+            else
+            {
+                outLog("    Mode");
+                outLog("    8) test mode: enable here to initialize the dataset as train/test (not use for kaggle scope)");
+            }
+
             //display menu
             outLog("    ____________________________");
             outLog("    Algorithms");
@@ -329,7 +347,6 @@ namespace RS_Engine
             outLog("    3) U-CF");
             outLog("    4) I-CF");
             outLog("    ____________________________");
-            outLog("    8) EVALUATE TRAIN-TEST");
             outLog("    9) .bin size calculator");
             outLog("    ____________________________");
             outLog("    0) exit");
@@ -345,11 +362,23 @@ namespace RS_Engine
             //display selection
             outLog(string.Format("    ==> selected program ({0})", EXEMODE));
             outLog("-----------------------------------------------------------------");
+
+            //detect local testing mode
+            if (EXEMODE == 8)
+            {
+                ISTESTMODE = true;
+                Console.Clear();
+                menuRS();
+            }
         }
 
         //HALT RECOMMENDER SYSTEM
         public static void haltRS()
         {
+            //if TEST mode, get output results
+            if(ISTESTMODE)
+                REngineEVAL.computePrecision();
+
             //Halting
             outLog("-----------------------------------------------------------------");
             outLog(" >>>>>> halting RS..");

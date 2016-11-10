@@ -55,6 +55,7 @@ namespace RS_Engine
             //Info
             RManager.outLog("-----------------------------------------------------------------");
             RManager.outLog("  # running program " + RManager.EXEMODE);
+            RManager.outLog("");
 
             //CHOICE INVOKER
             //ALGORITHM INVOKER

@@ -3,6 +3,9 @@ RS:> -----------------------------------------------------------------
 RS:>  ** RECOMMENDATORS ENGINE **
 RS:> -----------------------------------------------------------------
 RS:>     ____________________________
+RS:>     Mode
+RS:>     7) test mode: enable here to initialize the dataset as train/test (not use for kaggle scope)
+RS:>     ____________________________
 RS:>     Algorithms
 RS:>     1) TOP
 RS:>     2) CB-F
@@ -15,7 +18,7 @@ RS:>     ____________________________
 RS:>     0) exit
 RS:> -----------------------------------------------------------------
 RS:> 
-RS:>     > RS:>     ==> selected program (4)
+RS:>     > RS:>     ==> selected program (9)
 RS:> -----------------------------------------------------------------
 RS:>   + initializing RS 
 RS:>   + initializing dataset retrievement 
@@ -34,12 +37,7 @@ RS:>   -total lines | target_users >>> 10000
 RS:>   -total lines | user_profile >>> 40000
 RS:> 
 RS:> -----------------------------------------------------------------
-RS:>   # running program 4
-RS:>   + processing..
-RS:>   + computing ICF.. 
-RS:>   >>>>>> ARE YOU SURE TO CONTINUE?  THIS IS A VERY LONG RUNNING PROGRAM (1h)
-RS:>   + reading serialized file ICF_interaction_titles.bin
-RS:>   + computing all_user_interactions_titles..
-RS:>   + reading serialized file ICF_all_user_interactions_titles.bin
-RS:>   + computing TGTuser-ALLuser distance similarity matrix
-RS:>   + reading serialized file ICF_tgtuser_to_allusers_distance_similarity.bin
+RS:>   # running program 9
+RS:> 
+ CALCULATOR for float mxn matrices dimensions 
+RS:>  >>>>>> please insert the rows number: 

@@ -287,7 +287,7 @@ namespace RS_Engine
             RManager.outLog("  + generating output structured data");
 
             //generating items to recommend for each user
-            List<List<int>> user_user_simil_out = new List<List<int>>();
+            List<List<int>> icf_simil_out = new List<List<int>>();
 
             //for each user to recommend (u: is the id of the target user)
             //finding recommended items
@@ -344,6 +344,13 @@ namespace RS_Engine
                     if (!RManager.item_profile_enabled_list.Contains(interactions_of_similar_users[s]))
                         interactions_of_similar_users.RemoveAt(s);
 
+                //ordering most clicked items (and removing duplicates for next check)
+                interactions_of_similar_users = interactions_of_similar_users
+                                                            .GroupBy(i => i)
+                                                            .OrderByDescending(grp => grp.Count())
+                                                            .Select(x => x.Key)
+                                                            .ToList();
+
                 //CHECK
                 //if recommendations are not enough
                 int iteraction = 0;
@@ -357,23 +364,20 @@ namespace RS_Engine
                     for (s = interactions_of_newuser.Count - 1; s >= 0; s--)
                         if (!RManager.item_profile_enabled_list.Contains(interactions_of_newuser[s]))
                             interactions_of_newuser.RemoveAt(s);
+                    interactions_of_newuser = interactions_of_newuser.Distinct().ToList();
                     interactions_of_similar_users = interactions_of_similar_users.Concat(interactions_of_newuser).ToList();
                     iteraction++;
                 }
 
-                //selecting most clicked items (top 5)
-                var interactions_of_similar_users_group_by = interactions_of_similar_users
-                                                            .GroupBy(i => i)
-                                                            .OrderByDescending(grp => grp.Count())
-                                                            .Take(5);
-                List<int> interactions_of_similar_users_top = interactions_of_similar_users_group_by.Select(x => x.Key).ToList();
+                //trim of top 5
+                interactions_of_similar_users = interactions_of_similar_users.Take(5).ToList();
 
                 //saving for output
-                user_user_simil_out.Add(interactions_of_similar_users_top);
+                icf_simil_out.Add(interactions_of_similar_users);
             }
 
             //OUTPUT_SUBMISSION
-            RManager.exportRecToSubmit(RManager.target_users, user_user_simil_out);
+            RManager.exportRecToSubmit(RManager.target_users, icf_simil_out);
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////
