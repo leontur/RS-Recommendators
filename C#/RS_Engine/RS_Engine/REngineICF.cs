@@ -334,7 +334,7 @@ namespace RS_Engine
 
                 //ADVANCED FILTER
                 //retrieving interactions already used by the current user (not recommendig a job already applied)
-                List<int> already_clicked = RManager.interactions.Where(i => i[0] == RManager.target_users[u] && i[2] < 3).Select(i => i[1]).ToList();
+                List<int> already_clicked = RManager.interactions.Where(i => i[0] == RManager.target_users[u] && i[2] == 3).Select(i => i[1]).ToList();
                 
                 //removing already clicked
                 interactions_of_similar_users = interactions_of_similar_users.Except(already_clicked).ToList();

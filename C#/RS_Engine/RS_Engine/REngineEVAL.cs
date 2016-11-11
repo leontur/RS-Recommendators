@@ -45,6 +45,10 @@ namespace RS_Engine
             float mean_num = 0;
             for (int u = 0; u < tgt_user_count; u++)
             {
+                //counter
+                if (u % 50 == 0)
+                    RManager.outLog("  - user: " + u, true, true);
+
                 //get the id of current user to check
                 int u_id = RManager.output_users[u];
 

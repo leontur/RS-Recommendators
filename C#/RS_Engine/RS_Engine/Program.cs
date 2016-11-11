@@ -97,7 +97,7 @@ namespace RS_Engine
             else if (RManager.EXEMODE == 8)
             {
                 //PROCESSING - EVAL
-                //REngineEVAL.getEval();
+                REngineEVAL.computePrecision();
             }
             else if (RManager.EXEMODE == 9)
             {

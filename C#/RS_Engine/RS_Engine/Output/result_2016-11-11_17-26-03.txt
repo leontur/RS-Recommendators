@@ -1,0 +1,70 @@
+RS:> 
+RS:> -----------------------------------------------------------------
+RS:>  ** RECOMMENDATORS ENGINE **
+RS:> -----------------------------------------------------------------
+RS:>     ____________________________
+RS:>     Mode
+RS:>     7) test mode: enable here to initialize the dataset as train/test (not use for kaggle scope)
+RS:>     8) test mode EVAL: execute EVAL with input a csv (not use for kaggle scope)
+RS:>     ____________________________
+RS:>     Algorithms
+RS:>     1) TOP
+RS:>     2) CB-F
+RS:>     3) U-CF
+RS:>     4) I-CF
+RS:>     ____________________________
+RS:>     9) .bin size calculator
+RS:>     ____________________________
+RS:>     0) exit
+RS:> -----------------------------------------------------------------
+RS:> 
+RS:>     > RS:>     ==> selected program (8)
+RS:> -----------------------------------------------------------------
+RS:>   + initializing RS 
+RS:>   + initializing dataset retrievement 
+RS:>   + reading dataset: interactions
+RS:>   + dataset read OK | interactions_f count= 546865 | conversion..
+RS:>   + reading serialized file target_users.bin
+RS:>   + reading serialized file user_profile.bin
+RS:>   + reading serialized file item_profile.bin
+RS:>   + reading serialized file item_profile_disabled.bin
+RS:>   + populating auxiliary data structures 
+RS:> 
+RS:>   + all datasets conversion: OK
+RS:>   -total lines | interactions >>> 546864
+RS:>   -total lines | item_profile >>> 63446
+RS:>   -total lines | target_users >>> 10000
+RS:>   -total lines | user_profile >>> 40000
+RS:> 
+RS:>   + reading submission from csv
+RS:>   + read OK | submission_f count= 10001 | conversion..
+RS:>   + conversion OK | submission user count= 10000 | submission useritems count= 10000
+RS:> -----------------------------------------------------------------
+RS:>  >>>>>> TEST MODE GENERATING PRECISION 
+RS:>(/)   - user: 0RS:>(-)   - user: 50RS:>(\)   - user: 100RS:>(|)   - user: 150RS:>(/)   - user: 200RS:>(-)   - user: 250RS:>(\)   - user: 300RS:>(|)   - user: 350RS:>(/)   - user: 400RS:>(-)   - user: 450RS:>(\)   - user: 500RS:>(|)   - user: 550RS:>(/)   - user: 600RS:>(-)   - user: 650RS:>(\)   - user: 700RS:>(|)   - user: 750RS:>(/)   - user: 800RS:>(-)   - user: 850RS:>(\)   - user: 900RS:>(|)   - user: 950RS:>(/)   - user: 1000RS:>(-)   - user: 1050RS:>(\)   - user: 1100RS:>(|)   - user: 1150RS:>(/)   - user: 1200RS:>(-)   - user: 1250RS:>(\)   - user: 1300RS:>(|)   - user: 1350RS:>(/)   - user: 1400RS:>(-)   - user: 1450RS:>(\)   - user: 1500RS:>(|)   - user: 1550RS:>(/)   - user: 1600RS:>(-)   - user: 1650RS:>(\)   - user: 1700RS:>(|)   - user: 1750RS:>(/)   - user: 1800RS:>(-)   - user: 1850RS:>(\)   - user: 1900RS:>(|)   - user: 1950RS:>(/)   - user: 2000RS:>(-)   - user: 2050RS:>(\)   - user: 2100RS:>(|)   - user: 2150RS:>(/)   - user: 2200RS:>(-)   - user: 2250RS:>(\)   - user: 2300RS:>(|)   - user: 2350RS:>(/)   - user: 2400RS:>(-)   - user: 2450RS:>(\)   - user: 2500RS:>(|)   - user: 2550RS:>(/)   - user: 2600RS:>(-)   - user: 2650RS:>(\)   - user: 2700RS:>(|)   - user: 2750RS:>(/)   - user: 2800RS:>(-)   - user: 2850RS:>(\)   - user: 2900RS:>(|)   - user: 2950RS:>(/)   - user: 3000RS:>(-)   - user: 3050RS:>(\)   - user: 3100RS:>(|)   - user: 3150RS:>(/)   - user: 3200RS:>(-)   - user: 3250RS:>(\)   - user: 3300RS:>(|)   - user: 3350RS:>(/)   - user: 3400RS:>(-)   - user: 3450RS:>(\)   - user: 3500RS:>(|)   - user: 3550RS:>(/)   - user: 3600RS:>(-)   - user: 3650RS:>(\)   - user: 3700RS:>(|)   - user: 3750RS:>(/)   - user: 3800RS:>(-)   - user: 3850RS:>(\)   - user: 3900RS:>(|)   - user: 3950RS:>(/)   - user: 4000RS:>(-)   - user: 4050RS:>(\)   - user: 4100RS:>(|)   - user: 4150RS:>(/)   - user: 4200RS:>(-)   - user: 4250RS:>(\)   - user: 4300RS:>(|)   - user: 4350RS:>(/)   - user: 4400RS:>(-)   - user: 4450RS:>(\)   - user: 4500RS:>(|)   - user: 4550RS:>(/)   - user: 4600RS:>(-)   - user: 4650RS:>(\)   - user: 4700RS:>(|)   - user: 4750RS:>(/)   - user: 4800RS:>(-)   - user: 4850RS:>(\)   - user: 4900RS:>(|)   - user: 4950RS:>(/)   - user: 5000RS:>(-)   - user: 5050RS:>(\)   - user: 5100RS:>(|)   - user: 5150RS:>(/)   - user: 5200RS:>(-)   - user: 5250RS:>(\)   - user: 5300RS:>(|)   - user: 5350RS:>(/)   - user: 5400RS:>(-)   - user: 5450RS:>(\)   - user: 5500RS:>(|)   - user: 5550RS:>(/)   - user: 5600RS:>(-)   - user: 5650RS:>(\)   - user: 5700RS:>(|)   - user: 5750RS:>(/)   - user: 5800RS:>(-)   - user: 5850RS:>(\)   - user: 5900RS:>(|)   - user: 5950RS:>(/)   - user: 6000RS:>(-)   - user: 6050RS:>(\)   - user: 6100RS:>(|)   - user: 6150RS:>(/)   - user: 6200RS:>(-)   - user: 6250RS:>(\)   - user: 6300RS:>(|)   - user: 6350RS:>(/)   - user: 6400RS:>(-)   - user: 6450RS:>(\)   - user: 6500RS:>(|)   - user: 6550RS:>(/)   - user: 6600RS:>(-)   - user: 6650RS:>(\)   - user: 6700RS:>(|)   - user: 6750RS:>(/)   - user: 6800RS:>(-)   - user: 6850RS:>(\)   - user: 6900RS:>(|)   - user: 6950RS:>(/)   - user: 7000RS:>(-)   - user: 7050RS:>(\)   - user: 7100RS:>(|)   - user: 7150RS:>(/)   - user: 7200RS:>(-)   - user: 7250RS:>(\)   - user: 7300RS:>(|)   - user: 7350RS:>(/)   - user: 7400RS:>(-)   - user: 7450RS:>(\)   - user: 7500RS:>(|)   - user: 7550RS:>(/)   - user: 7600RS:>(-)   - user: 7650RS:>(\)   - user: 7700RS:>(|)   - user: 7750RS:>(/)   - user: 7800RS:>(-)   - user: 7850RS:>(\)   - user: 7900RS:>(|)   - user: 7950RS:>(/)   - user: 8000RS:>(-)   - user: 8050RS:>(\)   - user: 8100RS:>(|)   - user: 8150RS:>(/)   - user: 8200RS:>(-)   - user: 8250RS:>(\)   - user: 8300RS:>(|)   - user: 8350RS:>(/)   - user: 8400RS:>(-)   - user: 8450RS:>(\)   - user: 8500RS:>(|)   - user: 8550RS:>(/)   - user: 8600RS:>(-)   - user: 8650RS:>(\)   - user: 8700RS:>(|)   - user: 8750RS:>(/)   - user: 8800RS:>(-)   - user: 8850RS:>(\)   - user: 8900RS:>(|)   - user: 8950RS:>(/)   - user: 9000RS:>(-)   - user: 9050RS:>(\)   - user: 9100RS:>(|)   - user: 9150RS:>(/)   - user: 9200RS:>(-)   - user: 9250RS:>(\)   - user: 9300RS:>(|)   - user: 9350RS:>(/)   - user: 9400RS:>(-)   - user: 9450RS:>(\)   - user: 9500RS:>(|)   - user: 9550RS:>(/)   - user: 9600RS:>(-)   - user: 9650RS:>(\)   - user: 9700RS:>(|)   - user: 9750RS:>(/)   - user: 9800RS:>(-)   - user: 9850RS:>(\)   - user: 9900RS:>(|)   - user: 9950
+RS:>  >>>>>> MEAN AVERAGE PRECISION = 0  @5
+RS:>  >>>>>> RECALL = 0  @SINGLE3
+RS:> -----------------------------------------------------------------
+RS:>   # running program 8
+RS:> 
+RS:> 
+RS:> -----------------------------------------------------------------
+RS:>  ** RECOMMENDATORS ENGINE **
+RS:> -----------------------------------------------------------------
+RS:>     ____________________________
+RS:>     Mode
+RS:>     7) test mode: enable here to initialize the dataset as train/test (not use for kaggle scope)
+RS:>     8) test mode EVAL: execute EVAL with input a csv (not use for kaggle scope)
+RS:>     ____________________________
+RS:>     Algorithms
+RS:>     1) TOP
+RS:>     2) CB-F
+RS:>     3) U-CF
+RS:>     4) I-CF
+RS:>     ____________________________
+RS:>     9) .bin size calculator
+RS:>     ____________________________
+RS:>     0) exit
+RS:> -----------------------------------------------------------------
+RS:> 
+RS:>     > 

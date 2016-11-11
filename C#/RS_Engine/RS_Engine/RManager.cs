@@ -29,6 +29,7 @@ namespace RS_Engine
         //Global vars
         public static int EXEMODE = 0;
         public static bool ISTESTMODE = false;
+        public static bool ISEVALMODE = false;
 
         //Unique path vars
         private static string BACKPATH = "../../../";
@@ -315,8 +316,35 @@ namespace RS_Engine
             */
 
             //SPLITTING TRAIN AD TEST DATA
-            if(ISTESTMODE)
+            if (ISTESTMODE)
                 REngineSPLIT.splitTrainTestData();
+
+            //EVAL RUN MODE
+            if (ISEVALMODE)
+            {
+                //READ FROM CSV
+
+                //clear outputs
+                output_users.Clear();
+                output_useritems.Clear();
+
+                //Data init
+                outLog("  + reading submission from csv");
+                var submission_f = File.ReadAllLines(BACKPATH + "Output/eval/submission" + ".csv");
+                outLog("  + read OK | submission_f count= " + submission_f.Count() + " | conversion..");
+
+                //scroll file
+                for (i = 1; i < submission_f.Length; i++)
+                {
+                    List<string> row_IN = submission_f[i].Split(',').Select(x => x).ToList();
+
+                    //creating data structures for test purpose
+                    output_users.Add(Int32.Parse(row_IN[0]));
+                    output_useritems.Add(row_IN[1].Split('\t').Select(Int32.Parse).ToList());
+                }
+
+                outLog("  + conversion OK | submission user count= " + output_users.Count() + " | submission useritems count= " + output_useritems.Count());
+            }
         }
 
         //MENU SELECTOR
@@ -338,7 +366,8 @@ namespace RS_Engine
             else
             {
                 outLog("    Mode");
-                outLog("    8) test mode: enable here to initialize the dataset as train/test (not use for kaggle scope)");
+                outLog("    7) test mode: enable here to initialize the dataset as train/test (not use for kaggle scope)");
+                outLog("    8) test mode EVAL: execute EVAL with input a csv (not use for kaggle scope)");
             }
 
             //display menu
@@ -366,11 +395,15 @@ namespace RS_Engine
             outLog("-----------------------------------------------------------------");
 
             //detect local testing mode
-            if (EXEMODE == 8)
+            if (EXEMODE == 7)
             {
                 ISTESTMODE = true;
                 Console.Clear();
                 menuRS();
+            }
+            if (EXEMODE == 8)
+            {
+                ISEVALMODE = true;
             }
         }
 
@@ -378,7 +411,7 @@ namespace RS_Engine
         public static void haltRS()
         {
             //if TEST mode, get output results
-            if(ISTESTMODE)
+            if(ISTESTMODE && !ISEVALMODE)
                 REngineEVAL.computePrecision();
 
             //Halting
