@@ -333,11 +333,12 @@ namespace RS_Engine
                             interactions_of_similar_users.Add(j[1]);
 
                 //ADVANCED FILTER
-                //retrieving interactions already used by the current user (not recommendig a job already applied)
-                List<int> already_clicked = RManager.interactions.Where(i => i[0] == RManager.target_users[u] && i[2] == 3).Select(i => i[1]).ToList();
-                
-                //removing already clicked
-                interactions_of_similar_users = interactions_of_similar_users.Except(already_clicked).ToList();
+                if (!RManager.ISTESTMODE) {
+                    //retrieving interactions already used by the current user (not recommending a job already applied)
+                    List<int> already_clicked = RManager.interactions.Where(i => i[0] == RManager.target_users[u] && i[2] <= 3).Select(i => i[1]).ToList();
+                    //removing already clicked
+                    interactions_of_similar_users = interactions_of_similar_users.Except(already_clicked).ToList();
+                }
 
                 //removing not recommendable
                 for (s = interactions_of_similar_users.Count - 1; s >= 0; s--)
