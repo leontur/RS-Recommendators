@@ -47,4 +47,25 @@ namespace RS_Engine
             RManager.outLog("   # TIMER:" + use + " => " + timMS_1.ToString("F1") + " ms (" + (timMS_1/1000).ToString("F1") + " seconds) ");
         }
     }
+
+    ////////////////////////////////////////////////////////
+    //JUNK
+    /*
+    //MULTITHREAD 8 tasks / 1 per core
+    int threads = 8;
+    int tot = RManager.target_users.Count;
+    int slot = tot / threads;
+    var tasks = new Task[threads];
+    for (int t = 0; t < threads; t++)
+    {
+        int jump = slot * t;
+        int bound = (t == threads - 1) ? tot : jump + slot;
+        tasks[t] = Task.Factory.StartNew(() =>
+        {
+            for (int u = jump; u < bound; u++)
+                computeParallel(u, tgtuser_to_allusers_distance_similarity);
+        });
+    }
+    Task.WaitAll(tasks);  
+    */              
 }

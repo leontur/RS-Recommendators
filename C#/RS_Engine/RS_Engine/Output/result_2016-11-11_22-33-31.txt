@@ -1,0 +1,6 @@
+RS:>   + reading serialized file ICF_interaction_titles.bin
+RS:>   + computing all_user_interactions_titles..
+RS:>   + reading serialized file ICF_all_user_interactions_titles.bin
+RS:>   + computing TGTuser-ALLuser distance similarity matrix
+RS:>   + reading serialized file ICF_tgtuser_to_allusers_distance_similarity.bin
+RS:>   + generating output structured data

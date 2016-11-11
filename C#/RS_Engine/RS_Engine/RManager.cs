@@ -484,7 +484,7 @@ namespace RS_Engine
         private static string[] runChars = new string[] { "|", "/", "-", "\\" };
         private static int runCharsPos = 0;
         private static bool lastWasInline = false;
-        public static void outLog(string s, bool inline = false, bool carriageret = false)
+        public static void outLog(string s, bool inline = false, bool carriageret = false, bool onlyconsole = false)
         {
             //update runchars
             if(runCharsPos == 3) runCharsPos = 0;
@@ -512,16 +512,18 @@ namespace RS_Engine
                 Console.WriteLine(s);
 
             //try to append
-            try
-            {
-                if (inline)
-                    File.AppendAllText(LOGPATH, s);
-                else
-                    File.AppendAllText(LOGPATH, s + Environment.NewLine);
-            }
-            catch
-            {
-                Console.WriteLine("ERROR: unable to append text to output_log");
+            if (!onlyconsole) {
+                try
+                {
+                    if (inline)
+                        File.AppendAllText(LOGPATH, s);
+                    else
+                        File.AppendAllText(LOGPATH, s + Environment.NewLine);
+                }
+                catch
+                {
+                    Console.WriteLine("ERROR: unable to append text to output_log");
+                }
             }
 
             //memory
