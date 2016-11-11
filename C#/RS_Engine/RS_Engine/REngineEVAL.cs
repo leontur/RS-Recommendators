@@ -8,23 +8,42 @@ namespace RS_Engine
 {
     class REngineEVAL
     {
-
-        private static double AP;
+        //MAP EVAL VARS
+        private const int MAP_K = 5;
         private static double MAP;
-        private static double PREC;
-        private static double RECALL;
-        private static double K;
 
+        //RECALL EVAL VARS
+        private const int RECALL_SINGLE_K = 3;
+        private static double RECALL;
+
+        //Invocation method
         public static void computePrecision()
         {
             RManager.outLog("-----------------------------------------------------------------");
             RManager.outLog(" >>>>>> TEST MODE GENERATING PRECISION ");
 
+            //CALL MAP EXECUTION
+            mean_avg_precision();
+
+            //log
+            RManager.outLog(" >>>>>> MEAN AVERAGE PRECISION = " + MAP + "  @" + MAP_K);
+            RManager.outLog(" >>>>>> RECALL = " + RECALL + "  @SINGLE" + RECALL_SINGLE_K);
+        }
+
+        //MAP @K
+        //MEAN AVERAGE PRECISION 
+        private static void mean_avg_precision()
+        {
             //NOTE: output lists from algorithm execution
             //RManager.output_users     > count of these two lists is the same
             //RManager.output_useritems > for each row the inner list has count()==5 (predictions)
 
-            for (int u = 0; u < RManager.output_users.Count; u++)
+            //get the number of target users
+            int tgt_user_count = RManager.output_users.Count;
+
+            //Calculate the precision (AP) for each target user and create a mean (MAP)
+            float mean_num = 0;
+            for (int u = 0; u < tgt_user_count; u++)
             {
                 //get the id of current user to check
                 int u_id = RManager.output_users[u];
@@ -35,64 +54,70 @@ namespace RS_Engine
                 //select the user's clicked items in interactions (as list<int>)
                 List<int> job_clicked = RManager.interactions.Where(x => x[0] == u_id).Select(x => x[1]).ToList();
 
-                //getting the MAP@K precision for current user
-                float MAP = mean_avg_precision(u_id, j_id, job_clicked);
-
-                //getting RECALL
-                float REC = recall(u_id, j_id, job_clicked);
+                //getting the AP@K precision for current user
+                mean_num += ave_precision(u_id, j_id, job_clicked);
             }
+
+            //optional: getting recall mean
+            RECALL = RECALL / tgt_user_count;
+
+            //getting the MAP@K precision for all users (output_users)
+            MAP = mean_num / tgt_user_count;
         }
 
-        //MAP@K
-        //MEAN AVERAGE PRECISION
-        private static float mean_avg_precision(int u_id, int[] j_id, List<int> job_clicked)
-        {
-            //for each prediction
-            float num = 0;
-            for (int pred = 0; pred < j_id.Length; pred++)
-                num += ave_precision(u_id, j_id, pred, job_clicked);
-            return num / j_id.Length;
-        }
-
-        //AP
+        //AP @K
         //AVERAGE PRECISION
-        private static float ave_precision(int u_id, int[] j_id, int q, List<int> job_clicked)
+        private static float ave_precision(int u_id, int[] j_id, List<int> job_clicked)
         {
-            //sum first q elements and divide by number of relevant (clicked) items
+            //compute the number of hits (clicked and recommended) @K (that is a limit)
+            float hit = Math.Min(MAP_K, job_clicked.Intersect(j_id).Count());
+
+            //create the average numerator
             float avg = 0;
-            for (int j = 0; j <= q; j++)
+
+            //sum first q elements and divide by number of relevant (clicked) items
+            for (int j = 0; j < MAP_K; j++)
             {
-                int[] tmp = new int[j + 1];
-                for (int i = 0; i <= j; i++)
-                    tmp[i] = j_id[i];
-                avg += precision(u_id, tmp, job_clicked) * relevance(tmp[j], job_clicked);
+                //take first j elements from j_id list
+                int[] tmp_j_id = j_id.Take(j+1).ToArray();
+
+                //add to average | ( x/y z/t ...)
+                avg += precision(u_id, tmp_j_id, job_clicked) * relevance(tmp_j_id[j], job_clicked);
+
+                //optional: getting RECALL
+                if(j == RECALL_SINGLE_K - 1)
+                    RECALL += recall(tmp_j_id, job_clicked, hit);
             }
-            return avg / job_clicked.Count;
+
+            //return AP (@ K) | ( x/y z/t ...)/hit
+            if (hit == 0)
+                return 0;
+            else
+                return avg / hit;
         }
 
         //PRECISION
-        private static float precision(int u_id, int[] j_id, List<int> job_clicked)
+        private static float precision(int u_id, int[] tmp_j_id, List<int> job_clicked)
         {
             //find the number of common items (clicked and predicted)
-            //divided by fixed number (@ K)
-            return job_clicked.Intersect(j_id).Count() / j_id.Length;
+            //divided by the incremental subset in check
+            return job_clicked.Intersect(tmp_j_id).Count() / tmp_j_id.Length;
+        }
+
+        //Relevance check
+        private static int relevance(int curr_job_id, List<int> job_clicked)
+        {
+            return job_clicked.Contains(curr_job_id) ? 1 : 0;
         }
 
         //RECALL
-        private static float recall(int u_id, int[] j_id, List<int> job_clicked)
+        private static float recall(int[] tmp_j_id, List<int> job_clicked, float hit)
         {
-            //find the number of common items (clicked and predicted)
-            //divided by number of clicked (relevant)
-            return job_clicked.Intersect(j_id).Count() / job_clicked.Count;
-        }
-
-        /////////////////////////////////////////////////////////////////////////
-        //AUXILIARY
-
-        //Relevance check
-        private static int relevance(int job_id, List<int> job_clicked)
-        {
-            return job_clicked.Contains(job_id) ? 1 : 0;
+            //find the bounty of the first RECALL_SINGLE_K predictions (clicked and predicted over all hit)
+            if (hit == 0)
+                return 0;
+            else
+                return job_clicked.Intersect(tmp_j_id).Count() / hit;
         }
 
     }
