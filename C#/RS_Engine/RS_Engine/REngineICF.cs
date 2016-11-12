@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace RS_Engine
@@ -31,10 +32,12 @@ namespace RS_Engine
      */
     class REngineICF
     {
-
         //ALGORITHM PARAMETERS
         //number of similarities to select (for each item to be recommended)
         private const int SIM_RANGE = 5;
+
+        //EXECUTION VARS
+        private static List<List<double>> tgtuser_to_allusers_distance_similarity = new List<List<double>>();
 
         //MAIN ALGORITHM METHOD
         public static void getRecommendations()
@@ -107,7 +110,7 @@ namespace RS_Engine
                 //serialize
                 using (Stream stream = File.Open(Path.Combine(RManager.SERIALTPATH, "ICF_interaction_titles.bin"), FileMode.Create))
                 {
-                    RManager.outLog("\n  + writing serialized file " + "ICF_interaction_titles.bin");
+                    RManager.outLog("  + writing serialized file " + "ICF_interaction_titles.bin");
                     var bformatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
                     bformatter.Serialize(stream, interaction_titles);
                 }
@@ -187,7 +190,7 @@ namespace RS_Engine
                 //serialize
                 using (Stream stream = File.Open(Path.Combine(RManager.SERIALTPATH, "ICF_all_user_interactions_titles.bin"), FileMode.Create))
                 {
-                    RManager.outLog("\n  + writing serialized file " + "ICF_all_user_interactions_titles.bin");
+                    RManager.outLog("  + writing serialized file " + "ICF_all_user_interactions_titles.bin");
                     var bformatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
                     bformatter.Serialize(stream, all_user_interactions_titles);
                 }
@@ -211,7 +214,7 @@ namespace RS_Engine
             //compute the similarity between two users
             // rows: each target user (count: from target_users)
             // cols: each other user (count: from user_profile)
-            List<List<double>> tgtuser_to_allusers_distance_similarity = new List<List<double>>();
+            // data structure: List<List<double>> tgtuser_to_allusers_distance_similarity
 
             //NOTE
             // the index of the list   all_user_interactions_titles   
@@ -222,50 +225,61 @@ namespace RS_Engine
             //check if already serialized (for fast fetching)
             if (!File.Exists(Path.Combine(RManager.SERIALTPATH, "ICF_tgtuser_to_allusers_distance_similarity.bin")))
             {
+                //PARALLEL VARS
+                int par_length1 = RManager.target_users.Count;
+                double[][] par_data1 = new double[par_length1][];
+                int par_length2 = RManager.user_profile.Count;
+                int par_counter1 = par_length1;
 
-                //for each user to recommend (u: is the id of the target user)
-                int u1, u2;
-                double sim;
-                for (u1 = 0; u1 < RManager.target_users.Count(); u1++)
-                {
-                    //counter
-                    if (u1 % 100 == 0)
-                        RManager.outLog("  - user: " + u1, true, true);
+                //PARALLEL FOR
+                //for each user to recommend (u1: is the index of the target user)
+                Parallel.For(0, par_length1, new ParallelOptions { MaxDegreeOfParallelism = 1 },
+                    u1 => {
 
-                    //get index of user 1
-                    int u1ix = RManager.user_profile.FindIndex(x => (int)x[0] == RManager.target_users[u1]);
+                        //counter
+                        Interlocked.Decrement(ref par_counter1);
+                        if (par_counter1 % 10 == 0) RManager.outLog("  - remaining: " + par_counter1, true, true, true);
 
-                    //user 1 titles
-                    List<int> u1T = all_user_interactions_titles[u1ix];
+                        //get index of user 1
+                        int u1ix = RManager.user_profile.FindIndex(x => (int)x[0] == RManager.target_users[u1]);
 
-                    //temp sim list
-                    List<double> tmpSim = new List<double>();
+                        //user 1 titles
+                        List<int> u1T = all_user_interactions_titles[u1ix];
 
-                    //for each user in dataset
-                    for (u2 = 0; u2 < RManager.user_profile.Count(); u2++)
-                    {
-                        //testing override
-                        //u2 = 30744; //(=index of id 285)
+                        //temp sim list
+                        double[] tmpSim = new double[par_length2];
 
-                        //user 2 titles
-                        List<int> u2T = all_user_interactions_titles[u2];
+                        //PARALLEL FOR
+                        //for each user in dataset user_profile
+                        Parallel.For(0, par_length2, new ParallelOptions { MaxDegreeOfParallelism = 8 },
+                            u2 => {
 
-                        //compute similarity between u1 and u2
-                        //sim = computeDistanceBasedSimilarity(u1T, u2T);
-                        sim = computeJaccardSimilarity(u1T, u2T); 
+                                //testing override
+                                //u2 = 30744; //(=index of id 285)
 
-                        //storing sim
-                        tmpSim.Add(sim);
-                    }
+                                //user 2 titles
+                                List<int> u2T = all_user_interactions_titles[u2];
 
-                    //storing sim vector
-                    tgtuser_to_allusers_distance_similarity.Add(tmpSim);
-                }
+                                //COMPUTE SIMILARITY between u1 and u2
+                                //double sim = computeDistanceBasedSimilarity(u1T, u2T);
+                                double sim = computeJaccardSimilarity(u1T, u2T);
+
+                                //storing sim
+                                tmpSim[u2] = sim;
+
+                            });
+
+                        //storing sim vector
+                        par_data1[u1] = tmpSim;
+                    });
+
+                //Converting to list data structure
+                tgtuser_to_allusers_distance_similarity = par_data1.Select(p => p.ToList()).ToList();
 
                 //serialize
                 using (Stream stream = File.Open(Path.Combine(RManager.SERIALTPATH, "ICF_tgtuser_to_allusers_distance_similarity.bin"), FileMode.Create))
                 {
-                    RManager.outLog("\n  + writing serialized file " + "ICF_tgtuser_to_allusers_distance_similarity.bin");
+                    RManager.outLog("  + writing serialized file " + "ICF_tgtuser_to_allusers_distance_similarity.bin");
                     var bformatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
                     bformatter.Serialize(stream, tgtuser_to_allusers_distance_similarity);
                 }
@@ -287,29 +301,33 @@ namespace RS_Engine
             RManager.outLog("  + generating output structured data");
             
             //PARALLEL VARS
-            int par_length = RManager.target_users.Count;
-            int[][] icf_simil_out_par = new int[par_length][];
-            int counter = par_length;
+            int par_length3 = RManager.target_users.Count;
+            int[][] par_data3 = new int[par_length3][];
+            int par_counter3 = par_length3;
 
             //PARALLEL FOR
-            object sync = new Object();
-            Parallel.For(0, par_length, 
+            Parallel.For(0, par_length3, 
                 u => {
-                        //CALL COMPUTATION FOR USER AT INDEX u
-                        icf_simil_out_par[u] = computeParallel(u, tgtuser_to_allusers_distance_similarity);
-                        //COUNTER
-                        if (counter-- % 10 == 0) RManager.outLog("  - remaining: " + counter, true, true, true);
+
+                    //counter
+                    Interlocked.Decrement(ref par_counter3);
+                    if (par_counter3 % 20 == 0) RManager.outLog("  - remaining: " + par_counter3, true, true, true);
+
+                    //CALL COMPUTATION FOR USER AT INDEX u
+                    par_data3[u] = findItemsToRecommendForTarget(u);
                 });
 
             //Converting for output
-            List<List<int>> icf_simil_out = icf_simil_out_par.Select(p => p.ToList()).ToList();
+            List<List<int>> icf_simil_out = par_data3.Select(p => p.ToList()).ToList();
 
             //OUTPUT_SUBMISSION
             RManager.exportRecToSubmit(RManager.target_users, icf_simil_out);
         }
 
+        //////////////////////////////////////////////////////////////////////////////////////////
         //FOR PARALLEL COMPUTATION
-        private static int[] computeParallel(int u, List<List<double>> tgtuser_to_allusers_distance_similarity)
+
+        private static int[] findItemsToRecommendForTarget(int u)
         {
             //for each user to recommend (u: is the index of the target user)
             //finding recommended items
@@ -392,8 +410,8 @@ namespace RS_Engine
             return interactions_of_similar_users.ToArray();
         }
 
-
         //////////////////////////////////////////////////////////////////////////////////////////
+        //COMPUTATION RUNTIME AUXILIARY FUNCTIONS
 
         //JOBS TITLES
         //DISTANCE BASED SIMILARITY
