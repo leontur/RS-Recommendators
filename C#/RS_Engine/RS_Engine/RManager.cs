@@ -33,8 +33,9 @@ namespace RS_Engine
 
         //Unique path vars
         private static string BACKPATH = "../../../";
+        private static string uniqueFileDate = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss", CultureInfo.InvariantCulture);
         private static string DATASETPATH = BACKPATH + "Datasets/";
-        private static string LOGPATH = BACKPATH + "Output/result_" + DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss", CultureInfo.InvariantCulture) + ".txt";
+        private static string LOGPATH = BACKPATH + "Output/result_" + uniqueFileDate + ".txt";
         public static string SERIALTPATH = BACKPATH + "Serialized/";
 
         //INITIALIZE RECOMMENDER SYSTEM
@@ -460,7 +461,7 @@ namespace RS_Engine
             }
 
             //output file name creation
-            string sub_outputFileName = BACKPATH + "Output/submission_" + DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss", CultureInfo.InvariantCulture) + ".csv";
+            string sub_outputFileName = BACKPATH + "Output/submission_" + uniqueFileDate + ".csv";
 
             //try to create
             try
