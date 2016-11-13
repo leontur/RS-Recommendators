@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace RS_Engine
@@ -26,8 +27,10 @@ namespace RS_Engine
             mean_avg_precision();
 
             //log
-            RManager.outLog(" >>>>>> MEAN AVERAGE PRECISION = " + MAP + "  @" + MAP_K);
-            RManager.outLog(" >>>>>> RECALL = " + RECALL + "  @SINGLE" + RECALL_SINGLE_K);
+            RManager.outLog("");
+            RManager.outLog(" >>>>>> MAP @" + MAP_K + " = " + MAP);
+            RManager.outLog(" >>>>>> RECALL @SINGLE" + RECALL_SINGLE_K + " = " + RECALL);
+            RManager.outLog("__________________________________________________________________");
         }
 
         //MAP @K
@@ -41,32 +44,40 @@ namespace RS_Engine
             //get the number of target users
             int tgt_user_count = RManager.output_users.Count;
 
+            //PARALLEL FOR
             //Calculate the precision (AP) for each target user and create a mean (MAP)
-            float mean_num = 0;
-            for (int u = 0; u < tgt_user_count; u++)
-            {
-                //counter
-                if (u % 50 == 0)
-                    RManager.outLog("  - user: " + u, true, true);
+            float[] mean_num = new float[tgt_user_count];
+            int par_counter = tgt_user_count;
+            Parallel.For(0, tgt_user_count,
+                u => {
 
-                //get the id of current user to check
-                int u_id = RManager.output_users[u];
+                    //counter
+                    Interlocked.Decrement(ref par_counter);
+                    int count = Interlocked.CompareExchange(ref par_counter, 0, 0);
+                    if (count % 100 == 0) RManager.outLog("  - remaining: " + count, true, true, true);
 
-                //getting the list of predicted items for that user
-                int[] j_id = RManager.output_useritems[u].ToArray();
+                    //get the id of current user to check
+                    int u_id = RManager.output_users[u];
 
-                //select the user's clicked items in interactions (as list<int>)
-                List<int> job_clicked = RManager.interactions.Where(x => x[0] == u_id).Select(x => x[1]).ToList();
+                    //getting the list of predicted items for that user
+                    int[] j_id = RManager.output_useritems[u].ToArray();
 
-                //getting the AP@K precision for current user
-                mean_num += ave_precision(u_id, j_id, job_clicked);
-            }
+                    //select the user's clicked items in interactions (as list<int>)
+                    List<int> job_clicked = RManager.interactions.Where(x => x[0] == u_id).Select(x => x[1]).ToList();
+
+                    //getting the AP@K precision for current user
+                    mean_num[u] = ave_precision(u_id, j_id, job_clicked);
+
+                });
+
+            //getting sum of AP
+            double mean_num_sum = mean_num.Sum();
+
+            //getting the MAP@K precision for all users (output_users)
+            MAP = mean_num_sum / tgt_user_count;
 
             //optional: getting recall mean
             RECALL = RECALL / tgt_user_count;
-
-            //getting the MAP@K precision for all users (output_users)
-            MAP = mean_num / tgt_user_count;
         }
 
         //AP @K

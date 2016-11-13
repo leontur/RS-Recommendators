@@ -41,10 +41,12 @@ namespace RS_Engine
             for (int i=0; i<randomList.Count(); i++)
                 RManager.user_profile_test.Add(RManager.user_profile[randomList[i]].ToList());
 
+            /*
             //delete the row from train matrix
             randomList = randomList.OrderByDescending(c => c).ToArray();
             for (int i = 0; i < randomList.Count(); i++)
                 RManager.user_profile.RemoveAt(randomList[i]);
+            */
 
             //substitute the target users with the test users
             RManager.target_users.Clear();

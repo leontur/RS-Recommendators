@@ -110,6 +110,10 @@ namespace RS_Engine
                 running = false;
             }
 
+            //if TEST mode, do EVAL
+            if (RManager.ISTESTMODE)
+                REngineEVAL.computePrecision();
+
         }
     }
 }

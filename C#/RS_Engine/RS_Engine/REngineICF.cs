@@ -223,7 +223,7 @@ namespace RS_Engine
             //   is the same of   target_users
 
             //check if already serialized (for fast fetching)
-            if (!File.Exists(Path.Combine(RManager.SERIALTPATH, "ICF_tgtuser_to_allusers_distance_similarity.bin")))
+            if (RManager.ISTESTMODE || !File.Exists(Path.Combine(RManager.SERIALTPATH, "ICF_tgtuser_to_allusers_distance_similarity.bin")))
             {
                 //PARALLEL VARS
                 int par_length1 = RManager.target_users.Count;
@@ -238,7 +238,8 @@ namespace RS_Engine
 
                         //counter
                         Interlocked.Decrement(ref par_counter1);
-                        if (par_counter1 % 10 == 0) RManager.outLog("  - remaining: " + par_counter1, true, true, true);
+                        int count = Interlocked.CompareExchange(ref par_counter1, 0, 0);
+                        if (count % 10 == 0) RManager.outLog("  - remaining: " + count, true, true, true);
 
                         //get index of user 1
                         int u1ix = RManager.user_profile.FindIndex(x => (int)x[0] == RManager.target_users[u1]);
@@ -261,8 +262,8 @@ namespace RS_Engine
                                 List<int> u2T = all_user_interactions_titles[u2];
 
                                 //COMPUTE SIMILARITY between u1 and u2
-                                //double sim = computeDistanceBasedSimilarity(u1T, u2T);
-                                double sim = computeJaccardSimilarity(u1T, u2T);
+                                double sim = computeDistanceBasedSimilarity(u1T, u2T);
+                                //double sim = computeJaccardSimilarity(u1T, u2T);
 
                                 //storing sim
                                 tmpSim[u2] = sim;
@@ -277,11 +278,17 @@ namespace RS_Engine
                 tgtuser_to_allusers_distance_similarity = par_data1.Select(p => p.ToList()).ToList();
 
                 //serialize
-                using (Stream stream = File.Open(Path.Combine(RManager.SERIALTPATH, "ICF_tgtuser_to_allusers_distance_similarity.bin"), FileMode.Create))
+                if (!RManager.ISTESTMODE) {
+                    using (Stream stream = File.Open(Path.Combine(RManager.SERIALTPATH, "ICF_tgtuser_to_allusers_distance_similarity.bin"), FileMode.Create))
+                    {
+                        RManager.outLog("  + writing serialized file " + "ICF_tgtuser_to_allusers_distance_similarity.bin");
+                        var bformatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+                        bformatter.Serialize(stream, tgtuser_to_allusers_distance_similarity);
+                    }
+                }
+                else
                 {
-                    RManager.outLog("  + writing serialized file " + "ICF_tgtuser_to_allusers_distance_similarity.bin");
-                    var bformatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
-                    bformatter.Serialize(stream, tgtuser_to_allusers_distance_similarity);
+                    RManager.outLog("  + serialized file not saved because in test mode ");
                 }
             }
             else

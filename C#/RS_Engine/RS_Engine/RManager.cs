@@ -358,17 +358,12 @@ namespace RS_Engine
             outLog("-----------------------------------------------------------------");
 
             //display mode
-            outLog("    ____________________________");
             if (ISTESTMODE)
             {
-                outLog("    ++ TEST MODE ++");
-                outLog("    datasets are initialized as train/test (not use for kaggle scope)");
-            }
-            else
-            {
-                outLog("    Mode");
-                outLog("    7) test mode: enable here to initialize the dataset as train/test (not use for kaggle scope)");
-                outLog("    8) test mode EVAL: execute EVAL with input a csv (not use for kaggle scope)");
+                outLog("    ____________________________");
+                outLog("    +++ TEST MODE ENABLED +++");
+                outLog("    >> datasets are initialized as train/test (not use for kaggle scope)");
+                outLog("    >> after the algorithm is invoked EVAL");
             }
 
             //display menu
@@ -379,6 +374,15 @@ namespace RS_Engine
             outLog("    3) U-CF");
             outLog("    4) I-CF");
             outLog("    ____________________________");
+            if (!ISTESTMODE)
+            {
+                outLog("    ____________________________");
+                outLog("    TEST Mode");
+                outLog("    7) test mode: enable here to initialize the dataset as train/test and do EVAL (not use for kaggle scope)");
+            }
+
+            outLog("    ____________________________");
+            outLog("    8) EVAL mode: execute EVAL with input a specific csv (not use for kaggle scope)");
             outLog("    9) .bin size calculator");
             outLog("    ____________________________");
             outLog("    0) exit");
@@ -396,7 +400,7 @@ namespace RS_Engine
             outLog("-----------------------------------------------------------------");
 
             //detect local testing mode
-            if (EXEMODE == 7)
+            if (EXEMODE == 7 && !ISTESTMODE)
             {
                 ISTESTMODE = true;
                 Console.Clear();
@@ -411,10 +415,7 @@ namespace RS_Engine
         //HALT RECOMMENDER SYSTEM
         public static void haltRS()
         {
-            //if TEST mode, get output results
-            if(ISTESTMODE && !ISEVALMODE)
-                REngineEVAL.computePrecision();
-
+            
             //Halting
             outLog("-----------------------------------------------------------------");
             outLog(" >>>>>> halting RS..");
@@ -493,7 +494,7 @@ namespace RS_Engine
 
             //left margin
             if (carriageret)
-                s = "\rRS:>(" + runChars[runCharsPos] + ") " + s;
+                s = "\rRS:>(" + runChars[runCharsPos] + ") " + s + "             ";
             else
             {
                 if(lastWasInline)
