@@ -50,7 +50,7 @@ namespace RS_Engine
             /////////////////////////////////////////////
 
             //alert and info
-            RManager.outLog("  >>>>>> ARE YOU SURE TO CONTINUE?  THIS IS A VERY LONG RUNNING PROGRAM (1h)");
+            RManager.outLog("  >>>>>> ARE YOU SURE TO CONTINUE?  THIS IS A VERY LONG RUNNING PROGRAM");
             Console.ReadKey();
 
             //create a list of globally interacted items with no duplicates
@@ -262,8 +262,8 @@ namespace RS_Engine
                                 List<int> u2T = all_user_interactions_titles[u2];
 
                                 //COMPUTE SIMILARITY between u1 and u2
-                                double sim = computeDistanceBasedSimilarity(u1T, u2T);
-                                //double sim = computeJaccardSimilarity(u1T, u2T);
+                                //double sim = computeDistanceBasedSimilarity(u1T, u2T);
+                                double sim = computeJaccardSimilarity(u1T, u2T);
 
                                 //storing sim
                                 tmpSim[u2] = sim;
@@ -308,24 +308,25 @@ namespace RS_Engine
             RManager.outLog("  + generating output structured data");
             
             //PARALLEL VARS
-            int par_length3 = RManager.target_users.Count;
-            int[][] par_data3 = new int[par_length3][];
-            int par_counter3 = par_length3;
+            int par_length_out = RManager.target_users.Count;
+            int[][] par_data_out = new int[par_length_out][];
+            int par_counter_out = par_length_out;
 
             //PARALLEL FOR
-            Parallel.For(0, par_length3, 
+            Parallel.For(0, par_length_out, 
                 u => {
 
                     //counter
-                    Interlocked.Decrement(ref par_counter3);
-                    if (par_counter3 % 20 == 0) RManager.outLog("  - remaining: " + par_counter3, true, true, true);
+                    Interlocked.Decrement(ref par_counter_out);
+                    int count = Interlocked.CompareExchange(ref par_counter_out, 0, 0);
+                    if (count % 10 == 0) RManager.outLog("  - remaining: " + count, true, true, true);
 
                     //CALL COMPUTATION FOR USER AT INDEX u
-                    par_data3[u] = findItemsToRecommendForTarget(u);
+                    par_data_out[u] = findItemsToRecommendForTarget(u);
                 });
 
             //Converting for output
-            List<List<int>> icf_simil_out = par_data3.Select(p => p.ToList()).ToList();
+            List<List<int>> icf_simil_out = par_data_out.Select(p => p.ToList()).ToList();
 
             //OUTPUT_SUBMISSION
             RManager.exportRecToSubmit(RManager.target_users, icf_simil_out);
