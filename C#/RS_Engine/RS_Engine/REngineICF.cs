@@ -151,15 +151,15 @@ namespace RS_Engine
                     //add title list
                     try
                     {
-                        interaction_titles.Add(
-                            (List<int>)RManager.item_profile.Find(x => (int)x[0] == interacted[i])[1]
-                            );
+                        interaction_titles.Add((List<int>)RManager.item_profile.Find(x => (int)x[0] == interacted[i])[1]);
                     }
                     catch
                     {
+                        RManager.outLog("ERROR: catch ICF_interaction_titles");
+                        /* not more needed, the item profile data structure contains all elements, even the disabled ones
                         interaction_titles.Add(
                             (List<int>)RManager.item_profile_disabled.Find(x => (int)x[0] == interacted[i])[1]
-                            );
+                            );*/
                     }
                 }
 
@@ -405,7 +405,7 @@ namespace RS_Engine
         private static double computeJaccardSimilarity(List<int> titleU1, List<int> titleU2)
         {
             //compute the distance
-            double intersect = titleU1.Intersect(titleU2).Count();
+            double intersect = titleU1.Intersect(titleU2).ToList().Count();
             double union = titleU1.Union(titleU2).ToList().Count();
 
             //check if no one in common

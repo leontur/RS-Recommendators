@@ -1,0 +1,31 @@
+RS:> 
+RS:> -----------------------------------------------------------------
+RS:>  ** RECOMMENDATORS ENGINE **
+RS:> -----------------------------------------------------------------
+RS:>     ____________________________
+RS:>     Algorithms
+RS:>     1) TOP
+RS:>     2) CB-F
+RS:>     3) U-CF
+RS:>     4) I-CF
+RS:>     ____________________________
+RS:>     TEST Mode
+RS:>     7) test mode: enable here to initialize the dataset as train/test and do EVAL (not use for kaggle scope)
+RS:>     ____________________________
+RS:>     8) EVAL mode: execute EVAL with input a specific csv (not use for kaggle scope)
+RS:>     9) .bin size calculator
+RS:>     ____________________________
+RS:>     0) exit
+RS:> -----------------------------------------------------------------
+RS:> 
+RS:>     > RS:>     ==> selected program (2)
+RS:> -----------------------------------------------------------------
+RS:>   + initializing RS 
+RS:>   + initializing dataset retrievement 
+RS:>   + reading dataset: interactions
+RS:>   + dataset read OK | interactions_f count= 546865 | conversion..
+RS:>   + reading serialized file target_users.bin
+RS:>   + reading serialized file user_profile.bin
+RS:>   + reading dataset: item_profile
+RS:>   + dataset read OK | item_profile_f count= 167957 | conversion..
+RS:>(|)  -line: 1000   RS:>(/)  -line: 2000   RS:>(-)  -line: 3000   RS:>(\)  -line: 4000   RS:>(|)  -line: 5000   RS:>(/)  -line: 6000   RS:>(-)  -line: 7000   RS:>(\)  -line: 8000   RS:>(|)  -line: 9000   RS:>(/)  -line: 10000   RS:>(-)  -line: 11000   RS:>(\)  -line: 12000   RS:>(|)  -line: 13000   RS:>(/)  -line: 14000   RS:>(-)  -line: 15000   RS:>(\)  -line: 16000   RS:>(|)  -line: 17000   RS:>(/)  -line: 18000   RS:>(-)  -line: 19000   RS:>(\)  -line: 20000   RS:>(|)  -line: 21000   RS:>(/)  -line: 22000   RS:>(-)  -line: 23000   RS:>(\)  -line: 24000   RS:>(|)  -line: 25000   RS:>(/)  -line: 26000   RS:>(-)  -line: 27000   RS:>(\)  -line: 28000   RS:>(|)  -line: 29000   RS:>(/)  -line: 30000   RS:>(-)  -line: 31000   RS:>(\)  -line: 32000   RS:>(|)  -line: 33000   RS:>(/)  -line: 34000   RS:>(-)  -line: 35000   

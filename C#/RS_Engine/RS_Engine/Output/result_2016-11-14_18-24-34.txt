@@ -1,0 +1,57 @@
+RS:> 
+RS:> -----------------------------------------------------------------
+RS:>  ** RECOMMENDATORS ENGINE **
+RS:> -----------------------------------------------------------------
+RS:>     ____________________________
+RS:>     Algorithms
+RS:>     1) TOP
+RS:>     2) CB-F
+RS:>     3) U-CF
+RS:>     4) I-CF
+RS:>     ____________________________
+RS:>     TEST Mode
+RS:>     7) test mode: enable here to initialize the dataset as train/test and do EVAL (not use for kaggle scope)
+RS:>     ____________________________
+RS:>     8) EVAL mode: execute EVAL with input a specific csv (not use for kaggle scope)
+RS:>     9) .bin size calculator
+RS:>     ____________________________
+RS:>     0) exit
+RS:> -----------------------------------------------------------------
+RS:> 
+RS:>     > RS:>     ==> selected program (2)
+RS:> -----------------------------------------------------------------
+RS:>   + initializing RS 
+RS:>   + initializing dataset retrievement 
+RS:>   + reading dataset: interactions
+RS:>   + dataset read OK | interactions_f count= 546865 | conversion..
+RS:>   + reading serialized file target_users.bin
+RS:>   + reading serialized file user_profile.bin
+RS:>   + reading serialized file item_profile.bin
+RS:>   + populating auxiliary data structures 
+RS:> 
+RS:>   + all datasets conversion: OK
+RS:>   -total lines | interactions >>> 546864
+RS:>   -total lines | item_profile >>> 167956
+RS:>   -total lines | target_users >>> 10000
+RS:>   -total lines | user_profile >>> 40000
+RS:> 
+RS:> -----------------------------------------------------------------
+RS:>   # running program 2
+RS:> 
+RS:>   + processing..
+RS:>   + computing CBF.. 
+RS:>   >>>>>> ARE YOU SURE TO CONTINUE?  THIS IS A VERY LONG RUNNING PROGRAM
+RS:>  SIM_WEIGHTS
+RS:>  -6 title
+RS:>  -9 career_level
+RS:>  -7 discipline_id
+RS:>  -6 industry_id
+RS:>  -8 country
+RS:>  -6 region
+RS:>  -9 latitude
+RS:>  -10 longitude
+RS:>  -6 employment
+RS:>  -10 tags
+RS:>  -0 created_at
+RS:>   + reading serialized file ICF_all_user_interactions_ids.bin
+RS:>   + generating output structured data

@@ -92,12 +92,16 @@ namespace RS_Engine
                 //take the first recommendable item from the next similar user (all the same procedure as above)
                 int newuserIndex = sorted_curr_user_line.Skip(SIM_RANGE + iteraction).Take(1).Select(x => x.Value).First();
                 int newuserId = (int)RManager.user_profile[newuserIndex][0];
+                //removing already clicked
                 List<int> interactions_of_newuser = RManager.interactions.Where(x => x[0] == newuserId).Select(x => x[1]).ToList();
                 interactions_of_newuser = interactions_of_newuser.Except(already_clicked).ToList();
+                //removing not recommendable
                 for (int s = interactions_of_newuser.Count - 1; s >= 0; s--)
                     if (!RManager.item_profile_enabled_list.Contains(interactions_of_newuser[s]))
                         interactions_of_newuser.RemoveAt(s);
+                //ordering most clicked items
                 interactions_of_newuser = interactions_of_newuser.Distinct().ToList();
+                //appending for the check
                 interactions_of_similar_users = interactions_of_similar_users.Concat(interactions_of_newuser).ToList();
                 iteraction++;
             }
@@ -139,7 +143,10 @@ namespace RS_Engine
         * 
         * |invoked from CBF
         * 
-    * -get top SIM_RANGE users similar to target
+        * 
+        *
+//RIFARE DESCRIZIONE PER BENE
+* -get top SIM_RANGE users similar to target
     * -get their interactions and merge all to select most commons
     * 
     * -select only not already interacted by target
@@ -153,103 +160,137 @@ namespace RS_Engine
             //for each user to recommend (u: is the index of the target user)
             //finding recommended items
 
+            //creating lists of similarities for each item in current_user_interactions_ordered_list
+            List<List<int>> top_similarities_for_each_current_user_interactions_ordered_list = new List<List<int>>();
+            List<List<int>> top_similarities_for_each_current_user_interactions_ordered_list_for_skip_check = new List<List<int>>();
+            foreach (var clicked in current_user_interactions_ordered_list)
+            {
+                //getting index of this item
+                int iix = RManager.item_profile.FindIndex(x => (int)x[0] == clicked);
 
-            //fare
-            /*
-             * prendere lista di arrivo click utente
-             * creare matrice con colonne quelli simili (items)
-             * 
-             * simile a metodo sopra
-             * -fare groupby per togliere doppioni
-             * -ecc
-             * --farlo per ogni riga stavolta!
-             * 
-             * poi prendere i migliori primi o secondi (con while)
-             * e suggerirli
-             * 
-             */
+                //SIMILARITY row creation (calling similarity computation)
+                List<double> item_sim_row = REngineCBF.computeWeightAvgSimilarity(iix);
+                //now I have a row which 
+                // columns are all other items
+                // values are the similarities of each item with the row-item 
+                // (that is the 'clicked' item id in the current_user_interactions_ordered_list)
 
+                //getting top SIM_RANGE for this item (without considering 1=himself in first position)
+                // transforming the line to a pair (value, index) array
+                // the value is a float, the index a int
+                // the index is used to find the id of the matched item
+                var sorted_curr_item_line = item_sim_row
+                                            .Select((x, i) => new KeyValuePair<double, int>(x, i))
+                                            .OrderByDescending(x => x.Key)
+                                            .ToList();
+                sorted_curr_item_line.RemoveAt(0);
+                //trim line to best SIM_RANGE matches
+                var sorted_curr_item_line_top = sorted_curr_item_line
+                                            .Take(SIM_RANGE)
+                                            .ToList();
+                //List<float> topforitem = sorted_curr_item_line_top.Select(x => x.Key).ToList();
+                List<int> itemoriginalindex = sorted_curr_item_line_top.Select(x => x.Value).ToList();
 
+                //retrieving indexes of the item to recommend
+                List<int> similar_items = new List<int>();
+                foreach (var i in itemoriginalindex)
+                    similar_items.Add((int)RManager.item_profile[i][0]);
 
+                //adding to item similarity list concerning this row-item
+                top_similarities_for_each_current_user_interactions_ordered_list.Add(similar_items.ToList());
+                //now I have a row which 
+                // columns are the other SIM_RANGE items
+                // values are the IDs of each most similar item to the row-item 
+                // (that is the 'clicked' item id in the current_user_interactions_ordered_list)
 
+                ///////////////
+                //doing the same for the skip check
+                int takeforskipbuffer = 20;
+                List<int> itemoriginalindex_skip = sorted_curr_item_line.Skip(SIM_RANGE).Take(takeforskipbuffer).Select(x => x.Value).ToList();
+                //retrieving indexes of the item to recommend
+                List<int> similar_items_skip = new List<int>();
+                foreach (var i in itemoriginalindex_skip)
+                    similar_items_skip.Add((int)RManager.item_profile[i][0]);
+                //adding to item similarity list concerning this row-item
+                top_similarities_for_each_current_user_interactions_ordered_list_for_skip_check.Add(similar_items_skip.ToList());
+            }
 
+            //////// !!!!!!!!!!
+            //TRY 1 (provo a mescolare tutte le liste di quelli piu simili per vedere se ci sono items più ricorrenti e scegliere quelli)
+            //      (non è detto funzioni, da qui in poi potrebbe essere necessario cambiarlo radicalmente)
 
-
-
-
-
-
-
-
-            ///
-            //SBAGLIATO
-            //PERCHE' uno cliccato e ora disabilitato potrebbe essere simile a uno che è attivo!!
-            //remove the disabled items
-            List<int> disabled_items = RManager.item_profile_disabled.Select(x => x[0]).Cast<Int32>().ToList();
-            interactions_of_user_top = interactions_of_user_top.Except(disabled_items).ToList();
-            //NOTE: this could remove EVERY candidate
-            
-
-            //getting similar items (basing on the best clicked by this user)
-            //foreach (var best in interactions_of_user_top) { } this is to use in case if want to select similarities foreach top clicked item and not only for the absolute best
-            int best = interactions_of_user_top.First();
-            ///
-
-            //getting index of this item
-            int iix = RManager.item_profile.FindIndex(x => (int)x[0] == best);
-
-            //from the triangular jagged matrix, retrieve the complete list of similarities for this item
-            float[] curr_item_line = new float[i_size];
-            for (int m = 0; m < i_size; m++)
-                curr_item_line[m] = (m <= iix) ? item_item_simil[iix][m] : item_item_simil[m][iix];
-
-            //getting top SIM_RANGE for this item (without considering 1=himself in first position)
-            // transforming the line to a pair (value, index) array
-            // the value is a float, the index a int
-            // the index is used to find the id of the matched item
-            var sorted_curr_item_line = curr_item_line
-                                        .Select((x, i) => new KeyValuePair<float, int>(x, i))
-                                        .OrderByDescending(x => x.Key)
-                                        .Take(SIM_RANGE)
-                                        .ToList();
-            sorted_curr_item_line.RemoveAt(0);
-            List<float> topforitem = sorted_curr_item_line.Select(x => x.Key).ToList();
-            List<int> itemoriginalindex = sorted_curr_item_line.Select(x => x.Value).ToList();
-
-            //retrieving indexes of the item to recommend
-            List<int> similar_items = new List<int>();
-            foreach (var i in itemoriginalindex)
-                similar_items.Add((int)RManager.item_profile[i][0]);
+            //collecting all items in one list
+            List<int> similar_items_merge = top_similarities_for_each_current_user_interactions_ordered_list.SelectMany(x => x).ToList();
 
             //ADVANCED FILTER
-            //-retrieving interactions already clicked by the current user (not recommendig an item already clicked)
-            //-removing already clicked
-            similar_items = similar_items.Except(interactions_of_user).ToList();
-            similar_items = similar_items.Take(5).ToList();
+            List<int> already_clicked = new List<int>();
+            if (!RManager.ISTESTMODE)
+            {
+                //retrieving interactions already used by the current user (not recommending a job already applied)
+                already_clicked = RManager.interactions.Where(i => i[0] == RManager.target_users[u] && i[2] <= 3).Select(i => i[1]).ToList();
+                //removing already clicked
+                similar_items_merge = similar_items_merge.Except(already_clicked).ToList();
+            }
 
-            /*
-            //debug
-            Console.WriteLine("\n  >>> index of " + u + " in the simil array is " + iix);
-            Console.WriteLine("\n  >>> retrieved interactions_of_user_top:");
-            foreach (var z in interactions_of_user_top)
-                Console.Write(" " + z);
-            Console.WriteLine("\n  >>> recommendations:");
-            foreach (var z in topforitem)
-                Console.Write(" " + z);
-            Console.WriteLine("\n  >>> original index:");
-            foreach (var z in itemoriginalindex)
-                Console.Write(" " + z);
-            Console.WriteLine("\n  >>> retrieved users:");
-            foreach (var z in similar_items)
-                Console.Write(" " + z);
-            //Console.ReadKey();
-            */
+            //removing not recommendable
+            for (int s = similar_items_merge.Count - 1; s >= 0; s--)
+                if (!RManager.item_profile_enabled_list.Contains(similar_items_merge[s]))
+                    similar_items_merge.RemoveAt(s);
+
+            //ordering most clicked items (and removing duplicates for next check)
+            similar_items_merge = similar_items_merge
+                                                    .GroupBy(i => i)
+                                                    .OrderByDescending(grp => grp.Count())
+                                                    .Select(x => x.Key)
+                                                    .ToList();
+            //CHECK
+            //if recommendations are not enough
+            int iteraction = 0;
+            List<int> similar_items_merge_check = new List<int>();
+            while (similar_items_merge.Count < 5)
+            {
+                //take the first recommendable item from the next similar item (all the same procedure as above)
+                if (similar_items_merge_check.Count == 0)
+                {
+                    //collecting all items in one list
+                    foreach (var ck in top_similarities_for_each_current_user_interactions_ordered_list_for_skip_check)
+                        similar_items_merge_check.Add(ck[iteraction]);
+                    //removing already clicked
+                    similar_items_merge_check = similar_items_merge_check.Except(already_clicked).ToList();
+                    //removing not recommendable
+                    for (int s = similar_items_merge_check.Count - 1; s >= 0; s--)
+                        if (!RManager.item_profile_enabled_list.Contains(similar_items_merge_check[s]))
+                            similar_items_merge_check.RemoveAt(s);
+                    //ordering most clicked items
+                    similar_items_merge_check = similar_items_merge_check
+                                                                        .GroupBy(i => i)
+                                                                        .OrderByDescending(grp => grp.Count())
+                                                                        .Select(x => x.Key)
+                                                                        .ToList();
+                }
+                else
+                {
+                    //appending
+                    similar_items_merge = similar_items_merge.Concat(similar_items_merge_check.Take(1)).ToList();
+                    //checking if not appended a duplicate
+                    similar_items_merge = similar_items_merge.Distinct().ToList();
+                    //removing for (possible) next iteration
+                    similar_items_merge_check.RemoveAt(0);
+                }
+                //next cycle
+                if (similar_items_merge_check.Count == 0)
+                    iteraction++;
+                //check for infinite loop
+                if (iteraction >= top_similarities_for_each_current_user_interactions_ordered_list_for_skip_check.Count)
+                    //selecting top popular
+                    similar_items_merge = similar_items_merge.Concat(REngineTOP.getTOP5List()).ToList();
+            }
+
+            //trim of top 5
+            similar_items_merge = similar_items_merge.Take(5).ToList();
 
             //saving for output
-            return similar_items.ToArray();
-
-
-
+            return similar_items_merge.ToArray();
         }
 
     }

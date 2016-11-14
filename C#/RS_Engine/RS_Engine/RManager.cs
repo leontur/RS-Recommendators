@@ -19,7 +19,7 @@ namespace RS_Engine
 
         //AUXILIARY DATA STRUCTURES
         public static List<int> item_profile_enabled_list = new List<int>();
-        public static List<List<object>> item_profile_disabled = new List<List<object>>();
+        //public static List<List<object>> item_profile_disabled = new List<List<object>>();
 
         //TEST DATA STRUCTURES
         public static List<List<object>> user_profile_test = new List<List<object>>();
@@ -173,7 +173,7 @@ namespace RS_Engine
                 //serialize
                 using (Stream stream = File.Open(Path.Combine(SERIALTPATH, "user_profile.bin"), FileMode.Create))
                 {
-                    RManager.outLog("\n  + writing serialized file " + "user_profile.bin");
+                    RManager.outLog("  + writing serialized file " + "user_profile.bin");
                     bformatter.Serialize(stream, user_profile);
                 }
 
@@ -196,7 +196,11 @@ namespace RS_Engine
                 //Data init
                 outLog("  + reading dataset: " + "item_profile");
                 var item_profile_f = File.ReadAllLines(DATASETPATH + "item_profile" + ".csv");
-                outLog("  + dataset read OK | item_profile_f count= " + item_profile_f.Count() + " | conversion..");    
+                outLog("  + dataset read OK | item_profile_f count= " + item_profile_f.Count() + " | conversion..");
+
+                //float dot separator
+                CultureInfo ci = (CultureInfo)CultureInfo.CurrentCulture.Clone();
+                ci.NumberFormat.CurrencyDecimalSeparator = ".";
 
                 //scroll file
                 for (i = 1; i < item_profile_f.Length; i++)
@@ -233,6 +237,17 @@ namespace RS_Engine
                                 itm_row_tmpIN[j] == "non_dach" ? 0 : 0
                                 );
                         }
+                        else if (j == 7 || j == 8)
+                        {
+                            try
+                            {
+                                itm_row_tmpOUT.Add(float.Parse(itm_row_tmpIN[j], NumberStyles.Any, ci));
+                            }
+                            catch
+                            {
+                                itm_row_tmpOUT.Add((float)0);
+                            }
+                        }
                         else
                         {
                             try
@@ -241,19 +256,20 @@ namespace RS_Engine
                             }
                             catch
                             {
-                                itm_row_tmpOUT.Add(0);
+                                itm_row_tmpOUT.Add((Int32)0);
                             }
                         }
                     }
 
-                    //ADVANCED FILTER
-                    //not storing not recommendable items
-                    if ((int)itm_row_tmpOUT.Last() != 0)
-                        //add tmp to data structure
-                        item_profile.Add(itm_row_tmpOUT);
-                    else
+                    //add tmp to data structure
+                    item_profile.Add(itm_row_tmpOUT);
+
+                    /*
+                    //storing not recommendable items list
+                    if ((int)itm_row_tmpOUT.Last() == 0)
                         //add id of disabled item to data structure
                         item_profile_disabled.Add(itm_row_tmpOUT);
+                    */
 
                     //counter
                     if (i % 1000 == 0)
@@ -263,14 +279,16 @@ namespace RS_Engine
                 //serialize
                 using (Stream stream = File.Open(Path.Combine(SERIALTPATH, "item_profile.bin"), FileMode.Create))
                 {
-                    RManager.outLog("\n  + writing serialized file " + "item_profile.bin");
+                    RManager.outLog("  + writing serialized file " + "item_profile.bin");
                     bformatter.Serialize(stream, item_profile);
                 }
+                /*
                 using (Stream stream = File.Open(Path.Combine(SERIALTPATH, "item_profile_disabled.bin"), FileMode.Create))
                 {
                     RManager.outLog("\n  + writing serialized file " + "item_profile_disabled.bin");
                     bformatter.Serialize(stream, item_profile_disabled);
                 }
+                */
             }
             else
             {
@@ -280,11 +298,13 @@ namespace RS_Engine
                     RManager.outLog("  + reading serialized file " + "item_profile.bin");
                     item_profile = (List<List<Object>>)bformatter.Deserialize(stream);
                 }
+                /*
                 using (Stream stream = File.Open(Path.Combine(SERIALTPATH, "item_profile_disabled.bin"), FileMode.Open))
                 {
                     RManager.outLog("  + reading serialized file " + "item_profile_disabled.bin");
                     item_profile_disabled = (List<List<object>>)bformatter.Deserialize(stream);
                 }
+                */
             }
 
             //AUXILIARY DATA STRUCTURES
