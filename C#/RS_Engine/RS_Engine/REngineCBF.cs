@@ -23,6 +23,7 @@ namespace RS_Engine
         //ALGORITHM PARAMETERS
         //number of similarities to select (for each item to be recommended)
         private const int SIM_RANGE = 5;
+        private const int SIM_RANGE_SKIP = 10;
 
         //weights for average similarity (weight are 1-10)
         private static int[] SIM_WEIGHTS = new int[10];
@@ -204,7 +205,7 @@ namespace RS_Engine
                     List<int> interactions_of_user_top = all_user_interactions_ids[u];
 
                     //CALL COMPUTATION FOR USER AT INDEX u
-                    par_data_out[u] = REngineOUTPUT.findItemsToRecommendForTarget_U_I(u, interactions_of_user_top, SIM_RANGE);
+                    par_data_out[u] = REngineOUTPUT.findItemsToRecommendForTarget_U_I(u, interactions_of_user_top, SIM_RANGE, SIM_RANGE_SKIP);
                 });
 
             //Converting for output

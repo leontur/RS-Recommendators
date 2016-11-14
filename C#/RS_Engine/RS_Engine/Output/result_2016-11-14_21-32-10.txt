@@ -1,0 +1,64 @@
+RS:> 
+RS:> -----------------------------------------------------------------
+RS:>  ** RECOMMENDATORS ENGINE **
+RS:> -----------------------------------------------------------------
+RS:>     ____________________________
+RS:>     Algorithms
+RS:>     1) TOP
+RS:>     2) CB-F
+RS:>     3) U-CF
+RS:>     4) I-CF
+RS:>     ____________________________
+RS:>     TEST Mode
+RS:>     7) test mode: enable here to initialize the dataset as train/test and do EVAL (not use for kaggle scope)
+RS:>     ____________________________
+RS:>     8) EVAL mode: execute EVAL with input a specific csv (not use for kaggle scope)
+RS:>     9) .bin size calculator
+RS:>     ____________________________
+RS:>     0) exit
+RS:> -----------------------------------------------------------------
+RS:> 
+RS:>     > RS:>     ==> selected program (2)
+RS:> -----------------------------------------------------------------
+RS:>   + initializing RS 
+RS:>   + initializing dataset retrievement 
+RS:>   + reading dataset: interactions
+RS:>   + dataset read OK | interactions_f count= 546865 | conversion..
+RS:>   + reading serialized file target_users.bin
+RS:>   + reading serialized file user_profile.bin
+RS:>   + reading dataset: item_profile
+RS:>   + dataset read OK | item_profile_f count= 167957 | conversion..
+RS:>(|)  -line: 1000   RS:>(/)  -line: 2000   RS:>(-)  -line: 3000   RS:>(\)  -line: 4000   RS:>(|)  -line: 5000   RS:>(/)  -line: 6000   RS:>(-)  -line: 7000   RS:>(\)  -line: 8000   RS:>(|)  -line: 9000   RS:>(/)  -line: 10000   RS:>(-)  -line: 11000   RS:>(\)  -line: 12000   RS:>(|)  -line: 13000   RS:>(/)  -line: 14000   RS:>(-)  -line: 15000   RS:>(\)  -line: 16000   RS:>(|)  -line: 17000   RS:>(/)  -line: 18000   RS:>(-)  -line: 19000   RS:>(\)  -line: 20000   RS:>(|)  -line: 21000   RS:>(/)  -line: 22000   RS:>(-)  -line: 23000   RS:>(\)  -line: 24000   RS:>(|)  -line: 25000   RS:>(/)  -line: 26000   RS:>(-)  -line: 27000   RS:>(\)  -line: 28000   RS:>(|)  -line: 29000   RS:>(/)  -line: 30000   RS:>(-)  -line: 31000   RS:>(\)  -line: 32000   RS:>(|)  -line: 33000   RS:>(/)  -line: 34000   RS:>(-)  -line: 35000   RS:>(\)  -line: 36000   RS:>(|)  -line: 37000   RS:>(/)  -line: 38000   RS:>(-)  -line: 39000   RS:>(\)  -line: 40000   RS:>(|)  -line: 41000   RS:>(/)  -line: 42000   RS:>(-)  -line: 43000   RS:>(\)  -line: 44000   RS:>(|)  -line: 45000   RS:>(/)  -line: 46000   RS:>(-)  -line: 47000   RS:>(\)  -line: 48000   RS:>(|)  -line: 49000   RS:>(/)  -line: 50000   RS:>(-)  -line: 51000   RS:>(\)  -line: 52000   RS:>(|)  -line: 53000   RS:>(/)  -line: 54000   RS:>(-)  -line: 55000   RS:>(\)  -line: 56000   RS:>(|)  -line: 57000   RS:>(/)  -line: 58000   RS:>(-)  -line: 59000   RS:>(\)  -line: 60000   RS:>(|)  -line: 61000   RS:>(/)  -line: 62000   RS:>(-)  -line: 63000   RS:>(\)  -line: 64000   RS:>(|)  -line: 65000   RS:>(/)  -line: 66000   RS:>(-)  -line: 67000   RS:>(\)  -line: 68000   RS:>(|)  -line: 69000   RS:>(/)  -line: 70000   RS:>(-)  -line: 71000   RS:>(\)  -line: 72000   RS:>(|)  -line: 73000   RS:>(/)  -line: 74000   RS:>(-)  -line: 75000   RS:>(\)  -line: 76000   RS:>(|)  -line: 77000   RS:>(/)  -line: 78000   RS:>(-)  -line: 79000   RS:>(\)  -line: 80000   RS:>(|)  -line: 81000   RS:>(/)  -line: 82000   RS:>(-)  -line: 83000   RS:>(\)  -line: 84000   RS:>(|)  -line: 85000   RS:>(/)  -line: 86000   RS:>(-)  -line: 87000   RS:>(\)  -line: 88000   RS:>(|)  -line: 89000   RS:>(/)  -line: 90000   RS:>(-)  -line: 91000   RS:>(\)  -line: 92000   RS:>(|)  -line: 93000   RS:>(/)  -line: 94000   RS:>(-)  -line: 95000   RS:>(\)  -line: 96000   RS:>(|)  -line: 97000   RS:>(/)  -line: 98000   RS:>(-)  -line: 99000   RS:>(\)  -line: 100000   RS:>(|)  -line: 101000   RS:>(/)  -line: 102000   RS:>(-)  -line: 103000   RS:>(\)  -line: 104000   RS:>(|)  -line: 105000   RS:>(/)  -line: 106000   RS:>(-)  -line: 107000   RS:>(\)  -line: 108000   RS:>(|)  -line: 109000   RS:>(/)  -line: 110000   RS:>(-)  -line: 111000   RS:>(\)  -line: 112000   RS:>(|)  -line: 113000   RS:>(/)  -line: 114000   RS:>(-)  -line: 115000   RS:>(\)  -line: 116000   RS:>(|)  -line: 117000   RS:>(/)  -line: 118000   RS:>(-)  -line: 119000   RS:>(\)  -line: 120000   RS:>(|)  -line: 121000   RS:>(/)  -line: 122000   RS:>(-)  -line: 123000   RS:>(\)  -line: 124000   RS:>(|)  -line: 125000   RS:>(/)  -line: 126000   RS:>(-)  -line: 127000   RS:>(\)  -line: 128000   RS:>(|)  -line: 129000   RS:>(/)  -line: 130000   RS:>(-)  -line: 131000   RS:>(\)  -line: 132000   RS:>(|)  -line: 133000   RS:>(/)  -line: 134000   RS:>(-)  -line: 135000   RS:>(\)  -line: 136000   RS:>(|)  -line: 137000   RS:>(/)  -line: 138000   RS:>(-)  -line: 139000   RS:>(\)  -line: 140000   RS:>(|)  -line: 141000   RS:>(/)  -line: 142000   RS:>(-)  -line: 143000   RS:>(\)  -line: 144000   RS:>(|)  -line: 145000   RS:>(/)  -line: 146000   RS:>(-)  -line: 147000   RS:>(\)  -line: 148000   RS:>(|)  -line: 149000   RS:>(/)  -line: 150000   RS:>(-)  -line: 151000   RS:>(\)  -line: 152000   RS:>(|)  -line: 153000   RS:>(/)  -line: 154000   RS:>(-)  -line: 155000   RS:>(\)  -line: 156000   RS:>(|)  -line: 157000   RS:>(/)  -line: 158000   RS:>(-)  -line: 159000   RS:>(\)  -line: 160000   RS:>(|)  -line: 161000   RS:>(/)  -line: 162000   RS:>(-)  -line: 163000   RS:>(\)  -line: 164000   RS:>(|)  -line: 165000   RS:>(/)  -line: 166000   RS:>(-)  -line: 167000   
+RS:>   + writing serialized file item_profile.bin
+RS:> 
+  + writing serialized file item_profile_enabled.bin
+RS:>   + populating auxiliary data structures 
+RS:> 
+RS:>   + all datasets conversion: OK
+RS:>   -total lines | interactions    >>> 546864
+RS:>   -total lines | item_profile    >>> 167956
+RS:>   -total lines | item_profile_en >>> 167956
+RS:>   -total lines | target_users    >>> 10000
+RS:>   -total lines | user_profile    >>> 40000
+RS:> 
+RS:> -----------------------------------------------------------------
+RS:>   # running program 2
+RS:> 
+RS:>   + processing..
+RS:>   + computing CBF.. 
+RS:>   >>>>>> ARE YOU SURE TO CONTINUE?  THIS IS A VERY LONG RUNNING PROGRAM
+RS:> 
+RS:>   SIM_WEIGHTS
+RS:>    -6 title
+RS:>    -9 career_level
+RS:>    -7 discipline_id
+RS:>    -6 industry_id
+RS:>    -8 country
+RS:>    -6 region
+RS:>    -9 latitude - longitude
+RS:>    -10 employment
+RS:>    -6 tags
+RS:>    -10 created_at
+RS:> 
+RS:>   + reading serialized file ICF_all_user_interactions_ids.bin
+RS:>   + generating output structured data

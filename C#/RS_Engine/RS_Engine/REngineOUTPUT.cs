@@ -154,7 +154,7 @@ namespace RS_Engine
     * 
     * -output
         */
-        public static int[] findItemsToRecommendForTarget_U_I(int u, List<int> current_user_interactions_ordered_list, int SIM_RANGE)
+        public static int[] findItemsToRecommendForTarget_U_I(int u, List<int> current_user_interactions_ordered_list, int SIM_RANGE, int SIM_RANGE_SKIP)
         {
             //USE:
             //for each user to recommend (u: is the index of the target user)
@@ -206,8 +206,7 @@ namespace RS_Engine
 
                 ///////////////
                 //doing the same for the skip check
-                int takeforskipbuffer = 20;
-                List<int> itemoriginalindex_skip = sorted_curr_item_line.Skip(SIM_RANGE).Take(takeforskipbuffer).Select(x => x.Value).ToList();
+                List<int> itemoriginalindex_skip = sorted_curr_item_line.Skip(SIM_RANGE).Take(SIM_RANGE_SKIP).Select(x => x.Value).ToList();
                 //retrieving indexes of the item to recommend
                 List<int> similar_items_skip = new List<int>();
                 foreach (var i in itemoriginalindex_skip)
@@ -250,6 +249,8 @@ namespace RS_Engine
             List<int> similar_items_merge_check = new List<int>();
             while (similar_items_merge.Count < 5)
             {
+                //Console.WriteLine("check failed");
+
                 //take the first recommendable item from the next similar item (all the same procedure as above)
                 if (similar_items_merge_check.Count == 0)
                 {

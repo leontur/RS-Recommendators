@@ -288,13 +288,11 @@ namespace RS_Engine
                     RManager.outLog("  + writing serialized file " + "item_profile.bin");
                     bformatter.Serialize(stream, item_profile);
                 }
-                /*
-                using (Stream stream = File.Open(Path.Combine(SERIALTPATH, "item_profile_disabled.bin"), FileMode.Create))
+                using (Stream stream = File.Open(Path.Combine(SERIALTPATH, "item_profile_enabled.bin"), FileMode.Create))
                 {
-                    RManager.outLog("\n  + writing serialized file " + "item_profile_disabled.bin");
-                    bformatter.Serialize(stream, item_profile_disabled);
+                    RManager.outLog("\n  + writing serialized file " + "item_profile_enabled.bin");
+                    bformatter.Serialize(stream, item_profile_enabled);
                 }
-                */
             }
             else
             {
@@ -304,13 +302,11 @@ namespace RS_Engine
                     RManager.outLog("  + reading serialized file " + "item_profile.bin");
                     item_profile = (List<List<Object>>)bformatter.Deserialize(stream);
                 }
-                /*
-                using (Stream stream = File.Open(Path.Combine(SERIALTPATH, "item_profile_disabled.bin"), FileMode.Open))
+                using (Stream stream = File.Open(Path.Combine(SERIALTPATH, "item_profile_enabled.bin"), FileMode.Open))
                 {
-                    RManager.outLog("  + reading serialized file " + "item_profile_disabled.bin");
-                    item_profile_disabled = (List<List<object>>)bformatter.Deserialize(stream);
+                    RManager.outLog("  + reading serialized file " + "item_profile_enabled.bin");
+                    item_profile_enabled = (List<List<object>>)bformatter.Deserialize(stream);
                 }
-                */
             }
 
             //AUXILIARY DATA STRUCTURES
@@ -324,7 +320,7 @@ namespace RS_Engine
             outLog("  + all datasets conversion: OK");
             outLog("  -total lines | interactions    >>> " + interactions.Count());
             outLog("  -total lines | item_profile    >>> " + item_profile.Count());
-            outLog("  -total lines | item_profile_en >>> " + item_profile.Count());
+            outLog("  -total lines | item_profile_en >>> " + item_profile_enabled.Count());
             outLog("  -total lines | target_users    >>> " + target_users.Count());
             outLog("  -total lines | user_profile    >>> " + user_profile.Count());
             outLog("");
