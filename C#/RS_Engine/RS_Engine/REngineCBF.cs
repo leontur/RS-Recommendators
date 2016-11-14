@@ -22,7 +22,7 @@ namespace RS_Engine
     {
         //ALGORITHM PARAMETERS
         //number of similarities to select (for each item to be recommended)
-        private const int SIM_RANGE = 10;
+        private const int SIM_RANGE = 5;
 
         //weights for average similarity (weight are 1-10)
         private static int[] SIM_WEIGHTS = new int[10];
@@ -34,6 +34,8 @@ namespace RS_Engine
         //EXECUTION VARS
         //Getting item_profile count
         private static int i_size = RManager.item_profile.Count;
+        //Getting item_profile_enabled count
+        private static int i_en_size = RManager.item_profile_enabled.Count;
         //Instantiating item-item matrix
         //public static float[][] item_item_simil = new float[i_size][];
 
@@ -190,13 +192,13 @@ namespace RS_Engine
             int par_counter_out = par_length_out;
 
             //PARALLEL FOR
-            Parallel.For(0, par_length_out,
+            Parallel.For(0, par_length_out, new ParallelOptions { MaxDegreeOfParallelism = 2 },
                 u => {
 
                     //counter
                     Interlocked.Decrement(ref par_counter_out);
                     int count = Interlocked.CompareExchange(ref par_counter_out, 0, 0);
-                    if (count % 20 == 0) RManager.outLog("  - remaining: " + count, true, true, true);
+                    if (count % 10 == 0) RManager.outLog("  - remaining: " + count, true, true, true);
 
                     //retrieving best clicked interactions done by current user to recommend (already computed)
                     List<int> interactions_of_user_top = all_user_interactions_ids[u];
@@ -221,19 +223,19 @@ namespace RS_Engine
         public static List<double> computeWeightAvgSimilarity(int item_index)
         {
             //PARALLEL VARS
-            int par_length = i_size;
+            int par_length = i_en_size;
             double[] par_data = new double[par_length];
 
             //PARALLEL FOR
             //foreach i1, i2 === item_profile list index
-            Parallel.For(0, par_length, new ParallelOptions { MaxDegreeOfParallelism = 64 },
+            Parallel.For(0, par_length, new ParallelOptions { MaxDegreeOfParallelism = 16 },
                 i => {
 
-                    //COMPUTE SIMILARITY for these two vectors
+                    //COMPUTE SIMILARITY for these two vectors (input for total matrix, cross computation with only enabled items)
                     if (item_index == i)
                         par_data[i] = (float)1;
                     else
-                        par_data[i] = computeWeightAvgSimilarityForItems(RManager.item_profile[item_index], RManager.item_profile[i]);
+                        par_data[i] = computeWeightAvgSimilarityForItems(RManager.item_profile[item_index], RManager.item_profile_enabled[i]);
                 });
 
             //return as list of double

@@ -19,6 +19,7 @@ namespace RS_Engine
 
         //AUXILIARY DATA STRUCTURES
         public static List<int> item_profile_enabled_list = new List<int>();
+        public static List<List<object>> item_profile_enabled = new List<List<object>>();
         //public static List<List<object>> item_profile_disabled = new List<List<object>>();
 
         //TEST DATA STRUCTURES
@@ -264,6 +265,11 @@ namespace RS_Engine
                     //add tmp to data structure
                     item_profile.Add(itm_row_tmpOUT);
 
+                    //storing not recommendable items list
+                    if ((int)itm_row_tmpOUT.Last() != 0)
+                        //add id of disabled item to data structure
+                        item_profile_enabled.Add(itm_row_tmpOUT);
+
                     /*
                     //storing not recommendable items list
                     if ((int)itm_row_tmpOUT.Last() == 0)
@@ -316,10 +322,11 @@ namespace RS_Engine
             //INFO
             outLog("");
             outLog("  + all datasets conversion: OK");
-            outLog("  -total lines | interactions >>> " + interactions.Count());
-            outLog("  -total lines | item_profile >>> " + item_profile.Count());
-            outLog("  -total lines | target_users >>> " + target_users.Count());
-            outLog("  -total lines | user_profile >>> " + user_profile.Count());
+            outLog("  -total lines | interactions    >>> " + interactions.Count());
+            outLog("  -total lines | item_profile    >>> " + item_profile.Count());
+            outLog("  -total lines | item_profile_en >>> " + item_profile.Count());
+            outLog("  -total lines | target_users    >>> " + target_users.Count());
+            outLog("  -total lines | user_profile    >>> " + user_profile.Count());
             outLog("");
 
             /*

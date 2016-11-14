@@ -171,9 +171,10 @@ namespace RS_Engine
                 //SIMILARITY row creation (calling similarity computation)
                 List<double> item_sim_row = REngineCBF.computeWeightAvgSimilarity(iix);
                 //now I have a row which 
-                // columns are all other items
-                // values are the similarities of each item with the row-item 
-                // (that is the 'clicked' item id in the current_user_interactions_ordered_list)
+                // -columns are all other ENABLED items 
+                //  (the length of this row is 'RManager.item_profile_enabled.Count')
+                // -values are the similarities of each item with the row-item 
+                //  (that is the 'clicked' item id in the current_user_interactions_ordered_list)
 
                 //getting top SIM_RANGE for this item (without considering 1=himself in first position)
                 // transforming the line to a pair (value, index) array
@@ -194,7 +195,7 @@ namespace RS_Engine
                 //retrieving indexes of the item to recommend
                 List<int> similar_items = new List<int>();
                 foreach (var i in itemoriginalindex)
-                    similar_items.Add((int)RManager.item_profile[i][0]);
+                    similar_items.Add((int)RManager.item_profile_enabled[i][0]);
 
                 //adding to item similarity list concerning this row-item
                 top_similarities_for_each_current_user_interactions_ordered_list.Add(similar_items.ToList());
@@ -210,7 +211,7 @@ namespace RS_Engine
                 //retrieving indexes of the item to recommend
                 List<int> similar_items_skip = new List<int>();
                 foreach (var i in itemoriginalindex_skip)
-                    similar_items_skip.Add((int)RManager.item_profile[i][0]);
+                    similar_items_skip.Add((int)RManager.item_profile_enabled[i][0]);
                 //adding to item similarity list concerning this row-item
                 top_similarities_for_each_current_user_interactions_ordered_list_for_skip_check.Add(similar_items_skip.ToList());
             }
@@ -232,10 +233,10 @@ namespace RS_Engine
                 similar_items_merge = similar_items_merge.Except(already_clicked).ToList();
             }
 
-            //removing not recommendable
-            for (int s = similar_items_merge.Count - 1; s >= 0; s--)
-                if (!RManager.item_profile_enabled_list.Contains(similar_items_merge[s]))
-                    similar_items_merge.RemoveAt(s);
+            //removing not recommendable (not necessary more because similarity computed only over enabled items)
+            //for (int s = similar_items_merge.Count - 1; s >= 0; s--)
+                //if (!RManager.item_profile_enabled_list.Contains(similar_items_merge[s]))
+                    //similar_items_merge.RemoveAt(s);
 
             //ordering most clicked items (and removing duplicates for next check)
             similar_items_merge = similar_items_merge
@@ -258,9 +259,9 @@ namespace RS_Engine
                     //removing already clicked
                     similar_items_merge_check = similar_items_merge_check.Except(already_clicked).ToList();
                     //removing not recommendable
-                    for (int s = similar_items_merge_check.Count - 1; s >= 0; s--)
-                        if (!RManager.item_profile_enabled_list.Contains(similar_items_merge_check[s]))
-                            similar_items_merge_check.RemoveAt(s);
+                    //for (int s = similar_items_merge_check.Count - 1; s >= 0; s--)
+                        //if (!RManager.item_profile_enabled_list.Contains(similar_items_merge_check[s]))
+                            //similar_items_merge_check.RemoveAt(s);
                     //ordering most clicked items
                     similar_items_merge_check = similar_items_merge_check
                                                                         .GroupBy(i => i)
@@ -271,7 +272,7 @@ namespace RS_Engine
                 else
                 {
                     //appending
-                    similar_items_merge = similar_items_merge.Concat(similar_items_merge_check.Take(1)).ToList();
+                    similar_items_merge = similar_items_merge.Concat(similar_items_merge_check.Take(1).ToList()).ToList();
                     //checking if not appended a duplicate
                     similar_items_merge = similar_items_merge.Distinct().ToList();
                     //removing for (possible) next iteration
@@ -282,7 +283,7 @@ namespace RS_Engine
                     iteraction++;
                 //check for infinite loop
                 if (iteraction >= top_similarities_for_each_current_user_interactions_ordered_list_for_skip_check.Count)
-                    //selecting top popular
+                    //selecting top popular (last last chance)
                     similar_items_merge = similar_items_merge.Concat(REngineTOP.getTOP5List()).ToList();
             }
 

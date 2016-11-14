@@ -77,7 +77,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="ClassDiagram1.cd" />
     <None Include="Datasets\interactions.csv" />
     <None Include="Datasets\item_profile.csv" />
     <None Include="Datasets\sample_submission.csv" />
