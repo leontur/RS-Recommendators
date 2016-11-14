@@ -1,0 +1,116 @@
+RS:> 
+RS:> -----------------------------------------------------------------
+RS:>  ** RECOMMENDATORS ENGINE **
+RS:> -----------------------------------------------------------------
+RS:>     ____________________________
+RS:>     Algorithms
+RS:>     1) TOP
+RS:>     2) CB-F
+RS:>     3) U-CF
+RS:>     4) I-CF
+RS:>     ____________________________
+RS:>     TEST Mode
+RS:>     7) test mode: enable here to initialize the dataset as train/test and do EVAL (not use for kaggle scope)
+RS:>     ____________________________
+RS:>     8) EVAL mode: execute EVAL with input a specific csv (not use for kaggle scope)
+RS:>     9) .bin size calculator
+RS:>     ____________________________
+RS:>     0) exit
+RS:> -----------------------------------------------------------------
+RS:> 
+RS:>     > RS:>     ==> selected program (7)
+RS:> -----------------------------------------------------------------
+RS:> 
+RS:> -----------------------------------------------------------------
+RS:>  ** RECOMMENDATORS ENGINE **
+RS:> -----------------------------------------------------------------
+RS:>     ____________________________
+RS:>     +++ TEST MODE ENABLED +++
+RS:>     >> datasets are initialized as train/test (not use for kaggle scope)
+RS:>     >> after the algorithm is invoked EVAL
+RS:>     ____________________________
+RS:>     Algorithms
+RS:>     1) TOP
+RS:>     2) CB-F
+RS:>     3) U-CF
+RS:>     4) I-CF
+RS:>     ____________________________
+RS:>     8) EVAL mode: execute EVAL with input a specific csv (not use for kaggle scope)
+RS:>     9) .bin size calculator
+RS:>     ____________________________
+RS:>     0) exit
+RS:> -----------------------------------------------------------------
+RS:> 
+RS:>     > RS:>     ==> selected program (4)
+RS:> -----------------------------------------------------------------
+RS:>   + initializing RS 
+RS:>   + initializing dataset retrievement 
+RS:>   + reading dataset: interactions
+RS:>   + dataset read OK | interactions_f count= 546865 | conversion..
+RS:>   + reading serialized file target_users.bin
+RS:>   + reading serialized file user_profile.bin
+RS:>   + reading serialized file item_profile.bin
+RS:>   + reading serialized file item_profile_disabled.bin
+RS:>   + populating auxiliary data structures 
+RS:> 
+RS:>   + all datasets conversion: OK
+RS:>   -total lines | interactions >>> 546864
+RS:>   -total lines | item_profile >>> 63446
+RS:>   -total lines | target_users >>> 10000
+RS:>   -total lines | user_profile >>> 40000
+RS:> 
+RS:>   + TINY TEST MODE: thining out datasets
+RS:>   + tiny random list size: 10000
+RS:>   -total lines | user_profile (tiny) >>> 10000
+RS:>   -total lines | interactions (tiny) >>> 139219
+RS:>   + creating random list..  percentage is set to 20%
+RS:>   + random list size: 2000
+RS:>   + splitting data into train and test..
+RS:>   -total lines | user_profile (train)    >>> 10000
+RS:>   -total lines | user_profile_test       >>> 2000
+RS:>   -total lines | target_users (replaced) >>> 2000
+RS:> -----------------------------------------------------------------
+RS:>   # running program 4
+RS:> 
+RS:>   + processing..
+RS:>   + computing ICF.. 
+RS:>   >>>>>> ARE YOU SURE TO CONTINUE?  THIS IS A VERY LONG RUNNING PROGRAM
+RS:>   + reading serialized file ICF_interaction_titles.bin
+RS:>   + computing all_user_interactions_titles..
+RS:>   + reading serialized file ICF_all_user_interactions_titles.bin
+RS:>   + computing TGTuser-ALLuser distance similarity matrix
+
+RS:>   + serialized file not saved because in test mode 
+RS:>   + generating output structured data
+
+RS:>  >>>>>> generating output file, wait a minute..
+RS:>  >>>>>> output submission file created: ../../../Output/submission_2016-11-14_11-16-36.csv
+RS:> -----------------------------------------------------------------
+RS:>  >>>>>> TEST MODE GENERATING PRECISION 
+
+RS:> 
+RS:>  >>>>>> MAP @5 = 0,007375
+RS:>  >>>>>> RECALL @SINGLE3 = 0,0131833334267139
+RS:> _______________________________________________________
+RS:> 
+RS:> -----------------------------------------------------------------
+RS:>  ** RECOMMENDATORS ENGINE **
+RS:> -----------------------------------------------------------------
+RS:>     ____________________________
+RS:>     +++ TEST MODE ENABLED +++
+RS:>     >> datasets are initialized as train/test (not use for kaggle scope)
+RS:>     >> after the algorithm is invoked EVAL
+RS:>     ____________________________
+RS:>     Algorithms
+RS:>     1) TOP
+RS:>     2) CB-F
+RS:>     3) U-CF
+RS:>     4) I-CF
+RS:>     ____________________________
+RS:>     8) EVAL mode: execute EVAL with input a specific csv (not use for kaggle scope)
+RS:>     9) .bin size calculator
+RS:>     ____________________________
+RS:>     0) exit
+RS:> -----------------------------------------------------------------
+RS:> 
+RS:>     > 

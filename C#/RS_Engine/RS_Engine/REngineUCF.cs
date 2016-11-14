@@ -11,19 +11,17 @@ namespace RS_Engine
     /**
      * |USER BASED COLLABORATIVE FILTERING
      * |ALGORITHM EXECUTION SUMMARY
+     * 
      * -compute all similarities for users
+     * 
      * -for each user to recommend
-     * -select n users most similars
-     * -for each
-     * -select his most clicked items
-     * -get top 5 clicked
-     * -output
+     * -call output structured data creation
      */
     class REngineUCF
     {
         //ALGORITHM PARAMETERS
         //number of similarities to select (for each user to be recommended)
-        private const int SIM_RANGE = 5;
+        private const int SIM_RANGE = 20;
 
         //weights for average similarity (weight are 1-10)
         private static int[] SIM_WEIGHTS = new int[11];
@@ -43,15 +41,15 @@ namespace RS_Engine
         public static void getRecommendations()
         {
             //Assigning weights
-            SIM_WEIGHTS[0] = 2;   //jobroles	
-            SIM_WEIGHTS[1] = 7;   //career_level	
+            SIM_WEIGHTS[0] = 8;   //jobroles	
+            SIM_WEIGHTS[1] = 10;   //career_level	
             SIM_WEIGHTS[2] = 10;  //discipline_id	
-            SIM_WEIGHTS[3] = 8;   //industry_id	
-            SIM_WEIGHTS[4] = 6;   //country	
-            SIM_WEIGHTS[5] = 4;   //region	
-            SIM_WEIGHTS[6] = 3;   //experience_n_entries_class	
-            SIM_WEIGHTS[7] = 7;   //experience_years_experience	
-            SIM_WEIGHTS[8] = 1;   //experience_years_in_current
+            SIM_WEIGHTS[3] = 9;   //industry_id	
+            SIM_WEIGHTS[4] = 8;   //country	
+            SIM_WEIGHTS[5] = 0;   //region	
+            SIM_WEIGHTS[6] = 0;   //experience_n_entries_class	
+            SIM_WEIGHTS[7] = 5;   //experience_years_experience	
+            SIM_WEIGHTS[8] = 2;   //experience_years_in_current
             SIM_WEIGHTS[9] = 10;  //edu_degree	
             SIM_WEIGHTS[10] = 10; //edu_fieldofstudies
 
@@ -82,7 +80,7 @@ namespace RS_Engine
 
                 //PARALLEL FOR
                 //foreach u1, u2 === user_profile list index
-                Parallel.For(0, par_length1, new ParallelOptions { MaxDegreeOfParallelism = 4 },
+                Parallel.For(0, par_length1, new ParallelOptions { MaxDegreeOfParallelism = 2 },
                     u1 => {
 
                         //counter
@@ -96,7 +94,7 @@ namespace RS_Engine
 
                         //PARALLEL FOR
                         //populating the row
-                        Parallel.For(0, r_sz, new ParallelOptions { MaxDegreeOfParallelism = 16 },
+                        Parallel.For(0, r_sz, new ParallelOptions { MaxDegreeOfParallelism = 8 },
                             u2 => {
 
                                 if (u1 == u2)
@@ -109,16 +107,29 @@ namespace RS_Engine
                                     //user_user_simil[u1][u2] = computeCosineSimilarity(u1, u2);
                                     user_user_simil[u1][u2] = computeWeightAvgSimilarity(u1, u2);
                                 }
-
                             });
                     });
+
+                //printing weights for log
+                RManager.outLog(" SIM_WEIGHTS");
+                RManager.outLog(" -" + SIM_WEIGHTS[0] + " jobroles");
+                RManager.outLog(" -" + SIM_WEIGHTS[1] + " career_level");
+                RManager.outLog(" -" + SIM_WEIGHTS[2] + " discipline_id");
+                RManager.outLog(" -" + SIM_WEIGHTS[3] + " industry_id");
+                RManager.outLog(" -" + SIM_WEIGHTS[4] + " country");
+                RManager.outLog(" -" + SIM_WEIGHTS[5] + " region");
+                RManager.outLog(" -" + SIM_WEIGHTS[6] + " experience_n_entries_class");
+                RManager.outLog(" -" + SIM_WEIGHTS[7] + " experience_years_experience");
+                RManager.outLog(" -" + SIM_WEIGHTS[8] + " experience_years_in_current");
+                RManager.outLog(" -" + SIM_WEIGHTS[9] + " edu_degree");
+                RManager.outLog(" -" + SIM_WEIGHTS[10] + " edu_fieldofstudies");
 
                 //serialize
                 if (!RManager.ISTESTMODE)
                 {
                     using (Stream stream = File.Open(Path.Combine(RManager.SERIALTPATH, "user_user_simil.bin"), FileMode.Create))
                     {
-                        RManager.outLog("\n  + writing serialized file " + "user_user_simil.bin");
+                        RManager.outLog("  + writing serialized file " + "user_user_simil.bin");
                         var bformatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
                         bformatter.Serialize(stream, user_user_simil);
                     }
@@ -172,8 +183,16 @@ namespace RS_Engine
                     int count = Interlocked.CompareExchange(ref par_counter_out, 0, 0);
                     if (count % 20 == 0) RManager.outLog("  - remaining: " + count, true, true, true);
 
+                    //getting index of this user
+                    int uix = RManager.user_profile.FindIndex(x => (int)x[0] == RManager.target_users[u]);
+
+                    //from the triangular jagged matrix, retrieve the complete list of similarities for the current user
+                    double[] curr_user_line = new double[u_size];
+                    for (int m = 0; m < u_size; m++)
+                        curr_user_line[m] = (m <= uix) ? user_user_simil[uix][m] : user_user_simil[m][uix];
+
                     //CALL COMPUTATION FOR USER AT INDEX u
-                    par_data_out[u] = findItemsToRecommendForTarget(u);
+                    par_data_out[u] = REngineOUTPUT.findItemsToRecommendForTarget_U_U(u, curr_user_line.ToList(), SIM_RANGE);
                 });
 
             //Converting for output
@@ -184,122 +203,7 @@ namespace RS_Engine
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////
-        //FOR PARALLEL COMPUTATION
-
-        private static int[] findItemsToRecommendForTarget(int u)
-        {
-            //for each user to recommend (u: is the index of the target user)
-            //finding recommended items
-
-            //timer
-            //RTimer.TimerStart();
-
-            //getting index of this user
-            int uix = RManager.user_profile.FindIndex(x => (int)x[0] == RManager.target_users[u]);
-
-            //from the triangular jagged matrix, retrieve the complete list of similarities for the current user
-            float[] curr_user_line = new float[u_size];
-            for (int m = 0; m < u_size; m++)
-                curr_user_line[m] = (m <= uix) ? user_user_simil[uix][m] : user_user_simil[m][uix];
-
-            //getting top SIM_RANGE for this user (without considering 1=himself in first position)
-            // transforming the line to a pair (value, index) array
-            // the value is a float, the index a int
-            // the index is used to find the id of the matched user
-            var sorted_curr_user_line = curr_user_line
-                                        .Select((x, i) => new KeyValuePair<float, int>(x, i))
-                                        .OrderByDescending(x => x.Key)
-                                        .ToList();
-            sorted_curr_user_line.RemoveAt(0);
-            //trim line to best SIM_RANGE matches
-            var sorted_curr_user_line_top = sorted_curr_user_line
-                                        .Take(SIM_RANGE)
-                                        .ToList();
-            //List<float> topforuser = sorted_curr_user_line.Select(x => x.Key).ToList();
-            List<int> useroriginalindex = sorted_curr_user_line_top.Select(x => x.Value).ToList();
-
-            //retrieving indexes of the users to recommend
-            List<int> similar_users = new List<int>();
-            foreach (var i in useroriginalindex)
-                similar_users.Add((int)RManager.user_profile[i][0]);
-
-            //retrieving interactions done by each user to recommend (and merging to select most populars)
-            List<int> interactions_of_similar_users = new List<int>();
-            foreach (var i in similar_users)
-                foreach (var j in RManager.interactions)
-                    if (j[0] == i)
-                        interactions_of_similar_users.Add(j[1]);
-
-            //ADVANCED FILTER
-            List<int> already_clicked = new List<int>();
-            if (!RManager.ISTESTMODE)
-            {
-                //retrieving interactions already clicked by the current user (not recommendig an item already clicked)
-                already_clicked = RManager.interactions.Where(i => i[0] == RManager.target_users[u] && i[2] <= 3).Select(i => i[1]).ToList();
-                //removing already clicked
-                interactions_of_similar_users = interactions_of_similar_users.Except(already_clicked).ToList();
-            }
-
-            //removing not recommendable
-            for (int s = interactions_of_similar_users.Count - 1; s >= 0; s--)
-                if (!RManager.item_profile_enabled_list.Contains(interactions_of_similar_users[s]))
-                    interactions_of_similar_users.RemoveAt(s);
-
-            //ordering most clicked items (and removing duplicates for next check)
-            interactions_of_similar_users = interactions_of_similar_users
-                                                        .GroupBy(i => i)
-                                                        .OrderByDescending(grp => grp.Count())
-                                                        .Select(x => x.Key)
-                                                        .ToList();
-
-            //CHECK
-            //if recommendations are not enough
-            int iteraction = 0;
-            while (interactions_of_similar_users.Count < 5)
-            {
-                //take the first recommendable item from the next similar user (all the same procedure as above)
-                int newuserIndex = sorted_curr_user_line.Skip(SIM_RANGE + iteraction).Take(1).Select(x => x.Value).First();
-                int newuserId = (int)RManager.user_profile[newuserIndex][0];
-                List<int> interactions_of_newuser = RManager.interactions.Where(x => x[0] == newuserId).Select(x => x[1]).ToList();
-                interactions_of_newuser = interactions_of_newuser.Except(already_clicked).ToList();
-                for (int s = interactions_of_newuser.Count - 1; s >= 0; s--)
-                    if (!RManager.item_profile_enabled_list.Contains(interactions_of_newuser[s]))
-                        interactions_of_newuser.RemoveAt(s);
-                interactions_of_newuser = interactions_of_newuser.Distinct().ToList();
-                interactions_of_similar_users = interactions_of_similar_users.Concat(interactions_of_newuser).ToList();
-                iteraction++;
-            }
-
-            //trim of top 5
-            interactions_of_similar_users = interactions_of_similar_users.Take(5).ToList();
-
-            //saving for output
-            return interactions_of_similar_users.ToArray();
-
-            /*
-            //debug
-            Console.WriteLine("\n  >>> index of " + u + " in the simil array is " + uix);
-            Console.WriteLine("\n  >>> recommendations:");
-            foreach(var z in topforuser)
-                Console.Write(" " + z);
-            Console.WriteLine("\n  >>> original index:");
-            foreach (var z in useroriginalindex)
-                Console.Write(" " + z);
-            Console.WriteLine("\n  >>> retrieved users:");
-            foreach (var z in similar_users)
-                Console.Write(" " + z);
-            Console.WriteLine("\n  >>> retrieved top items:");
-            foreach (var z in interactions_of_similar_users_top)
-                Console.Write(" " + z);
-            Console.ReadKey();
-
-            //timer
-            RTimer.TimerEndResult("foreach user_user_simil_out");
-            */
-        }
-
-        //////////////////////////////////////////////////////////////////////////////////////////
-        //COMPUTATION RUNTIME AUXILIARY FUNCTIONS
+        //ALGORITHM RUNTIME AUXILIARY FUNCTIONS
 
         //COMPUTE WEIGHTED AVERAGE SIMILARITY FOR PASSED COUPLE OF ROWS of user_profile
         private static float computeWeightAvgSimilarity(int r1, int r2)

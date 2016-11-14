@@ -24,11 +24,8 @@ namespace RS_Engine
      * TODO:
      * -compute pearson correlation coefficient for a couple of users
      * 
-     * -get top SIM_RANGE users similar to target
-     * -get their interactions and merge all to select most commons
-     * -select only not already interacted by target
-     * -select top 5
-     * -output
+     * -for each user to recommend
+     * -call output structured data creation
      */
     class REngineICF
     {
@@ -52,6 +49,79 @@ namespace RS_Engine
             //alert and info
             RManager.outLog("  >>>>>> ARE YOU SURE TO CONTINUE?  THIS IS A VERY LONG RUNNING PROGRAM");
             Console.ReadKey();
+
+            /////////////////////////////////////////////
+
+            //compute a list of jobs ids for which each user is interested
+            List<List<int>> all_user_interactions_ids = new List<List<int>>();
+            RManager.outLog("  + computing all_user_interactions_ids..");
+
+            //check if already serialized (for fast fetching)
+            if (!File.Exists(Path.Combine(RManager.SERIALTPATH, "ICF_all_user_interactions_ids.bin")))
+            {
+                //foreach user in user_profile
+                int c = 0;
+                foreach (var u in RManager.user_profile)
+                {
+                    //counter
+                    if (++c % 100 == 0)
+                        RManager.outLog("  - user: " + c, true, true);
+
+                    //retrieving interactions done by current user to recommend (and merging to select most populars)
+                    List<int> interactions_of_user = RManager.interactions.Where(i => i[0] == (int)u[0]).Select(i => i[1]).ToList();
+
+                    //getting pair <item_id, interaction_type> for weights
+                    List<List<int>> interactions_of_user_weight = new List<List<int>>();
+                    foreach (var j in RManager.interactions)
+                        if (j[0] == (int)u[0])
+                            interactions_of_user_weight.Add(new List<int> { j[1], j[2] });
+                    //sorting by interactions type (because have more weight)
+                    interactions_of_user_weight.OrderByDescending(x => x[1]);
+
+                    //sorting most clicked items
+                    var interactions_of_user_group_by = interactions_of_user.GroupBy(i => i).OrderByDescending(grp => grp.Count());
+
+                    //computing best, considering weights
+                    List<List<int>> interactions_of_user_weighted = new List<List<int>>();
+                    int it_id, it_clickcount, it_weight, it_avg_weight;
+                    foreach (var item in interactions_of_user_group_by)
+                    {
+                        it_id = item.Key;
+                        it_clickcount = item.Count();
+                        it_weight = interactions_of_user_weight.Where(i => i[0] == it_id).Select(i => i[1]).First();
+                        it_avg_weight = it_clickcount + it_weight / 2;
+                        interactions_of_user_weighted.Add(new List<int> { it_id, it_avg_weight });
+                    }
+                    interactions_of_user_weighted = interactions_of_user_weighted.OrderByDescending(x => x[1]).ToList();
+
+                    //select best clicked
+                    List<int> interactions_of_user_top = interactions_of_user_weighted.Select(x => x[0]).ToList();
+                    //at this point I have the list of all jobs IDs for the current user
+
+                    //store in global list
+                    all_user_interactions_ids.Add(interactions_of_user_top);
+                }
+
+                //serialize
+                using (Stream stream = File.Open(Path.Combine(RManager.SERIALTPATH, "ICF_all_user_interactions_ids.bin"), FileMode.Create))
+                {
+                    RManager.outLog("  + writing serialized file " + "ICF_all_user_interactions_ids.bin");
+                    var bformatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+                    bformatter.Serialize(stream, all_user_interactions_ids);
+                }
+            }
+            else
+            {
+                //deserialize
+                using (Stream stream = File.Open(Path.Combine(RManager.SERIALTPATH, "ICF_all_user_interactions_ids.bin"), FileMode.Open))
+                {
+                    RManager.outLog("  + reading serialized file " + "ICF_all_user_interactions_ids.bin");
+                    var bformatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+                    all_user_interactions_ids = (List<List<int>>)bformatter.Deserialize(stream);
+                }
+            }
+
+            /////////////////////////////////////////////
 
             //create a list of globally interacted items with no duplicates
             List<int> interacted = RManager.interactions.Select(x => x[1]).ToList();
@@ -137,42 +207,14 @@ namespace RS_Engine
             if (!File.Exists(Path.Combine(RManager.SERIALTPATH, "ICF_all_user_interactions_titles.bin")))
             {
                 //foreach user in user_profile
-                int c = 0;
-                foreach (var u in RManager.user_profile)
+                for(int u= 0; u < RManager.user_profile.Count; u++)
                 {
                     //counter
-                    if (++c % 100 == 0)
-                        RManager.outLog("  - user: " + c, true, true);
+                    if (u % 100 == 0)
+                        RManager.outLog("  - user: " + u, true, true);
 
-                    //retrieving interactions done by current user to recommend (and merging to select most populars)
-                    List<int> interactions_of_user = RManager.interactions.Where(i => i[0] == (int)u[0]).Select(i => i[1]).ToList();
-
-                    //getting pair <item_id, interaction_type> for weights
-                    List<List<int>> interactions_of_user_weight = new List<List<int>>();
-                    foreach (var j in RManager.interactions)
-                        if (j[0] == (int)u[0])
-                            interactions_of_user_weight.Add(new List<int> { j[1], j[2] });
-                    //sorting by interactions type (because have more weight)
-                    interactions_of_user_weight.OrderByDescending(x => x[1]);
-
-                    //sorting most clicked items
-                    var interactions_of_user_group_by = interactions_of_user.GroupBy(i => i).OrderByDescending(grp => grp.Count());
-
-                    //computing best, considering weights
-                    List<List<int>> interactions_of_user_weighted = new List<List<int>>();
-                    int it_id, it_clickcount, it_weight, it_avg_weight;
-                    foreach (var item in interactions_of_user_group_by)
-                    {
-                        it_id = item.Key;
-                        it_clickcount = item.Count();
-                        it_weight = interactions_of_user_weight.Where(i => i[0] == it_id).Select(i => i[1]).First();
-                        it_avg_weight = it_clickcount + it_weight / 2;
-                        interactions_of_user_weighted.Add(new List<int> { it_id, it_avg_weight });
-                    }
-                    interactions_of_user_weighted = interactions_of_user_weighted.OrderByDescending(x => x[1]).ToList();
-
-                    //select best clicked
-                    List<int> interactions_of_user_top = interactions_of_user_weighted.Select(x => x[0]).ToList();
+                    //retrieving best clicked interactions done by current user to recommend (already computed)
+                    List<int> interactions_of_user_top = all_user_interactions_ids[u];
 
                     //collecting all titles for that user, basing of his top interactions
                     List<int> interactions_titles_of_user_top = new List<int>();
@@ -211,6 +253,7 @@ namespace RS_Engine
 
             RManager.outLog("  + computing TGTuser-ALLuser distance similarity matrix");
 
+            //DISTANCE BETWEEN 2 USERS IS BASED ON THE SIMILARITY BETWEEN THEIR CLICKED JOBS TITLES
             //compute the similarity between two users
             // rows: each target user (count: from target_users)
             // cols: each other user (count: from user_profile)
@@ -321,8 +364,11 @@ namespace RS_Engine
                     int count = Interlocked.CompareExchange(ref par_counter_out, 0, 0);
                     if (count % 10 == 0) RManager.outLog("  - remaining: " + count, true, true, true);
 
+                    //retrieve the complete list of similarities for the current user
+                    List<double> curr_user_line = tgtuser_to_allusers_distance_similarity[u];
+
                     //CALL COMPUTATION FOR USER AT INDEX u
-                    par_data_out[u] = findItemsToRecommendForTarget(u);
+                    par_data_out[u] = REngineOUTPUT.findItemsToRecommendForTarget_U_U(u, curr_user_line, SIM_RANGE);
                 });
 
             //Converting for output
@@ -333,93 +379,7 @@ namespace RS_Engine
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////
-        //FOR PARALLEL COMPUTATION
-
-        private static int[] findItemsToRecommendForTarget(int u)
-        {
-            //for each user to recommend (u: is the index of the target user)
-            //finding recommended items
-
-            //retrieve the complete list of similarities for the current user
-            List<double> curr_user_line = tgtuser_to_allusers_distance_similarity[u];
-
-            //getting top SIM_RANGE for this user (without considering 1=himself in first position)
-            // transforming the line to a pair (value, index) array
-            // the value is a float, the index a int
-            // the index is used to find the id of the matched user
-            var sorted_curr_user_line = curr_user_line
-                                        .Select((x, i) => new KeyValuePair<double, int>(x, i))
-                                        .OrderByDescending(x => x.Key)
-                                        .ToList();
-            sorted_curr_user_line.RemoveAt(0);
-            //trim line to best SIM_RANGE matches
-            var sorted_curr_user_line_top = sorted_curr_user_line
-                                        .Take(SIM_RANGE)
-                                        .ToList();
-            //List<float> topforuser = sorted_curr_user_line.Select(x => x.Key).ToList();
-            List<int> useroriginalindex = sorted_curr_user_line_top.Select(x => x.Value).ToList();
-
-            //retrieving indexes of the users to recommend
-            List<int> similar_users = new List<int>();
-            foreach (var i in useroriginalindex)
-                similar_users.Add((int)RManager.user_profile[i][0]);
-
-            //retrieving interactions done by each user to recommend (and merging to select most populars)
-            List<int> interactions_of_similar_users = new List<int>();
-            foreach (var i in similar_users)
-                foreach (var j in RManager.interactions)
-                    if (j[0] == i)
-                        interactions_of_similar_users.Add(j[1]);
-
-            //ADVANCED FILTER
-            List<int> already_clicked = new List<int>();
-            if (!RManager.ISTESTMODE)
-            {
-                //retrieving interactions already used by the current user (not recommending a job already applied)
-                already_clicked = RManager.interactions.Where(i => i[0] == RManager.target_users[u] && i[2] <= 3).Select(i => i[1]).ToList();
-                //removing already clicked
-                interactions_of_similar_users = interactions_of_similar_users.Except(already_clicked).ToList();
-            }
-
-            //removing not recommendable
-            for (int s = interactions_of_similar_users.Count - 1; s >= 0; s--)
-                if (!RManager.item_profile_enabled_list.Contains(interactions_of_similar_users[s]))
-                    interactions_of_similar_users.RemoveAt(s);
-
-            //ordering most clicked items (and removing duplicates for next check)
-            interactions_of_similar_users = interactions_of_similar_users
-                                                        .GroupBy(i => i)
-                                                        .OrderByDescending(grp => grp.Count())
-                                                        .Select(x => x.Key)
-                                                        .ToList();
-
-            //CHECK
-            //if recommendations are not enough
-            int iteraction = 0;
-            while (interactions_of_similar_users.Count < 5)
-            {
-                //take the first recommendable item from the next similar user (all the same procedure as above)
-                int newuserIndex = sorted_curr_user_line.Skip(SIM_RANGE + iteraction).Take(1).Select(x => x.Value).First();
-                int newuserId = (int)RManager.user_profile[newuserIndex][0];
-                List<int> interactions_of_newuser = RManager.interactions.Where(x => x[0] == newuserId).Select(x => x[1]).ToList();
-                interactions_of_newuser = interactions_of_newuser.Except(already_clicked).ToList();
-                for (int s = interactions_of_newuser.Count - 1; s >= 0; s--)
-                    if (!RManager.item_profile_enabled_list.Contains(interactions_of_newuser[s]))
-                        interactions_of_newuser.RemoveAt(s);
-                interactions_of_newuser = interactions_of_newuser.Distinct().ToList();
-                interactions_of_similar_users = interactions_of_similar_users.Concat(interactions_of_newuser).ToList();
-                iteraction++;
-            }
-
-            //trim of top 5
-            interactions_of_similar_users = interactions_of_similar_users.Take(5).ToList();
-
-            //saving for output
-            return interactions_of_similar_users.ToArray();
-        }
-
-        //////////////////////////////////////////////////////////////////////////////////////////
-        //COMPUTATION RUNTIME AUXILIARY FUNCTIONS
+        //ALGORITHM RUNTIME AUXILIARY FUNCTIONS
 
         //JOBS TITLES
         //DISTANCE BASED SIMILARITY

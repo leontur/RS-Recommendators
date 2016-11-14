@@ -67,8 +67,8 @@ namespace RS_Engine
 
                 
                 //debug
-                foreach(var i in interactions_top)
-                    RManager.outLog("   -saved top 5 > " + i);
+                //foreach(var i in interactions_top)
+                    //RManager.outLog("   -saved top 5 > " + i);
                 
 
                 return interactions_top;

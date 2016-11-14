@@ -14,7 +14,7 @@ namespace RS_Engine
         //MAIN DATA STRUCTURES (cleaned from datasets)
         public static List<List<int>> interactions = new List<List<int>>();
         public static List<int> target_users = new List<int>();
-        public static List<List<object>> user_profile = new List<List<object>>(); //train matrix
+        public static List<List<object>> user_profile = new List<List<object>>(); //also used as train matrix
         public static List<List<object>> item_profile = new List<List<object>>();
 
         //AUXILIARY DATA STRUCTURES
@@ -373,7 +373,7 @@ namespace RS_Engine
             outLog("    2) CB-F");
             outLog("    3) U-CF");
             outLog("    4) I-CF");
-            outLog("    ____________________________");
+
             if (!ISTESTMODE)
             {
                 outLog("    ____________________________");

@@ -11,19 +11,67 @@ namespace RS_Engine
         //Test percentage of the dataset (in %)
         private const int TESTPERCENTAGE = 20;
 
+        //Fast test mode with datasets reduced at 10000
+        private const bool TINYTEST = true;
+
         //TRAIN AND TEST SET SPLIT
         public static void splitTrainTestData()
         {
             //sizes
+            int keepOnly = 10000;
             int userSize = RManager.user_profile.Count;
+
+            //if tiny test, thin out the datasets
+            if (TINYTEST)
+            {
+                //generate rnd with rnd seed avoiding duplicates
+                //generate 0>keepOnly randoms with value between 0>userSize
+                RManager.outLog("  + TINY TEST MODE ENABLED - LIMIT=" + keepOnly);
+                int[] randomListTiny = new int[keepOnly];
+                int rnd2;
+                for (int i = 0; i < keepOnly; i++)
+                {
+                    do
+                    {
+                        rnd2 = new Random(Guid.NewGuid().GetHashCode()).Next(0, userSize);
+                    }
+                    while (randomListTiny.Contains(rnd2));
+                    randomListTiny[i] = rnd2;
+                }
+                randomListTiny = randomListTiny.OrderBy(c => c).ToArray();
+                RManager.outLog("  + tiny random list size: " + randomListTiny.Count());
+                RManager.outLog("  + thining out datasets (1m)");
+
+                //get the ids of user to keep
+                List<int> keepUsers = new List<int>();
+                for (int i = 0; i < randomListTiny.Count(); i++) //scroll subset of index to save
+                    keepUsers.Add((int)RManager.user_profile[randomListTiny[i]][0]);
+
+                //thin out user_profile
+                RManager.user_profile.RemoveAll(x => !keepUsers.Contains((int)x[0]));
+
+                //thin out interactions
+                RManager.interactions.RemoveAll(x => !keepUsers.Contains(x[0]));
+
+                //log
+                RManager.outLog("  -total lines | user_profile (tiny) >>> " + RManager.user_profile.Count());
+                RManager.outLog("  -total lines | interactions (tiny) >>> " + RManager.interactions.Count());
+
+                //update size with new value
+                userSize = keepOnly;
+            }
+
+
+            //sizes
             int testSize = userSize * TESTPERCENTAGE / 100;
             int trainSize = userSize - testSize;
 
             //generate rnd with rnd seed avoiding duplicates
+            //generate 0>testSize randoms with value between 0>userSize
             RManager.outLog("  + creating random list..  percentage is set to " + TESTPERCENTAGE + "%");
             int[] randomList = new int[testSize];
             int rnd;
-            for(int i=0; i<testSize; i++)
+            for (int i = 0; i < testSize; i++)
             {
                 do
                 {

@@ -30,7 +30,7 @@ namespace RS_Engine
             RManager.outLog("");
             RManager.outLog(" >>>>>> MAP @" + MAP_K + " = " + MAP);
             RManager.outLog(" >>>>>> RECALL @SINGLE" + RECALL_SINGLE_K + " = " + RECALL);
-            RManager.outLog("__________________________________________________________________");
+            RManager.outLog("_______________________________________________________");
         }
 
         //MAP @K
