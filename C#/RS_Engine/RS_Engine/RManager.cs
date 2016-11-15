@@ -33,7 +33,7 @@ namespace RS_Engine
         public static bool ISEVALMODE = false;
 
         //Unique path vars
-        private static string BACKPATH = "../../../";
+        public static string BACKPATH = "../../../";
         private static string uniqueFileDate = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss", CultureInfo.InvariantCulture);
         private static string DATASETPATH = BACKPATH + "Datasets/";
         private static string LOGPATH = BACKPATH + "Output/result_" + uniqueFileDate + ".txt";

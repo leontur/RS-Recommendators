@@ -176,21 +176,40 @@ namespace RS_Engine
                 // -values are the similarities of each item with the row-item 
                 //  (that is the 'clicked' item id in the current_user_interactions_ordered_list)
 
-                //getting top SIM_RANGE for this item (without considering 1=himself in first position)
-                // transforming the line to a pair (value, index) array
-                // the value is a float, the index a int
-                // the index is used to find the id of the matched item
-                var sorted_curr_item_line = item_sim_row
-                                            .Select((x, i) => new KeyValuePair<double, int>(x, i))
-                                            .OrderByDescending(x => x.Key)
-                                            .ToList();
-                sorted_curr_item_line.RemoveAt(0);
-                //trim line to best SIM_RANGE matches
-                var sorted_curr_item_line_top = sorted_curr_item_line
-                                            .Take(SIM_RANGE)
-                                            .ToList();
-                //List<float> topforitem = sorted_curr_item_line_top.Select(x => x.Key).ToList();
-                List<int> itemoriginalindex = sorted_curr_item_line_top.Select(x => x.Value).ToList();
+                //item most similar indexes (computed and in cache or to compute)
+                List<int> itemoriginalindex = new List<int>();
+                List<int> itemoriginalindex_skip = new List<int>();
+
+                //CACHE CHECK: if already computed, retrieve
+                if (REngineCBF.item_sim_row_cache[iix] != null)
+                {
+                    //retrieving from cache
+                    itemoriginalindex = REngineCBF.item_sim_row_cache[iix].ToList();
+                    itemoriginalindex_skip = itemoriginalindex.Skip(SIM_RANGE).Take(SIM_RANGE_SKIP).ToList();
+                }
+                else
+                {
+                    //getting top SIM_RANGE for this item (without considering 1=himself in first position)
+                    // transforming the line to a pair (value, index) array
+                    // the value is a float, the index a int
+                    // the index is used to find the id of the matched item
+                    var sorted_curr_item_line = item_sim_row
+                                                .Select((x, i) => new KeyValuePair<double, int>(x, i))
+                                                .OrderByDescending(x => x.Key)
+                                                .ToList();
+                    sorted_curr_item_line.RemoveAt(0);
+                    //trim line to best SIM_RANGE matches
+                    var sorted_curr_item_line_top = sorted_curr_item_line
+                                                .Take(SIM_RANGE)
+                                                .ToList();
+                    //List<float> topforitem = sorted_curr_item_line_top.Select(x => x.Key).ToList();
+                    itemoriginalindex = sorted_curr_item_line_top.Select(x => x.Value).ToList();
+                    itemoriginalindex_skip = sorted_curr_item_line.Skip(SIM_RANGE).Take(SIM_RANGE_SKIP).Select(x => x.Value).ToList();
+
+                    //CACHE
+                    //caching to avoid recomputing
+                    REngineCBF.item_sim_row_cache[iix] = sorted_curr_item_line.Take(SIM_RANGE + SIM_RANGE_SKIP + 5).Select(x => x.Value).ToArray();
+                }
 
                 //retrieving indexes of the item to recommend
                 List<int> similar_items = new List<int>();
@@ -206,7 +225,6 @@ namespace RS_Engine
 
                 ///////////////
                 //doing the same for the skip check
-                List<int> itemoriginalindex_skip = sorted_curr_item_line.Skip(SIM_RANGE).Take(SIM_RANGE_SKIP).Select(x => x.Value).ToList();
                 //retrieving indexes of the item to recommend
                 List<int> similar_items_skip = new List<int>();
                 foreach (var i in itemoriginalindex_skip)

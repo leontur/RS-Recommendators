@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace RS_Engine
 {
     /**
-     * |CONTENT BASED FILTERING          //////////////////////////// SICURI si chiami così??
+     * |CONTENT BASED FILTERING 
      * |ALGORITHM EXECUTION SUMMARY
      * 
      * -compute all similarities for items
@@ -23,7 +23,8 @@ namespace RS_Engine
         //ALGORITHM PARAMETERS
         //number of similarities to select (for each item to be recommended)
         private const int SIM_RANGE = 5;
-        private const int SIM_RANGE_SKIP = 10;
+        private const int SIM_RANGE_SKIP = 5;
+        private const int INTER_RANGE = 8;
 
         //weights for average similarity (weight are 1-10)
         private static int[] SIM_WEIGHTS = new int[10];
@@ -39,6 +40,8 @@ namespace RS_Engine
         private static int i_en_size = RManager.item_profile_enabled.Count;
         //Instantiating item-item matrix
         //public static float[][] item_item_simil = new float[i_size][];
+        //CACHE for similarity computation
+        public static int[][] item_sim_row_cache = new int[i_size][];
 
         //MAIN ALGORITHM METHOD
         public static void getRecommendations()
@@ -193,7 +196,7 @@ namespace RS_Engine
             int par_counter_out = par_length_out;
 
             //PARALLEL FOR
-            Parallel.For(0, par_length_out, new ParallelOptions { MaxDegreeOfParallelism = 2 },
+            Parallel.For(0, par_length_out,
                 u => {
 
                     //counter
@@ -202,11 +205,22 @@ namespace RS_Engine
                     if (count % 10 == 0) RManager.outLog("  - remaining: " + count, true, true, true);
 
                     //retrieving best clicked interactions done by current user to recommend (already computed)
-                    List<int> interactions_of_user_top = all_user_interactions_ids[u];
+                    List<int> interactions_of_user_top = all_user_interactions_ids[u].Take(INTER_RANGE).ToList();
 
                     //CALL COMPUTATION FOR USER AT INDEX u
                     par_data_out[u] = REngineOUTPUT.findItemsToRecommendForTarget_U_I(u, interactions_of_user_top, SIM_RANGE, SIM_RANGE_SKIP);
                 });
+
+            //serialize CACHE
+            if (!RManager.ISTESTMODE)
+            {
+                using (Stream stream = File.Open(Path.Combine(RManager.SERIALTPATH, "item_sim_row_cache.bin"), FileMode.Create))
+                {
+                    RManager.outLog("  + writing serialized file " + "item_sim_row_cache.bin");
+                    var bformatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+                    bformatter.Serialize(stream, item_sim_row_cache);
+                }
+            }
 
             //Converting for output
             List<List<int>> item_item_simil_out = par_data_out.Select(p => p.ToList()).ToList();
@@ -225,22 +239,22 @@ namespace RS_Engine
         {
             //PARALLEL VARS
             int par_length = i_en_size;
-            double[] par_data = new double[par_length];
+            double[] sim_row = new double[par_length];
 
             //PARALLEL FOR
             //foreach i1, i2 === item_profile list index
-            Parallel.For(0, par_length, new ParallelOptions { MaxDegreeOfParallelism = 16 },
+            Parallel.For(0, par_length,
                 i => {
 
                     //COMPUTE SIMILARITY for these two vectors (input for total matrix, cross computation with only enabled items)
                     if (item_index == i)
-                        par_data[i] = (float)1;
+                        sim_row[i] = (float)1;
                     else
-                        par_data[i] = computeWeightAvgSimilarityForItems(RManager.item_profile[item_index], RManager.item_profile_enabled[i]);
+                        sim_row[i] = computeWeightAvgSimilarityForItems(RManager.item_profile[item_index], RManager.item_profile_enabled[i]);
                 });
 
             //return as list of double
-            return par_data.ToList();
+            return sim_row.ToList();
         }
 
         //COMPUTE WEIGHTED AVERAGE SIMILARITY FOR PASSED COUPLE OF ROWS (Lists<obj>) of item_profile

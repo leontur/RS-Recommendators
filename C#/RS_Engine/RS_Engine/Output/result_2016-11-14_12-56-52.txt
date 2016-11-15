@@ -1,77 +1,0 @@
-RS:> 
-RS:> -----------------------------------------------------------------
-RS:>  ** RECOMMENDATORS ENGINE **
-RS:> -----------------------------------------------------------------
-RS:>     ____________________________
-RS:>     Algorithms
-RS:>     1) TOP
-RS:>     2) CB-F
-RS:>     3) U-CF
-RS:>     4) I-CF
-RS:>     ____________________________
-RS:>     TEST Mode
-RS:>     7) test mode: enable here to initialize the dataset as train/test and do EVAL (not use for kaggle scope)
-RS:>     ____________________________
-RS:>     8) EVAL mode: execute EVAL with input a specific csv (not use for kaggle scope)
-RS:>     9) .bin size calculator
-RS:>     ____________________________
-RS:>     0) exit
-RS:> -----------------------------------------------------------------
-RS:> 
-RS:>     > RS:>     ==> selected program (4)
-RS:> -----------------------------------------------------------------
-RS:>   + initializing RS 
-RS:>   + initializing dataset retrievement 
-RS:>   + reading dataset: interactions
-RS:>   + dataset read OK | interactions_f count= 546865 | conversion..
-RS:>   + reading serialized file target_users.bin
-RS:>   + reading serialized file user_profile.bin
-RS:>   + reading serialized file item_profile.bin
-RS:>   + reading serialized file item_profile_disabled.bin
-RS:>   + populating auxiliary data structures 
-RS:> 
-RS:>   + all datasets conversion: OK
-RS:>   -total lines | interactions >>> 546864
-RS:>   -total lines | item_profile >>> 63446
-RS:>   -total lines | target_users >>> 10000
-RS:>   -total lines | user_profile >>> 40000
-RS:> 
-RS:> -----------------------------------------------------------------
-RS:>   # running program 4
-RS:> 
-RS:>   + processing..
-RS:>   + computing ICF.. 
-RS:>   >>>>>> ARE YOU SURE TO CONTINUE?  THIS IS A VERY LONG RUNNING PROGRAM
-RS:>   + computing all_user_interactions_ids..
-RS:>(\)   - user: 100   RS:>(|)   - user: 200   RS:>(/)   - user: 300   RS:>(-)   - user: 400   RS:>(\)   - user: 500   RS:>(|)   - user: 600   RS:>(/)   - user: 700   RS:>(-)   - user: 800   RS:>(\)   - user: 900   RS:>(|)   - user: 1000   RS:>(/)   - user: 1100   RS:>(-)   - user: 1200   RS:>(\)   - user: 1300   RS:>(|)   - user: 1400   RS:>(/)   - user: 1500   RS:>(-)   - user: 1600   RS:>(\)   - user: 1700   RS:>(|)   - user: 1800   RS:>(/)   - user: 1900   RS:>(-)   - user: 2000   RS:>(\)   - user: 2100   RS:>(|)   - user: 2200   RS:>(/)   - user: 2300   RS:>(-)   - user: 2400   RS:>(\)   - user: 2500   RS:>(|)   - user: 2600   RS:>(/)   - user: 2700   RS:>(-)   - user: 2800   RS:>(\)   - user: 2900   RS:>(|)   - user: 3000   RS:>(/)   - user: 3100   RS:>(-)   - user: 3200   RS:>(\)   - user: 3300   RS:>(|)   - user: 3400   RS:>(/)   - user: 3500   RS:>(-)   - user: 3600   RS:>(\)   - user: 3700   RS:>(|)   - user: 3800   RS:>(/)   - user: 3900   RS:>(-)   - user: 4000   RS:>(\)   - user: 4100   RS:>(|)   - user: 4200   RS:>(/)   - user: 4300   RS:>(-)   - user: 4400   RS:>(\)   - user: 4500   RS:>(|)   - user: 4600   RS:>(/)   - user: 4700   RS:>(-)   - user: 4800   RS:>(\)   - user: 4900   RS:>(|)   - user: 5000   RS:>(/)   - user: 5100   RS:>(-)   - user: 5200   RS:>(\)   - user: 5300   RS:>(|)   - user: 5400   RS:>(/)   - user: 5500   RS:>(-)   - user: 5600   RS:>(\)   - user: 5700   RS:>(|)   - user: 5800   RS:>(/)   - user: 5900   RS:>(-)   - user: 6000   RS:>(\)   - user: 6100   RS:>(|)   - user: 6200   RS:>(/)   - user: 6300   RS:>(-)   - user: 6400   RS:>(\)   - user: 6500   RS:>(|)   - user: 6600   RS:>(/)   - user: 6700   RS:>(-)   - user: 6800   RS:>(\)   - user: 6900   RS:>(|)   - user: 7000   RS:>(/)   - user: 7100   RS:>(-)   - user: 7200   RS:>(\)   - user: 7300   RS:>(|)   - user: 7400   RS:>(/)   - user: 7500   RS:>(-)   - user: 7600   RS:>(\)   - user: 7700   RS:>(|)   - user: 7800   RS:>(/)   - user: 7900   RS:>(-)   - user: 8000   RS:>(\)   - user: 8100   RS:>(|)   - user: 8200   RS:>(/)   - user: 8300   RS:>(-)   - user: 8400   RS:>(\)   - user: 8500   RS:>(|)   - user: 8600   RS:>(/)   - user: 8700   RS:>(-)   - user: 8800   RS:>(\)   - user: 8900   RS:>(|)   - user: 9000   RS:>(/)   - user: 9100   RS:>(-)   - user: 9200   RS:>(\)   - user: 9300   RS:>(|)   - user: 9400   RS:>(/)   - user: 9500   RS:>(-)   - user: 9600   RS:>(\)   - user: 9700   RS:>(|)   - user: 9800   RS:>(/)   - user: 9900   RS:>(-)   - user: 10000   RS:>(\)   - user: 10100   RS:>(|)   - user: 10200   RS:>(/)   - user: 10300   RS:>(-)   - user: 10400   RS:>(\)   - user: 10500   RS:>(|)   - user: 10600   RS:>(/)   - user: 10700   RS:>(-)   - user: 10800   RS:>(\)   - user: 10900   RS:>(|)   - user: 11000   RS:>(/)   - user: 11100   RS:>(-)   - user: 11200   RS:>(\)   - user: 11300   RS:>(|)   - user: 11400   RS:>(/)   - user: 11500   RS:>(-)   - user: 11600   RS:>(\)   - user: 11700   RS:>(|)   - user: 11800   RS:>(/)   - user: 11900   RS:>(-)   - user: 12000   RS:>(\)   - user: 12100   RS:>(|)   - user: 12200   RS:>(/)   - user: 12300   RS:>(-)   - user: 12400   RS:>(\)   - user: 12500   RS:>(|)   - user: 12600   RS:>(/)   - user: 12700   RS:>(-)   - user: 12800   RS:>(\)   - user: 12900   RS:>(|)   - user: 13000   RS:>(/)   - user: 13100   RS:>(-)   - user: 13200   RS:>(\)   - user: 13300   RS:>(|)   - user: 13400   RS:>(/)   - user: 13500   RS:>(-)   - user: 13600   RS:>(\)   - user: 13700   RS:>(|)   - user: 13800   RS:>(/)   - user: 13900   RS:>(-)   - user: 14000   RS:>(\)   - user: 14100   RS:>(|)   - user: 14200   RS:>(/)   - user: 14300   RS:>(-)   - user: 14400   RS:>(\)   - user: 14500   RS:>(|)   - user: 14600   RS:>(/)   - user: 14700   RS:>(-)   - user: 14800   RS:>(\)   - user: 14900   RS:>(|)   - user: 15000   RS:>(/)   - user: 15100   RS:>(-)   - user: 15200   RS:>(\)   - user: 15300   RS:>(|)   - user: 15400   RS:>(/)   - user: 15500   RS:>(-)   - user: 15600   RS:>(\)   - user: 15700   RS:>(|)   - user: 15800   RS:>(/)   - user: 15900   RS:>(-)   - user: 16000   RS:>(\)   - user: 16100   RS:>(|)   - user: 16200   RS:>(/)   - user: 16300   RS:>(-)   - user: 16400   RS:>(\)   - user: 16500   RS:>(|)   - user: 16600   RS:>(/)   - user: 16700   RS:>(-)   - user: 16800   RS:>(\)   - user: 16900   RS:>(|)   - user: 17000   RS:>(/)   - user: 17100   RS:>(-)   - user: 17200   RS:>(\)   - user: 17300   RS:>(|)   - user: 17400   RS:>(/)   - user: 17500   RS:>(-)   - user: 17600   RS:>(\)   - user: 17700   RS:>(|)   - user: 17800   RS:>(/)   - user: 17900   RS:>(-)   - user: 18000   RS:>(\)   - user: 18100   RS:>(|)   - user: 18200   RS:>(/)   - user: 18300   RS:>(-)   - user: 18400   RS:>(\)   - user: 18500   RS:>(|)   - user: 18600   RS:>(/)   - user: 18700   RS:>(-)   - user: 18800   RS:>(\)   - user: 18900   RS:>(|)   - user: 19000   RS:>(/)   - user: 19100   RS:>(-)   - user: 19200   RS:>(\)   - user: 19300   RS:>(|)   - user: 19400   RS:>(/)   - user: 19500   RS:>(-)   - user: 19600   RS:>(\)   - user: 19700   RS:>(|)   - user: 19800   RS:>(/)   - user: 19900   RS:>(-)   - user: 20000   RS:>(\)   - user: 20100   RS:>(|)   - user: 20200   RS:>(/)   - user: 20300   RS:>(-)   - user: 20400   RS:>(\)   - user: 20500   RS:>(|)   - user: 20600   RS:>(/)   - user: 20700   RS:>(-)   - user: 20800   RS:>(\)   - user: 20900   RS:>(|)   - user: 21000   RS:>(/)   - user: 21100   RS:>(-)   - user: 21200   RS:>(\)   - user: 21300   RS:>(|)   - user: 21400   RS:>(/)   - user: 21500   RS:>(-)   - user: 21600   RS:>(\)   - user: 21700   RS:>(|)   - user: 21800   RS:>(/)   - user: 21900   RS:>(-)   - user: 22000   RS:>(\)   - user: 22100   RS:>(|)   - user: 22200   RS:>(/)   - user: 22300   RS:>(-)   - user: 22400   RS:>(\)   - user: 22500   RS:>(|)   - user: 22600   RS:>(/)   - user: 22700   RS:>(-)   - user: 22800   RS:>(\)   - user: 22900   RS:>(|)   - user: 23000   RS:>(/)   - user: 23100   RS:>(-)   - user: 23200   RS:>(\)   - user: 23300   RS:>(|)   - user: 23400   RS:>(/)   - user: 23500   RS:>(-)   - user: 23600   RS:>(\)   - user: 23700   RS:>(|)   - user: 23800   RS:>(/)   - user: 23900   RS:>(-)   - user: 24000   RS:>(\)   - user: 24100   RS:>(|)   - user: 24200   RS:>(/)   - user: 24300   RS:>(-)   - user: 24400   RS:>(\)   - user: 24500   RS:>(|)   - user: 24600   RS:>(/)   - user: 24700   RS:>(-)   - user: 24800   RS:>(\)   - user: 24900   RS:>(|)   - user: 25000   RS:>(/)   - user: 25100   RS:>(-)   - user: 25200   RS:>(\)   - user: 25300   RS:>(|)   - user: 25400   RS:>(/)   - user: 25500   RS:>(-)   - user: 25600   RS:>(\)   - user: 25700   RS:>(|)   - user: 25800   RS:>(/)   - user: 25900   RS:>(-)   - user: 26000   RS:>(\)   - user: 26100   RS:>(|)   - user: 26200   RS:>(/)   - user: 26300   RS:>(-)   - user: 26400   RS:>(\)   - user: 26500   RS:>(|)   - user: 26600   RS:>(/)   - user: 26700   RS:>(-)   - user: 26800   RS:>(\)   - user: 26900   RS:>(|)   - user: 27000   RS:>(/)   - user: 27100   RS:>(-)   - user: 27200   RS:>(\)   - user: 27300   RS:>(|)   - user: 27400   RS:>(/)   - user: 27500   RS:>(-)   - user: 27600   RS:>(\)   - user: 27700   RS:>(|)   - user: 27800   RS:>(/)   - user: 27900   RS:>(-)   - user: 28000   RS:>(\)   - user: 28100   RS:>(|)   - user: 28200   RS:>(/)   - user: 28300   RS:>(-)   - user: 28400   RS:>(\)   - user: 28500   RS:>(|)   - user: 28600   RS:>(/)   - user: 28700   RS:>(-)   - user: 28800   RS:>(\)   - user: 28900   RS:>(|)   - user: 29000   RS:>(/)   - user: 29100   RS:>(-)   - user: 29200   RS:>(\)   - user: 29300   RS:>(|)   - user: 29400   RS:>(/)   - user: 29500   RS:>(-)   - user: 29600   RS:>(\)   - user: 29700   RS:>(|)   - user: 29800   RS:>(/)   - user: 29900   RS:>(-)   - user: 30000   RS:>(\)   - user: 30100   RS:>(|)   - user: 30200   RS:>(/)   - user: 30300   RS:>(-)   - user: 30400   RS:>(\)   - user: 30500   RS:>(|)   - user: 30600   RS:>(/)   - user: 30700   RS:>(-)   - user: 30800   RS:>(\)   - user: 30900   RS:>(|)   - user: 31000   RS:>(/)   - user: 31100   RS:>(-)   - user: 31200   RS:>(\)   - user: 31300   RS:>(|)   - user: 31400   RS:>(/)   - user: 31500   RS:>(-)   - user: 31600   RS:>(\)   - user: 31700   RS:>(|)   - user: 31800   RS:>(/)   - user: 31900   RS:>(-)   - user: 32000   RS:>(\)   - user: 32100   RS:>(|)   - user: 32200   RS:>(/)   - user: 32300   RS:>(-)   - user: 32400   RS:>(\)   - user: 32500   RS:>(|)   - user: 32600   RS:>(/)   - user: 32700   RS:>(-)   - user: 32800   RS:>(\)   - user: 32900   RS:>(|)   - user: 33000   RS:>(/)   - user: 33100   RS:>(-)   - user: 33200   RS:>(\)   - user: 33300   RS:>(|)   - user: 33400   RS:>(/)   - user: 33500   RS:>(-)   - user: 33600   RS:>(\)   - user: 33700   RS:>(|)   - user: 33800   RS:>(/)   - user: 33900   RS:>(-)   - user: 34000   RS:>(\)   - user: 34100   RS:>(|)   - user: 34200   RS:>(/)   - user: 34300   RS:>(-)   - user: 34400   RS:>(\)   - user: 34500   RS:>(|)   - user: 34600   RS:>(/)   - user: 34700   RS:>(-)   - user: 34800   RS:>(\)   - user: 34900   RS:>(|)   - user: 35000   RS:>(/)   - user: 35100   RS:>(-)   - user: 35200   RS:>(\)   - user: 35300   RS:>(|)   - user: 35400   RS:>(/)   - user: 35500   RS:>(-)   - user: 35600   RS:>(\)   - user: 35700   RS:>(|)   - user: 35800   RS:>(/)   - user: 35900   RS:>(-)   - user: 36000   RS:>(\)   - user: 36100   RS:>(|)   - user: 36200   RS:>(/)   - user: 36300   RS:>(-)   - user: 36400   RS:>(\)   - user: 36500   RS:>(|)   - user: 36600   RS:>(/)   - user: 36700   RS:>(-)   - user: 36800   RS:>(\)   - user: 36900   RS:>(|)   - user: 37000   RS:>(/)   - user: 37100   RS:>(-)   - user: 37200   RS:>(\)   - user: 37300   RS:>(|)   - user: 37400   RS:>(/)   - user: 37500   RS:>(-)   - user: 37600   RS:>(\)   - user: 37700   RS:>(|)   - user: 37800   RS:>(/)   - user: 37900   RS:>(-)   - user: 38000   RS:>(\)   - user: 38100   RS:>(|)   - user: 38200   RS:>(/)   - user: 38300   RS:>(-)   - user: 38400   RS:>(\)   - user: 38500   RS:>(|)   - user: 38600   RS:>(/)   - user: 38700   RS:>(-)   - user: 38800   RS:>(\)   - user: 38900   RS:>(|)   - user: 39000   RS:>(/)   - user: 39100   RS:>(-)   - user: 39200   RS:>(\)   - user: 39300   RS:>(|)   - user: 39400   RS:>(/)   - user: 39500   RS:>(-)   - user: 39600   RS:>(\)   - user: 39700   RS:>(|)   - user: 39800   RS:>(/)   - user: 39900   RS:>(-)   - user: 40000   
-RS:>   + writing serialized file ICF_all_user_interactions_ids.bin
-RS:>   + reading serialized file ICF_interaction_titles.bin
-RS:>   + computing all_user_interactions_titles..
-RS:>   + reading serialized file ICF_all_user_interactions_titles.bin
-RS:>   + computing TGTuser-ALLuser distance similarity matrix
-RS:>   + reading serialized file ICF_tgtuser_to_allusers_distance_similarity.bin
-RS:>   + generating output structured data
-
-RS:>  >>>>>> generating output file, wait a minute..
-RS:>  >>>>>> output submission file created: ../../../Output/submission_2016-11-14_12-56-52.csv
-RS:> 
-RS:> -----------------------------------------------------------------
-RS:>  ** RECOMMENDATORS ENGINE **
-RS:> -----------------------------------------------------------------
-RS:>     ____________________________
-RS:>     Algorithms
-RS:>     1) TOP
-RS:>     2) CB-F
-RS:>     3) U-CF
-RS:>     4) I-CF
-RS:>     ____________________________
-RS:>     TEST Mode
-RS:>     7) test mode: enable here to initialize the dataset as train/test and do EVAL (not use for kaggle scope)
-RS:>     ____________________________
-RS:>     8) EVAL mode: execute EVAL with input a specific csv (not use for kaggle scope)
-RS:>     9) .bin size calculator
-RS:>     ____________________________
-RS:>     0) exit
-RS:> -----------------------------------------------------------------
-RS:> 
-RS:>     > 

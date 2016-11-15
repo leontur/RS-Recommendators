@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -24,6 +25,121 @@ namespace RS_Engine
             long mb = (32L * rn * cn) / (8 * 1000 * 1000);
             RManager.outLog(" >>>>>> output .bin dimensions and RAM consumption (about): " + mb + " MB" + " | for a jagged array use (about): " + mb/2 + " MB");
         }
+
+        //SHAKE AND REPROPOSE (g-IT)
+        public static void shakeNpropose()
+        {
+            RManager.outLog("  + SHAKE N PROPOSE");
+
+            //generate n rndms (items to 'substitute')
+            int subst = 200;
+            RManager.outLog("  + creating random list SUB of " + subst);
+            int[] randomList = new int[subst];
+            int rnd;
+            for (int i = 0; i < subst; i++)
+            {
+                do
+                {
+                    rnd = new Random(Guid.NewGuid().GetHashCode()).Next(0, 10000);
+                }
+                while (randomList.Contains(rnd));
+                randomList[i] = rnd;
+            }
+            RManager.outLog("  + random list size: " + randomList.Count());
+
+            //generate n rndms (items to 'shake')
+            int shake = 200;
+            RManager.outLog("  + creating random list SHK of " + shake);
+            int[] randomList2 = new int[shake];
+            int rnd2;
+            for (int i = 0; i < shake; i++)
+            {
+                do
+                {
+                    rnd2 = new Random(Guid.NewGuid().GetHashCode()).Next(0, 10000);
+                }
+                while (randomList2.Contains(rnd2));
+                randomList2[i] = rnd2;
+            }
+            RManager.outLog("  + random list size: " + randomList2.Count());
+
+            //temp arrays
+            int[][] input1 = new int[10000][];
+            int[][] input2 = new int[10000][];
+            int[][] output = new int[10000][];
+            List<int> userlist = new List<int>();
+
+            ///////GOOD FILE
+            //source file
+            RManager.outLog("  + reading submission GOOD from csv");
+            var submission_f = File.ReadAllLines(RManager.BACKPATH + "Output/eval/submissionG" + ".csv");
+            RManager.outLog("  + read OK | submission_f count= " + submission_f.Count() + " | conversion..");
+
+            //scroll file, take items
+            for (int i = 1; i < submission_f.Length; i++)
+            {
+                List<string> row_IN = submission_f[i].Split(',').Select(x => x).ToList();
+                userlist.Add(Int32.Parse(row_IN[0]));
+                input1[i - 1] = row_IN[1].Split(' ').Select(Int32.Parse).ToArray();
+            }
+            RManager.outLog("  + input OK. Count= " + input1.Count());
+
+            ///////BAD FILE
+            //source file
+            RManager.outLog("  + reading submission BAD from csv");
+            var submission_f2 = File.ReadAllLines(RManager.BACKPATH + "Output/eval/submissionB" + ".csv");
+            RManager.outLog("  + read OK | submission_f count= " + submission_f2.Count() + " | conversion..");
+
+            //scroll file, take items
+            for (int i = 1; i < submission_f2.Length; i++)
+            {
+                List<string> row_IN = submission_f2[i].Split(',').Select(x => x).ToList();
+                input2[i - 1] = row_IN[1].Split('\t').Select(Int32.Parse).ToArray();
+            }
+            RManager.outLog("  + input OK. Count= " + input2.Count());
+
+            //SUB
+            //create destination
+            for(int i=0; i < input1.Count(); i++)
+            {
+                if (randomList.Contains(i))
+                {
+                    output[i] = input2[i];
+                    RManager.outLog("  - SUB hit at row " + i);
+                }
+                else
+                {
+                    output[i] = input1[i];
+                }
+            }
+            //SHK
+            for (int i = 0; i < output.Count(); i++)
+            {
+                if (randomList2.Contains(i))
+                {
+                    var tmp = output[i].ToArray();
+                    
+                    if(i%2 == 0)
+                    {
+                        output[i][0] = tmp[1];
+                        output[i][1] = tmp[0];
+                    }
+                    else
+                    {
+                        output[i][1] = tmp[3];
+                        output[i][2] = tmp[1];
+                        output[i][3] = tmp[2];
+                    }
+                    RManager.outLog("  - SHK hit at row " + i);
+                }
+            }
+
+            RManager.outLog("  + output OK. Count= " + output.Count());
+            RManager.outLog("  + output csv generation ");
+            RManager.exportRecToSubmit(userlist, output.Select(p => p.ToList()).ToList());
+
+        }
+
     }
 
     ////////////////////////////////////////////////////////

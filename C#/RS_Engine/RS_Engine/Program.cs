@@ -26,6 +26,10 @@ namespace RS_Engine
             Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
             String Root = Directory.GetCurrentDirectory();
 
+            //Execute shakeNpropose
+            //RUtils.shakeNpropose();
+
+            //running loop
             while (running)
             {
                 //SHOW MENU
