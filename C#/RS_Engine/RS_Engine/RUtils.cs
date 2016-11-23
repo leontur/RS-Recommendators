@@ -32,7 +32,7 @@ namespace RS_Engine
             RManager.outLog("  + SHAKE N PROPOSE");
 
             //generate n rndms (items to 'substitute')
-            int subst = 200;
+            int subst = 400;
             RManager.outLog("  + creating random list SUB of " + subst);
             int[] randomList = new int[subst];
             int rnd;
@@ -48,7 +48,7 @@ namespace RS_Engine
             RManager.outLog("  + random list size: " + randomList.Count());
 
             //generate n rndms (items to 'shake')
-            int shake = 200;
+            int shake = 800;
             RManager.outLog("  + creating random list SHK of " + shake);
             int[] randomList2 = new int[shake];
             int rnd2;
@@ -118,17 +118,20 @@ namespace RS_Engine
                 if (randomList2.Contains(i))
                 {
                     var tmp = output[i].ToArray();
-                    
-                    if(i%2 == 0)
+
+                    if (new Random(Guid.NewGuid().GetHashCode()).Next(0, 10000) % 2 == 0)
                     {
-                        output[i][0] = tmp[1];
-                        output[i][1] = tmp[0];
-                    }
-                    else
-                    {
-                        output[i][1] = tmp[3];
-                        output[i][2] = tmp[1];
-                        output[i][3] = tmp[2];
+                        if (i % 2 == 0)
+                        {
+                            output[i][0] = tmp[1];
+                            output[i][1] = tmp[0];
+                        }
+                        else
+                        {
+                            output[i][1] = tmp[3];
+                            output[i][2] = tmp[1];
+                            output[i][3] = tmp[2];
+                        }
                     }
                     RManager.outLog("  - SHK hit at row " + i);
                 }

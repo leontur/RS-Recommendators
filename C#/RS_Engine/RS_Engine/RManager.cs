@@ -27,6 +27,10 @@ namespace RS_Engine
         public static List<int> output_users = new List<int>();
         public static List<List<int>> output_useritems = new List<List<int>>();
 
+        //DICTIONARIES DATA STRUCTURES
+        public static IDictionary<int, IDictionary<int, int>> user_items_dictionary = new Dictionary<int, IDictionary<int, int>>();
+        public static IDictionary<int, IDictionary<int, int>> item_users_dictionary = new Dictionary<int, IDictionary<int, int>>();
+
         //Global vars
         public static int EXEMODE = 0;
         public static bool ISTESTMODE = false;
@@ -396,6 +400,8 @@ namespace RS_Engine
             outLog("    2) CB-F");
             outLog("    3) U-CF");
             outLog("    4) I-CF");
+            outLog("");
+            outLog("    5) CF DICTIONARIES (*in DEV*)");
 
             if (!ISTESTMODE)
             {

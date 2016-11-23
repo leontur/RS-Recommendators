@@ -21,6 +21,9 @@ namespace RS_Engine
             int keepOnly = 10000;
             int userSize = RManager.user_profile.Count;
 
+            RManager.outLog("  + TEST MODE - INSERT LIMIT=", true);
+            keepOnly = Convert.ToInt32(Console.ReadLine());
+
             //if tiny test, thin out the datasets
             if (TINYTEST)
             {

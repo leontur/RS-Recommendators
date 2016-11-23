@@ -85,8 +85,8 @@ namespace RS_Engine
             }
             else if (RManager.EXEMODE == 5)
             {
-                //PROCESSING - XXX
-                ;
+                //PROCESSING - CFDICT
+                REngineCFDICT.getRecommendations();
             }
             else if (RManager.EXEMODE == 6)
             {

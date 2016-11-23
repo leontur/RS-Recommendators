@@ -196,7 +196,7 @@ namespace RS_Engine
             int par_counter_out = par_length_out;
 
             //PARALLEL FOR
-            Parallel.For(0, par_length_out,
+            Parallel.For(0, par_length_out, new ParallelOptions { MaxDegreeOfParallelism = 8 },
                 u => {
 
                     //counter
@@ -243,7 +243,7 @@ namespace RS_Engine
 
             //PARALLEL FOR
             //foreach i1, i2 === item_profile list index
-            Parallel.For(0, par_length,
+            Parallel.For(0, par_length, new ParallelOptions { MaxDegreeOfParallelism = 1 },
                 i => {
 
                     //COMPUTE SIMILARITY for these two vectors (input for total matrix, cross computation with only enabled items)
@@ -288,6 +288,7 @@ namespace RS_Engine
             //the cell content is a float for positions lat long
             //note: the distance calculation requires both 7 and 8 cells, so execute once
             similarities[6] = computeWeightAvgSimilarityForItemsCells_7_8((float)item1[7], (float)item1[8], (float)item2[7], (float)item2[8]);
+            //similarities[6] = (double)1;
 
             ///////////////
             //cell 2 and 9
