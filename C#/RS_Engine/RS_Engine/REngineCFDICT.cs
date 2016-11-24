@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace RS_Engine
@@ -52,67 +54,125 @@ namespace RS_Engine
             RManager.outLog("  + creating DICTIONARIES.. ");
 
             //counter
-            int c_tot = RManager.user_profile.Count();
+            int par_counter = RManager.user_profile.Count();
             RManager.outLog("  + user_items_dictionary");
-
-            //for every user
-            foreach (var u in RManager.user_profile)
+            
+            //check if already serialized (for fast fetching)
+            if (!File.Exists(Path.Combine(RManager.SERIALTPATH, "CFDICT_user_items_dictionary.bin")))
             {
-                //counter
-                if (c_tot % 10 == 0)
-                    RManager.outLog(" - remaining " + --c_tot, true, true, true);
 
-                //retrieving the list of interactions made by the user
-                List<int> curr_user_interacted_items = RManager.interactions.Where(x => x[0] == (int)u[0]).Select(x => x[1]).Distinct().ToList();
+                //for every user
+                Parallel.ForEach(
+                    RManager.user_profile,
+                    new ParallelOptions { MaxDegreeOfParallelism = 8 },
+                    u =>
+                    {
+                        //counter
+                        Interlocked.Decrement(ref par_counter);
+                        int count = Interlocked.CompareExchange(ref par_counter, 0, 0);
+                        if (count % 20 == 0) RManager.outLog("  - remaining: " + count, true, true, true);
 
-///NOTA: in questo caso ordino in base al peso del click, ma si dovrebbe considerare anche quanto è recente!!
-                //create a dictionary for every interacted item (with no interaction_type duplicates, only the bigger for each distinct interaction)
-                IDictionary<int, int> curr_user_interacted_items_dictionary = new Dictionary<int, int>();
-                foreach (var clicked in curr_user_interacted_items)
-                    curr_user_interacted_items_dictionary.Add(
-                            clicked, //item_id
-                            RManager.interactions.Where(x => x[0] == (int)u[0] && x[1] == clicked).Select(x => x[2]).OrderByDescending(y => y).ToList().First() //interaction_type
-                            );
+                        //retrieving the list of interactions made by the user
+                        List<int> curr_user_interacted_items = RManager.interactions.Where(x => x[0] == (int)u[0]).Select(x => x[1]).Distinct().ToList();
 
-                //create an entry in the dictionary
-                //associating all the interactions of the user (with no duplicates)
-                RManager.user_items_dictionary.Add(
-                                (int)u[0], //user_id
-                                curr_user_interacted_items_dictionary //dictionary with inside every clicked item and its bigger interaction_type value
-                                );
+            ///NOTA: in questo caso ordino in base al peso del click, ma si dovrebbe considerare anche quanto è recente!!
+                        //create a dictionary for every interacted item (with no interaction_type duplicates, only the bigger for each distinct interaction)
+                        IDictionary<int, int> curr_user_interacted_items_dictionary = new Dictionary<int, int>();
+                        foreach (var clicked in curr_user_interacted_items)
+                            curr_user_interacted_items_dictionary.Add(
+                                    clicked, //item_id
+                                    RManager.interactions.Where(x => x[0] == (int)u[0] && x[1] == clicked).Select(x => x[2]).OrderByDescending(y => y).ToList().First() //interaction_type
+                                    );
 
+                        //create an entry in the dictionary
+                        //associating all the interactions of the user (with no duplicates)
+                        RManager.user_items_dictionary.Add(
+                                        (int)u[0], //user_id
+                                        curr_user_interacted_items_dictionary //dictionary with inside every clicked item and its bigger interaction_type value
+                                        );
+
+                    }
+                );
+                //OLD: foreach (var u in RManager.user_profile){}
+
+                //serialize
+                using (Stream stream = File.Open(Path.Combine(RManager.SERIALTPATH, "CFDICT_user_items_dictionary.bin"), FileMode.Create))
+                {
+                    RManager.outLog("  + writing serialized file " + "CFDICT_user_items_dictionary.bin");
+                    var bformatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+                    bformatter.Serialize(stream, RManager.user_items_dictionary);
+                }
+            }
+            else
+            {
+                //deserialize
+                using (Stream stream = File.Open(Path.Combine(RManager.SERIALTPATH, "CFDICT_user_items_dictionary.bin"), FileMode.Open))
+                {
+                    RManager.outLog("  + reading serialized file " + "CFDICT_user_items_dictionary.bin");
+                    var bformatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+                    RManager.user_items_dictionary = (IDictionary<int, IDictionary<int, int>>)bformatter.Deserialize(stream);
+                }
             }
 
             //counter
-            c_tot = RManager.item_profile.Count();
+            par_counter = RManager.item_profile.Count();
             RManager.outLog("  + item_users_dictionary");
 
-            //for every item
-            foreach (var i in RManager.item_profile)
+            //check if already serialized (for fast fetching)
+            if (!File.Exists(Path.Combine(RManager.SERIALTPATH, "CFDICT_item_users_dictionary.bin")))
             {
-                //counter
-                if (c_tot % 10 == 0)
-                    RManager.outLog(" - remaining " + --c_tot, true, true, true);
 
-                //retrieving the list of users that interacted with this item
-                List<int> curr_item_interacted_users = RManager.interactions.Where(x => x[1] == (int)i[0]).Select(x => x[0]).Distinct().ToList();
+                //for every item
+                Parallel.ForEach(
+                    RManager.item_profile,
+                    new ParallelOptions { MaxDegreeOfParallelism = 8 },
+                    i =>
+                    {
+                        //counter
+                        Interlocked.Decrement(ref par_counter);
+                        int count = Interlocked.CompareExchange(ref par_counter, 0, 0);
+                        if (count % 200 == 0) RManager.outLog("  - remaining: " + count, true, true, true);
 
-///NOTA: in questo caso ordino in base al peso del click, ma si dovrebbe considerare anche quanto è recente!!
-                //create a dictionary for every user that clicked this item (with no interaction_type duplicates, only the bigger for each distinct user)
-                IDictionary<int, int> curr_item_interacted_users_dictionary = new Dictionary<int, int>();
-                foreach (var userclick in curr_item_interacted_users)
-                    curr_item_interacted_users_dictionary.Add(
-                            userclick, //user_id
-                            RManager.interactions.Where(x => x[1] == (int)i[0] && x[0] == userclick).Select(x => x[2]).OrderByDescending(y => y).ToList().First() //interaction_type
-                            );
+                        //retrieving the list of users that interacted with this item
+                        List<int> curr_item_interacted_users = RManager.interactions.Where(x => x[1] == (int)i[0]).Select(x => x[0]).Distinct().ToList();
 
-                //create an entry in the dictionary
-                //associating all the users that interacted (with no duplicates)
-                RManager.item_users_dictionary.Add(
-                                (int)i[0], //(item_)id
-                                curr_item_interacted_users_dictionary //dictionary with inside every user (that clicked) and its bigger interaction_type value
-                                );
+             ///NOTA: in questo caso ordino in base al peso del click, ma si dovrebbe considerare anche quanto è recente!!
+                        //create a dictionary for every user that clicked this item (with no interaction_type duplicates, only the bigger for each distinct user)
+                        IDictionary<int, int> curr_item_interacted_users_dictionary = new Dictionary<int, int>();
+                        foreach (var userclick in curr_item_interacted_users)
+                            curr_item_interacted_users_dictionary.Add(
+                                    userclick, //user_id
+                                    RManager.interactions.Where(x => x[1] == (int)i[0] && x[0] == userclick).Select(x => x[2]).OrderByDescending(y => y).ToList().First() //interaction_type
+                                    );
 
+                        //create an entry in the dictionary
+                        //associating all the users that interacted (with no duplicates)
+                        RManager.item_users_dictionary.Add(
+                                        (int)i[0], //(item_)id
+                                        curr_item_interacted_users_dictionary //dictionary with inside every user (that clicked) and its bigger interaction_type value
+                                        );
+
+                    }
+                );
+                //OLD: foreach (var i in RManager.item_profile)
+
+                //serialize
+                using (Stream stream = File.Open(Path.Combine(RManager.SERIALTPATH, "CFDICT_item_users_dictionary.bin"), FileMode.Create))
+                {
+                    RManager.outLog("  + writing serialized file " + "CFDICT_item_users_dictionary.bin");
+                    var bformatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+                    bformatter.Serialize(stream, RManager.item_users_dictionary);
+                }
+            }
+            else
+            {
+                //deserialize
+                using (Stream stream = File.Open(Path.Combine(RManager.SERIALTPATH, "CFDICT_item_users_dictionary.bin"), FileMode.Open))
+                {
+                    RManager.outLog("  + reading serialized file " + "CFDICT_item_users_dictionary.bin");
+                    var bformatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+                    RManager.item_users_dictionary = (IDictionary<int, IDictionary<int, int>>)bformatter.Deserialize(stream);
+                }
             }
 
         }
@@ -138,8 +198,8 @@ namespace RS_Engine
             foreach (var u in RManager.user_items_dictionary)
             {
                 //counter
-                if (c_tot % 10 == 0)
-                    RManager.outLog(" - remaining " + --c_tot, true, true, true);
+                if (--c_tot % 10 == 0)
+                    RManager.outLog(" - remaining " + c_tot, true, true, true);
 
                 //getting current user id
                 int user = u.Key;
@@ -212,8 +272,8 @@ namespace RS_Engine
             foreach(var u in user_user_similarity_dictionary_num)
             {
                 //counter
-                if (c_tot % 10 == 0)
-                    RManager.outLog(" - remaining " + --c_tot, true, true, true);
+                if (--c_tot % 10 == 0)
+                    RManager.outLog(" - remaining " + c_tot, true, true, true);
 
                 //get current user id
                 int user = u.Key;
@@ -260,8 +320,8 @@ namespace RS_Engine
             foreach (var user in RManager.target_users)
             {
                 //counter
-                if (c_tot % 10 == 0)
-                    RManager.outLog(" - remaining " + --c_tot, true, true, true);
+                if (--c_tot % 10 == 0)
+                    RManager.outLog(" - remaining " + c_tot, true, true, true);
 
                 //if current target has similar users
                 if (CF_user_user_sim_dictionary.ContainsKey(user))
@@ -318,8 +378,8 @@ namespace RS_Engine
             foreach (var u in users_prediction_dictionary_num)
             {
                 //counter
-                if (c_tot % 10 == 0)
-                    RManager.outLog(" - remaining " + --c_tot, true, true, true);
+                if (--c_tot % 10 == 0)
+                    RManager.outLog(" - remaining " + c_tot, true, true, true);
 
                 //get current user id
                 int user = u.Key;
@@ -361,8 +421,8 @@ namespace RS_Engine
             foreach (var u in CF_user_prediction_dictionary)
             {
                 //counter
-                if (c_tot % 10 == 0)
-                    RManager.outLog(" - remaining " + --c_tot, true, true, true);
+                if (--c_tot % 10 == 0)
+                    RManager.outLog(" - remaining " + c_tot, true, true, true);
 
                 //get user id
                 int user = u.Key;
