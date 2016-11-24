@@ -123,6 +123,7 @@ namespace RS_Engine
             {
 
                 //for every item
+                object sync = new object();
                 Parallel.ForEach(
                     RManager.item_profile,
                     new ParallelOptions { MaxDegreeOfParallelism = 8 },
@@ -147,10 +148,14 @@ namespace RS_Engine
 
                         //create an entry in the dictionary
                         //associating all the users that interacted (with no duplicates)
-                        RManager.item_users_dictionary.Add(
-                                        (int)i[0], //(item_)id
-                                        curr_item_interacted_users_dictionary //dictionary with inside every user (that clicked) and its bigger interaction_type value
-                                        );
+                        lock (sync)
+                        {
+                            if(!RManager.item_users_dictionary.ContainsKey((int)i[0]))
+                                RManager.item_users_dictionary.Add(
+                                                (int)i[0], //(item_)id
+                                                curr_item_interacted_users_dictionary //dictionary with inside every user (that clicked) and its bigger interaction_type value
+                                                );
+                        }
 
                     }
                 );

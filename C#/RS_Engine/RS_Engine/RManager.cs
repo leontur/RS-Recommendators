@@ -52,6 +52,17 @@ namespace RS_Engine
             outLog("  + initializing RS ");
             outLog("  + initializing dataset retrievement ");
 
+            /*
+            //DEBUG (CONSISTENCY CHECK - no duplicates)
+            var itemlist1 = RManager.item_profile.Select(x => (int)x[0]).ToList();
+            var itemlist2 = itemlist1.ToList().Distinct().ToList();
+            Console.WriteLine("L1: " + itemlist1.Count + "  L2: " + itemlist2.Count);
+            var itemlist3 = itemlist1.Except(itemlist2).ToList();
+            foreach (var it in itemlist3)
+                Console.WriteLine("DUPLICATE ITEM_ID: " + it);
+            Console.ReadKey();
+            */
+
             //CONVERSIONS.. (starting from 1 to remove header)
             // for someone: check if already serialized (for fast fetching)
 
