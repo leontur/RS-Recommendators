@@ -13,14 +13,17 @@ namespace RS_Engine
      */
     class REngineCFDICT
     {
+        /////////////////////////////////////////////
         //ALGORITHM PARAMETERS
         private const int SIM_SHRINK = 0;
         private const int PRED_SHRINK = 0;
 
+        /////////////////////////////////////////////
         //EXECUTION VARS
-        public static IDictionary<int, List<int>> CF_user_user_sim_dictionary = new Dictionary<int, List<int>>();
-        public static IDictionary<int, List<int>> CF_user_prediction_dictionary = new Dictionary<int, List<int>>();
+        public static IDictionary<int, IDictionary<int, double>> CF_user_user_sim_dictionary = new Dictionary<int, IDictionary<int, double>>();
+        public static IDictionary<int, IDictionary<int, double>> CF_user_prediction_dictionary = new Dictionary<int, IDictionary<int, double>>();
 
+        /////////////////////////////////////////////
         //MAIN ALGORITHM METHOD
         public static void getRecommendations()
         {
@@ -35,12 +38,15 @@ namespace RS_Engine
             computeCFUserUserSimilarity();
 
             //Execute
-            predictCFRecommendation();
+            predictCFRecommendations();
 
+            //Execute
+            generateOutput();
         }
 
+        //////////////////////////////////////////////////////////////////////////////////////////
         //DICTIONARIES CREATION
-        public static void createDictionaries()
+        private static void createDictionaries()
         {
             //info
             RManager.outLog("  + creating DICTIONARIES.. ");
@@ -59,6 +65,7 @@ namespace RS_Engine
                 //retrieving the list of interactions made by the user
                 List<int> curr_user_interacted_items = RManager.interactions.Where(x => x[0] == (int)u[0]).Select(x => x[1]).Distinct().ToList();
 
+///NOTA: in questo caso ordino in base al peso del click, ma si dovrebbe considerare anche quanto è recente!!
                 //create a dictionary for every interacted item (with no interaction_type duplicates, only the bigger for each distinct interaction)
                 IDictionary<int, int> curr_user_interacted_items_dictionary = new Dictionary<int, int>();
                 foreach (var clicked in curr_user_interacted_items)
@@ -90,6 +97,7 @@ namespace RS_Engine
                 //retrieving the list of users that interacted with this item
                 List<int> curr_item_interacted_users = RManager.interactions.Where(x => x[1] == (int)i[0]).Select(x => x[0]).Distinct().ToList();
 
+///NOTA: in questo caso ordino in base al peso del click, ma si dovrebbe considerare anche quanto è recente!!
                 //create a dictionary for every user that clicked this item (with no interaction_type duplicates, only the bigger for each distinct user)
                 IDictionary<int, int> curr_item_interacted_users_dictionary = new Dictionary<int, int>();
                 foreach (var userclick in curr_item_interacted_users)
@@ -109,8 +117,9 @@ namespace RS_Engine
 
         }
 
+        //////////////////////////////////////////////////////////////////////////////////////////
         //CREATE AN USER_USER SIMILARITY (DICTIONARY)
-        public static void computeCFUserUserSimilarity()
+        private static void computeCFUserUserSimilarity()
         {
             //info
             RManager.outLog("  + computeCFUserUserSimilarity(): ");
@@ -216,7 +225,7 @@ namespace RS_Engine
                     //get current sim_user id
                     int sim_user = sim_u.Key;
 
-                    //evaluate prediction of that item for that user
+                    //evaluate prediction of that sim_user for that user
                     double pred = user_user_similarity_dictionary_num[user][sim_user] / (Math.Sqrt(user_user_similarity_dictionary_den1[user][sim_user]) * Math.Sqrt(user_user_similarity_dictionary_den2[user][sim_user]) + SIM_SHRINK);
 
                     //storing
@@ -226,16 +235,188 @@ namespace RS_Engine
                 //storing
                 user_user_similarity_dictionary.Add(user, sim_users_predictions);
             }
+
+            //exposing
+            CF_user_user_sim_dictionary = user_user_similarity_dictionary;
         }
 
-        //
-        public static void predictCFRecommendation()
+        //////////////////////////////////////////////////////////////////////////////////////////
+        //CREATE RECOMMENDATIONS 
+        private static void predictCFRecommendations()
         {
             //info
             RManager.outLog("  + predictCFRecommendation(): ");
 
+            //runtime dictionaries
+            IDictionary<int, IDictionary<int, double>> users_prediction_dictionary = new Dictionary<int, IDictionary<int, double>>();
+            IDictionary<int, IDictionary<int, double>> users_prediction_dictionary_num = new Dictionary<int, IDictionary<int, double>>();
+            IDictionary<int, IDictionary<int, double>> users_prediction_dictionary_den = new Dictionary<int, IDictionary<int, double>>();
+
+            //counter
+            int c_tot = RManager.target_users.Count();
+            RManager.outLog("  + aggregation of predictions ");
+
+            //for each target user
+            foreach (var user in RManager.target_users)
+            {
+                //counter
+                if (c_tot % 10 == 0)
+                    RManager.outLog(" - remaining " + --c_tot, true, true, true);
+
+                //if current target has similar users
+                if (CF_user_user_sim_dictionary.ContainsKey(user))
+                {
+                    //creating user key in the coefficients dictionaries
+                    users_prediction_dictionary_num.Add(user, null);
+                    users_prediction_dictionary_den.Add(user, null);
+
+                    //get dictionary of similar users and value of similarity
+                    var uus_list = CF_user_user_sim_dictionary[user];
+
+                    //for every similar user in the dictionary
+                    foreach (var sim_user in uus_list)
+                    {
+                        //get sim_user id
+                        int user2 = sim_user.Key;
+
+                        //get items (dictionary) with which this user interacted
+                        var sim_user_item_list = RManager.user_items_dictionary[user2];
+
+                        //for every item in this dictionary
+                        foreach (var item in sim_user_item_list)
+                        {
+                            //get item id
+                            int i = item.Key;
+
+                            //coefficients
+                            double num = uus_list[user2] * sim_user_item_list[i];
+                            double den = uus_list[user2];
+
+                            //if the current item is not predicted yet for the user, add it
+                            if (!users_prediction_dictionary_num[user].ContainsKey(i))
+                            {
+                                users_prediction_dictionary_num[user].Add(i, num);
+                                users_prediction_dictionary_den[user].Add(i, den);
+                            }
+                            //else adding its contribution
+                            else
+                            {
+                                users_prediction_dictionary_num[user][i] += num;
+                                users_prediction_dictionary_den[user][i] += den;
+                            }
+                        }
+                    }
+                }
+            }
+
+            //counter
+            c_tot = users_prediction_dictionary_num.Count();
+            RManager.outLog("  + estimating ratings of similar items ");
+
+            //calculating similarity
+            //for every target user (users_prediction_dictionary_num contains all target users)
+            foreach (var u in users_prediction_dictionary_num)
+            {
+                //counter
+                if (c_tot % 10 == 0)
+                    RManager.outLog(" - remaining " + --c_tot, true, true, true);
+
+                //get current user id
+                int user = u.Key;
+
+                //for each item predicted for the user
+                IDictionary<int, double> sim_items_predictions = new Dictionary<int, double>();
+                foreach (var item_pred in users_prediction_dictionary_num[user])
+                {
+                    //get current item id
+                    int sim_item = item_pred.Key;
+
+                    //evaluate prediction of that item for that user
+                    double pred = users_prediction_dictionary_num[user][sim_item] / (users_prediction_dictionary_den[user][sim_item] + PRED_SHRINK);
+
+                    //storing
+                    sim_items_predictions.Add(sim_item, pred);
+                }
+
+                //storing
+                users_prediction_dictionary.Add(user, sim_items_predictions);
+            }
+
+            //expose
+            CF_user_prediction_dictionary = users_prediction_dictionary;
         }
 
+        //////////////////////////////////////////////////////////////////////////////////////////
+        //GENERATE OUTPUT STRUCTURED DATA
+        private static void generateOutput()
+        {
+            //counter
+            int c_tot = CF_user_prediction_dictionary.Count();
+            RManager.outLog("  + generating output structured data ");
 
+            //instantiating a structure for the output
+            IDictionary<int, List<int>> output_dictionary = new Dictionary<int, List<int>>();
+
+            //for every target user (CF_user_prediction_dictionary contains all and only target users)
+            foreach (var u in CF_user_prediction_dictionary)
+            {
+                //counter
+                if (c_tot % 10 == 0)
+                    RManager.outLog(" - remaining " + --c_tot, true, true, true);
+
+                //get user id
+                int user = u.Key;
+
+                //if the list of recommendable items is not empty
+                if(CF_user_prediction_dictionary[user].Count > 0)
+                {
+                    //retrieve the id(s) of recommendable items (ordered by the best, to the poor)
+                    List<int> rec_items = CF_user_prediction_dictionary[user].ToList().OrderByDescending(x => x.Value).Select(x => x.Key).ToList();
+
+                    //ADVANCED FILTER 1
+                    List<int> already_clicked = new List<int>();
+                    if (!RManager.ISTESTMODE)
+                    {
+                        //retrieving interactions already used by the current user (not recommending a job already applied)
+                        already_clicked = RManager.interactions.Where(i => i[0] == user && i[2] <= 3).Select(i => i[1]).ToList();
+                        //removing already clicked
+                        rec_items = rec_items.Except(already_clicked).ToList();
+                    }
+
+                    //ADVANCED FILTER 2
+                    //removing not recommendable items
+                    for (int s = rec_items.Count - 1; s >= 0; s--)
+                        if (!RManager.item_profile_enabled_list.Contains(rec_items[s]))
+                            rec_items.RemoveAt(s);
+
+                    //CHECK 1
+                    //if recommendations are not enough
+                    if (rec_items.Count < 5)
+                        RManager.outLog(" TGT USERID " + user + "  HAS LESS THAN 5 RECOMMENDATIONS!");
+
+                    //CHECK 2
+                    //trim of top 5
+                    rec_items = rec_items.Take(5).ToList();
+
+                    //saving
+                    output_dictionary.Add(user, rec_items);
+                }
+                else
+                {
+                    RManager.outLog(" TGT USERID " + user + "  HAS 0 RECOMMENDATIONS!");
+                    output_dictionary.Add(user, new List<int> { 0 });
+                }
+            }
+
+            //consistency check
+            if(output_dictionary.Count != RManager.target_users.Count)
+                RManager.outLog(" ERROR: the output dictionary count is not equal to the target user list!");
+
+            //Converting output for file write (the writer function wants a list of list of 5 int, ordered by the target_users list)
+            List<List<int>> output_dictionary_as_target_users_list = output_dictionary.ToList().OrderBy(x => x.Key).Select(x => x.Value).ToList();
+
+            //OUTPUT_SUBMISSION
+            RManager.exportRecToSubmit(RManager.target_users, output_dictionary_as_target_users_list);
+        }
     }
 }
