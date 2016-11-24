@@ -328,16 +328,16 @@ namespace RS_Engine
             outLog("  + populating auxiliary data structures ");
 
             //Populate item_profile_enabled_list
-            item_profile_enabled_list = item_profile.Select(x => (int)x[0]).ToList();
+            item_profile_enabled_list = item_profile_enabled.Select(x => (int)x[0]).ToList();
 
             //INFO
             outLog("");
             outLog("  + all datasets conversion: OK");
-            outLog("  -total lines | interactions    >>> " + interactions.Count());
-            outLog("  -total lines | item_profile    >>> " + item_profile.Count());
-            outLog("  -total lines | item_profile_en >>> " + item_profile_enabled.Count());
-            outLog("  -total lines | target_users    >>> " + target_users.Count());
-            outLog("  -total lines | user_profile    >>> " + user_profile.Count());
+            outLog("  -total lines | interactions      >>> " + interactions.Count());
+            outLog("  -total lines | item_profile      >>> " + item_profile.Count());
+            outLog("  -total lines | item_profile_enab >>> " + item_profile_enabled.Count());
+            outLog("  -total lines | target_users      >>> " + target_users.Count());
+            outLog("  -total lines | user_profile      >>> " + user_profile.Count());
             outLog("");
 
             /*
@@ -523,7 +523,7 @@ namespace RS_Engine
 
         //LOGGER
         //log in console and in file for every program run
-        private static string[] runChars = new string[] { "|", "/", "-", "\\" };
+        private static string[] runChars = new string[] { "|", "/", "-", "\\", "\\", "\\", "\\", "\\", "\\", "\\" };
         private static int runCharsPos = 0;
         private static bool lastWasInline = false;
         public static void outLog(string s, bool inline = false, bool carriageret = false, bool onlyconsole = false)

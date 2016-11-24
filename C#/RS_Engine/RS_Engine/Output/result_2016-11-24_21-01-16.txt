@@ -29,22 +29,3 @@ RS:>   + dataset read OK | interactions_f count= 546865 | conversion..
 RS:>   + reading serialized file target_users.bin
 RS:>   + reading serialized file user_profile.bin
 RS:>   + reading serialized file item_profile.bin
-RS:>   + reading serialized file item_profile_enabled.bin
-RS:>   + populating auxiliary data structures 
-RS:> 
-RS:>   + all datasets conversion: OK
-RS:>   -total lines | interactions    >>> 546864
-RS:>   -total lines | item_profile    >>> 167956
-RS:>   -total lines | item_profile_en >>> 63446
-RS:>   -total lines | target_users    >>> 10000
-RS:>   -total lines | user_profile    >>> 40000
-RS:> 
-RS:> -----------------------------------------------------------------
-RS:>   # running program 5
-RS:> 
-RS:>   + processing..
-RS:>   + CF Algorithm..
-RS:>   + creating DICTIONARIES.. 
-RS:>   + user_items_dictionary
-RS:>   + reading serialized file CFDICT_user_items_dictionary.bin
-RS:>   + item_users_dictionary

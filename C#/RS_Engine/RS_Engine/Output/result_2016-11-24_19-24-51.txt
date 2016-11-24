@@ -49,3 +49,5 @@ RS:>   + user_items_dictionary
 RS:>   + reading serialized file CFDICT_user_items_dictionary.bin
 RS:>   + item_users_dictionary
 RS:>   + reading serialized file CFDICT_item_users_dictionary.bin
+RS:>   + computeCFUserUserSimilarity(): 
+RS:>   + calculating all coefficients 

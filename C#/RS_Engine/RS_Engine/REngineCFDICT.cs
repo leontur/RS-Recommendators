@@ -62,6 +62,7 @@ namespace RS_Engine
             {
 
                 //for every user
+                object sync = new object();
                 Parallel.ForEach(
                     RManager.user_profile,
                     new ParallelOptions { MaxDegreeOfParallelism = 8 },
@@ -86,11 +87,14 @@ namespace RS_Engine
 
                         //create an entry in the dictionary
                         //associating all the interactions of the user (with no duplicates)
-                        RManager.user_items_dictionary.Add(
-                                        (int)u[0], //user_id
-                                        curr_user_interacted_items_dictionary //dictionary with inside every clicked item and its bigger interaction_type value
-                                        );
-
+                        lock (sync)
+                        {
+                            if (!RManager.user_items_dictionary.ContainsKey((int)u[0]))
+                                    RManager.user_items_dictionary.Add(
+                                                (int)u[0], //user_id
+                                                curr_user_interacted_items_dictionary //dictionary with inside every clicked item and its bigger interaction_type value
+                                                );
+                        }
                     }
                 );
                 //OLD: foreach (var u in RManager.user_profile){}
@@ -151,10 +155,10 @@ namespace RS_Engine
                         lock (sync)
                         {
                             if(!RManager.item_users_dictionary.ContainsKey((int)i[0]))
-                                RManager.item_users_dictionary.Add(
-                                                (int)i[0], //(item_)id
-                                                curr_item_interacted_users_dictionary //dictionary with inside every user (that clicked) and its bigger interaction_type value
-                                                );
+                                    RManager.item_users_dictionary.Add(
+                                                    (int)i[0], //(item_)id
+                                                    curr_item_interacted_users_dictionary //dictionary with inside every user (that clicked) and its bigger interaction_type value
+                                                    );
                         }
 
                     }
@@ -203,16 +207,16 @@ namespace RS_Engine
             foreach (var u in RManager.user_items_dictionary)
             {
                 //counter
-                if (--c_tot % 10 == 0)
+                if (--c_tot % 500 == 0)
                     RManager.outLog(" - remaining " + c_tot, true, true, true);
 
                 //getting current user id
                 int user = u.Key;
 
                 //creating user key in the coefficients dictionaries
-                user_user_similarity_dictionary_num.Add(user, null);
-                user_user_similarity_dictionary_den1.Add(user, null);
-                user_user_similarity_dictionary_den2.Add(user, null);
+                user_user_similarity_dictionary_num.Add(user, new Dictionary<int, double>());
+                user_user_similarity_dictionary_den1.Add(user, new Dictionary<int, double>());
+                user_user_similarity_dictionary_den2.Add(user, new Dictionary<int, double>());
 
                 //get the interacted items and the related best interaction type for each clicked item
                 IDictionary<int, int> interacted_items = u.Value;
@@ -235,7 +239,8 @@ namespace RS_Engine
                     {
                         //retrieving interaction coefficients
                         int interaction_type = i.Value;
-                        int interaction_type_of_sim_user = RManager.user_items_dictionary[sim_user][item];
+                        int interaction_type_of_sim_user = 0;
+                        RManager.user_items_dictionary[sim_user].TryGetValue(item, out interaction_type_of_sim_user);
 
                         //creating coefficients
                         double num = interaction_type * interaction_type_of_sim_user;
@@ -277,7 +282,7 @@ namespace RS_Engine
             foreach(var u in user_user_similarity_dictionary_num)
             {
                 //counter
-                if (--c_tot % 10 == 0)
+                if (--c_tot % 500 == 0)
                     RManager.outLog(" - remaining " + c_tot, true, true, true);
 
                 //get current user id
@@ -325,15 +330,15 @@ namespace RS_Engine
             foreach (var user in RManager.target_users)
             {
                 //counter
-                if (--c_tot % 10 == 0)
+                if (--c_tot % 500 == 0)
                     RManager.outLog(" - remaining " + c_tot, true, true, true);
 
                 //if current target has similar users
                 if (CF_user_user_sim_dictionary.ContainsKey(user))
                 {
                     //creating user key in the coefficients dictionaries
-                    users_prediction_dictionary_num.Add(user, null);
-                    users_prediction_dictionary_den.Add(user, null);
+                    users_prediction_dictionary_num.Add(user, new Dictionary<int, double>());
+                    users_prediction_dictionary_den.Add(user, new Dictionary<int, double>());
 
                     //get dictionary of similar users and value of similarity
                     var uus_list = CF_user_user_sim_dictionary[user];
@@ -383,7 +388,7 @@ namespace RS_Engine
             foreach (var u in users_prediction_dictionary_num)
             {
                 //counter
-                if (--c_tot % 10 == 0)
+                if (--c_tot % 500 == 0)
                     RManager.outLog(" - remaining " + c_tot, true, true, true);
 
                 //get current user id
@@ -426,19 +431,28 @@ namespace RS_Engine
             foreach (var u in CF_user_prediction_dictionary)
             {
                 //counter
-                if (--c_tot % 10 == 0)
+                if (c_tot-- % 10 == 0)
                     RManager.outLog(" - remaining " + c_tot, true, true, true);
 
                 //get user id
                 int user = u.Key;
 
+                //instantiate the list of most similar items
+                List<int> rec_items = new List<int>();
+
                 //if the list of recommendable items is not empty
-                if(CF_user_prediction_dictionary[user].Count > 0)
+                if (CF_user_prediction_dictionary[user].Count > 0)
                 {
                     //retrieve the id(s) of recommendable items (ordered by the best, to the poor)
-                    List<int> rec_items = CF_user_prediction_dictionary[user].ToList().OrderByDescending(x => x.Value).Select(x => x.Key).ToList();
+                    rec_items = CF_user_prediction_dictionary[user].ToList().OrderByDescending(x => x.Value).Select(x => x.Key).ToList();
 
                     //ADVANCED FILTER 1
+                    //removing not recommendable items
+                    for (int s = rec_items.Count - 1; s >= 0; s--)
+                        if (!RManager.item_profile_enabled_list.Contains(rec_items[s]))
+                            rec_items.RemoveAt(s);
+
+                    //ADVANCED FILTER 2
                     List<int> already_clicked = new List<int>();
                     if (!RManager.ISTESTMODE)
                     {
@@ -448,29 +462,47 @@ namespace RS_Engine
                         rec_items = rec_items.Except(already_clicked).ToList();
                     }
 
-                    //ADVANCED FILTER 2
-                    //removing not recommendable items
-                    for (int s = rec_items.Count - 1; s >= 0; s--)
-                        if (!RManager.item_profile_enabled_list.Contains(rec_items[s]))
-                            rec_items.RemoveAt(s);
-
-                    //CHECK 1
+                    //CHECK FOR FILTER 2
                     //if recommendations are not enough
                     if (rec_items.Count < 5)
-                        RManager.outLog(" TGT USERID " + user + "  HAS LESS THAN 5 RECOMMENDATIONS!");
-
-                    //CHECK 2
-                    //trim of top 5
-                    rec_items = rec_items.Take(5).ToList();
-
-                    //saving
-                    output_dictionary.Add(user, rec_items);
+                    {
+                        RManager.outLog(" TGT USERID " + user + "  HAS LESS THAN 5 RECOMMENDATIONS -> restoring already clicked..");
+                        rec_items.AddRange(already_clicked);
+                    }
                 }
                 else
                 {
+                    //the user has not clicked anything (cannot find similar users basing on current user clicks!)
                     RManager.outLog(" TGT USERID " + user + "  HAS 0 RECOMMENDATIONS!");
-                    output_dictionary.Add(user, new List<int> { 0 });
                 }
+
+                //FINAL CHECK 1
+                //if recommendations are still not enough
+                if (rec_items.Count < 5)
+                {
+                    RManager.outLog(" TGT USERID " + user + " *STILL* HAS LESS THAN 5 RECOMMENDATIONS -> hybrid system");
+
+                    ///TODO:
+                    /////in questo caso, cercare per N utenti simili, e suggerire quello che hanno cliccato loro (e ancora attivo)
+                    //////praticamente prendere la riga da UCF
+
+                    //DA FARE
+                }
+                //FINAL CHECK 1a (last chance)
+                if (rec_items.Count < 5)
+                {
+                    //add TOP 5
+                    RManager.outLog(" TGT USERID " + user + " *STILL* HAS LESS THAN 5 RECOMMENDATIONS -> adding top5");
+                    rec_items.AddRange(REngineTOP.getTOP5List());
+                }
+
+                //FINAL CHECK 2
+                //trim of list for top 5
+                rec_items = rec_items.Take(5).ToList();
+
+                //saving
+                output_dictionary.Add(user, rec_items);
+
             }
 
             //consistency check

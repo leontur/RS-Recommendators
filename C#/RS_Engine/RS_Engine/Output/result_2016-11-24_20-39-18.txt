@@ -48,3 +48,15 @@ RS:>   + creating DICTIONARIES..
 RS:>   + user_items_dictionary
 RS:>   + reading serialized file CFDICT_user_items_dictionary.bin
 RS:>   + item_users_dictionary
+RS:>   + reading serialized file CFDICT_item_users_dictionary.bin
+RS:>   + computeCFUserUserSimilarity(): 
+RS:>   + calculating all coefficients 
+
+RS:>   + calculating user_user similarity 
+
+RS:>   + predictCFRecommendation(): 
+RS:>   + aggregation of predictions 
+
+RS:>   + estimating ratings of similar items 
+
+RS:>   + generating output structured data 

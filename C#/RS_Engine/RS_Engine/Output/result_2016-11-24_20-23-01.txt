@@ -1,0 +1,445 @@
+RS:> 
+RS:> -----------------------------------------------------------------
+RS:>  ** RECOMMENDATORS ENGINE **
+RS:> -----------------------------------------------------------------
+RS:>     ____________________________
+RS:>     Algorithms
+RS:>     1) TOP
+RS:>     2) CB-F
+RS:>     3) U-CF
+RS:>     4) I-CF
+RS:> 
+RS:>     5) CF DICTIONARIES (*in DEV*)
+RS:>     ____________________________
+RS:>     TEST Mode
+RS:>     7) test mode: enable here to initialize the dataset as train/test and do EVAL (not use for kaggle scope)
+RS:>     ____________________________
+RS:>     8) EVAL mode: execute EVAL with input a specific csv (not use for kaggle scope)
+RS:>     9) .bin size calculator
+RS:>     ____________________________
+RS:>     0) exit
+RS:> -----------------------------------------------------------------
+RS:> 
+RS:>     > RS:>     ==> selected program (7)
+RS:> -----------------------------------------------------------------
+RS:> 
+RS:> -----------------------------------------------------------------
+RS:>  ** RECOMMENDATORS ENGINE **
+RS:> -----------------------------------------------------------------
+RS:>     ____________________________
+RS:>     +++ TEST MODE ENABLED +++
+RS:>     >> datasets are initialized as train/test (not use for kaggle scope)
+RS:>     >> after the algorithm is invoked EVAL
+RS:>     ____________________________
+RS:>     Algorithms
+RS:>     1) TOP
+RS:>     2) CB-F
+RS:>     3) U-CF
+RS:>     4) I-CF
+RS:> 
+RS:>     5) CF DICTIONARIES (*in DEV*)
+RS:>     ____________________________
+RS:>     8) EVAL mode: execute EVAL with input a specific csv (not use for kaggle scope)
+RS:>     9) .bin size calculator
+RS:>     ____________________________
+RS:>     0) exit
+RS:> -----------------------------------------------------------------
+RS:> 
+RS:>     > RS:>     ==> selected program (5)
+RS:> -----------------------------------------------------------------
+RS:>   + initializing RS 
+RS:>   + initializing dataset retrievement 
+RS:>   + reading dataset: interactions
+RS:>   + dataset read OK | interactions_f count= 546865 | conversion..
+RS:>   + reading serialized file target_users.bin
+RS:>   + reading serialized file user_profile.bin
+RS:>   + reading serialized file item_profile.bin
+RS:>   + reading serialized file item_profile_enabled.bin
+RS:>   + populating auxiliary data structures 
+RS:> 
+RS:>   + all datasets conversion: OK
+RS:>   -total lines | interactions    >>> 546864
+RS:>   -total lines | item_profile    >>> 167956
+RS:>   -total lines | item_profile_en >>> 63446
+RS:>   -total lines | target_users    >>> 10000
+RS:>   -total lines | user_profile    >>> 40000
+RS:> 
+RS:>   + TEST MODE - INSERT LIMIT=RS:>   + TINY TEST MODE ENABLED - LIMIT=4000
+RS:>   + tiny random list size: 4000
+RS:>   + thining out datasets (1m)
+RS:>   -total lines | user_profile (tiny) >>> 4000
+RS:>   -total lines | interactions (tiny) >>> 54177
+RS:>   + creating random list..  percentage is set to 20%
+RS:>   + random list size: 800
+RS:>   + splitting data into train and test..
+RS:>   -total lines | user_profile (train)    >>> 4000
+RS:>   -total lines | user_profile_test       >>> 800
+RS:>   -total lines | target_users (replaced) >>> 800
+RS:> -----------------------------------------------------------------
+RS:>   # running program 5
+RS:> 
+RS:>   + processing..
+RS:>   + CF Algorithm..
+RS:>   + creating DICTIONARIES.. 
+RS:>   + user_items_dictionary
+RS:>   + reading serialized file CFDICT_user_items_dictionary.bin
+RS:>   + item_users_dictionary
+RS:>   + reading serialized file CFDICT_item_users_dictionary.bin
+RS:>   + computeCFUserUserSimilarity(): 
+RS:>   + calculating all coefficients 
+
+RS:>   + calculating user_user similarity 
+
+RS:>   + predictCFRecommendation(): 
+RS:>   + aggregation of predictions 
+
+RS:>   + estimating ratings of similar items 
+
+RS:>   + generating output structured data 
+RS:>  TGT USERID 2237513  HAS 0 RECOMMENDATIONS!
+
+RS:>  TGT USERID 2265372  HAS 0 RECOMMENDATIONS!
+
+RS:>  TGT USERID 972032  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 466892  HAS LESS THAN 5 RECOMMENDATIONS!
+
+RS:>  TGT USERID 97266  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 1589636  HAS 0 RECOMMENDATIONS!
+
+RS:>  TGT USERID 267337  HAS 0 RECOMMENDATIONS!
+
+RS:>  TGT USERID 686178  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 1573855  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 541723  HAS 0 RECOMMENDATIONS!
+
+RS:>  TGT USERID 2055746  HAS 0 RECOMMENDATIONS!
+
+RS:>  TGT USERID 825199  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 1094386  HAS 0 RECOMMENDATIONS!
+
+RS:>  TGT USERID 158919  HAS 0 RECOMMENDATIONS!
+
+RS:>  TGT USERID 2819727  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 1355285  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 1408122  HAS 0 RECOMMENDATIONS!
+
+RS:>  TGT USERID 1658917  HAS 0 RECOMMENDATIONS!
+
+RS:>  TGT USERID 1736907  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 2672960  HAS 0 RECOMMENDATIONS!
+
+RS:>  TGT USERID 798845  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 1063733  HAS 0 RECOMMENDATIONS!
+
+RS:>  TGT USERID 2173533  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 1671641  HAS 0 RECOMMENDATIONS!
+
+RS:>  TGT USERID 1666299  HAS 0 RECOMMENDATIONS!
+
+RS:>  TGT USERID 2291171  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 1826569  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 2335676  HAS 0 RECOMMENDATIONS!
+
+RS:>  TGT USERID 197637  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 307206  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 1259349  HAS 0 RECOMMENDATIONS!
+
+RS:>  TGT USERID 2455135  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 1202121  HAS 0 RECOMMENDATIONS!
+
+RS:>  TGT USERID 288896  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 1350147  HAS 0 RECOMMENDATIONS!
+
+RS:>  TGT USERID 2367487  HAS 0 RECOMMENDATIONS!
+
+RS:>  TGT USERID 2107560  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 2982828  HAS 0 RECOMMENDATIONS!
+
+RS:>  TGT USERID 945238  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 1670536  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 2189941  HAS 0 RECOMMENDATIONS!
+
+RS:>  TGT USERID 1755136  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 1828330  HAS 0 RECOMMENDATIONS!
+
+RS:>  TGT USERID 2265642  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 1603179  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 2429611  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 1577074  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 532381  HAS 0 RECOMMENDATIONS!
+
+RS:>  TGT USERID 2245140  HAS 0 RECOMMENDATIONS!
+
+RS:>  TGT USERID 882301  HAS 0 RECOMMENDATIONS!
+
+RS:>  TGT USERID 456605  HAS 0 RECOMMENDATIONS!
+
+RS:>  TGT USERID 2106204  HAS 0 RECOMMENDATIONS!
+
+RS:>  TGT USERID 1394533  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 1541555  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 1550962  HAS 0 RECOMMENDATIONS!
+
+RS:>  TGT USERID 1693131  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 1210855  HAS 0 RECOMMENDATIONS!
+
+RS:>  TGT USERID 2127319  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 2239692  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 2255379  HAS 0 RECOMMENDATIONS!
+
+RS:>  TGT USERID 128064  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 2025652  HAS 0 RECOMMENDATIONS!
+
+RS:>  TGT USERID 2019466  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 937189  HAS 0 RECOMMENDATIONS!
+
+RS:>  TGT USERID 2382177  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 1824479  HAS 0 RECOMMENDATIONS!
+
+RS:>  TGT USERID 205672  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 2635826  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 2294375  HAS 0 RECOMMENDATIONS!
+
+RS:>  TGT USERID 1834323  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 1554165  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 2293529  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 1012797  HAS 0 RECOMMENDATIONS!
+
+RS:>  TGT USERID 243814  HAS 0 RECOMMENDATIONS!
+
+RS:>  TGT USERID 2605291  HAS 0 RECOMMENDATIONS!
+
+RS:>  TGT USERID 2114209  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 2367255  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 260974  HAS 0 RECOMMENDATIONS!
+
+RS:>  TGT USERID 1868700  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 2689990  HAS 0 RECOMMENDATIONS!
+
+RS:>  TGT USERID 2101789  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 2602227  HAS 0 RECOMMENDATIONS!
+
+RS:>  TGT USERID 1683191  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 2980827  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 393203  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 1280566  HAS 0 RECOMMENDATIONS!
+
+RS:>  TGT USERID 2776876  HAS 0 RECOMMENDATIONS!
+
+RS:>  TGT USERID 2296967  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 2481904  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 2358615  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 1672929  HAS 0 RECOMMENDATIONS!
+
+RS:>  TGT USERID 242773  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 58945  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 1330054  HAS 0 RECOMMENDATIONS!
+
+RS:>  TGT USERID 1322940  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 1446562  HAS 0 RECOMMENDATIONS!
+
+RS:>  TGT USERID 2290764  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 355446  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 1821665  HAS 0 RECOMMENDATIONS!
+
+RS:>  TGT USERID 1367125  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 443247  HAS 0 RECOMMENDATIONS!
+
+RS:>  TGT USERID 557923  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 1684249  HAS 0 RECOMMENDATIONS!
+
+RS:>  TGT USERID 1178545  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 1470284  HAS 0 RECOMMENDATIONS!
+
+RS:>  TGT USERID 321125  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 157494  HAS 0 RECOMMENDATIONS!
+
+RS:>  TGT USERID 809592  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 997857  HAS 0 RECOMMENDATIONS!
+
+RS:>  TGT USERID 2534546  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 1620809  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 2845256  HAS 0 RECOMMENDATIONS!
+
+RS:>  TGT USERID 1192739  HAS 0 RECOMMENDATIONS!
+
+RS:>  TGT USERID 201756  HAS 0 RECOMMENDATIONS!
+
+RS:>  TGT USERID 2834216  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 1228750  HAS 0 RECOMMENDATIONS!
+
+RS:>  TGT USERID 1924859  HAS 0 RECOMMENDATIONS!
+
+RS:>  TGT USERID 136039  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 2640583  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 2569107  HAS LESS THAN 5 RECOMMENDATIONS!
+
+RS:>  TGT USERID 2184055  HAS 0 RECOMMENDATIONS!
+
+RS:>  TGT USERID 1060405  HAS 0 RECOMMENDATIONS!
+
+RS:>  TGT USERID 254135  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 2465828  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 91412  HAS 0 RECOMMENDATIONS!
+
+RS:>  TGT USERID 1675190  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 1608908  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 137054  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 726016  HAS 0 RECOMMENDATIONS!
+
+RS:>  TGT USERID 2850029  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 391513  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 864335  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 1626356  HAS 0 RECOMMENDATIONS!
+
+RS:>  TGT USERID 1241921  HAS 0 RECOMMENDATIONS!
+
+RS:>  TGT USERID 2349147  HAS LESS THAN 5 RECOMMENDATIONS!
+
+RS:>  TGT USERID 2015868  HAS 0 RECOMMENDATIONS!
+
+RS:>  TGT USERID 704648  HAS 0 RECOMMENDATIONS!
+RS:>  TGT USERID 298415  HAS 0 RECOMMENDATIONS!
+
+RS:>  >>>>>> generating output file, wait a minute..
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 10  ROWVALUE: 448243
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 18  ROWVALUE: 2407146
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 20  ROWVALUE: 3672
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 27  ROWVALUE: 1772257
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 29  ROWVALUE: 787982
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 31  ROWVALUE: 330766
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 35  ROWVALUE: 2072284
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 36  ROWVALUE: 796079
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 40  ROWVALUE: 2501425
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 41  ROWVALUE: 1493663
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 43  ROWVALUE: 1494956
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 56  ROWVALUE: 562123
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 59  ROWVALUE: 1859872
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 62  ROWVALUE: 1578699
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 64  ROWVALUE: 686178
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 67  ROWVALUE: 1479946
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 69  ROWVALUE: 2055746
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 72  ROWVALUE: 1348184
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 74  ROWVALUE: 355950
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 78  ROWVALUE: 2926881
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 87  ROWVALUE: 1187247
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 95  ROWVALUE: 1165115
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 96  ROWVALUE: 557075
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 109  ROWVALUE: 1091397
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 114  ROWVALUE: 1986201
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 118  ROWVALUE: 2760841
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 132  ROWVALUE: 1905936
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 136  ROWVALUE: 1352915
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 140  ROWVALUE: 2850170
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 175  ROWVALUE: 639813
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 179  ROWVALUE: 1067200
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 187  ROWVALUE: 307206
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 202  ROWVALUE: 2102302
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 204  ROWVALUE: 1489024
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 206  ROWVALUE: 592254
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 220  ROWVALUE: 544808
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 223  ROWVALUE: 1130418
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 238  ROWVALUE: 1094830
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 243  ROWVALUE: 2671358
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 250  ROWVALUE: 1755136
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 259  ROWVALUE: 2265642
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 265  ROWVALUE: 1577074
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 277  ROWVALUE: 1629054
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 279  ROWVALUE: 2259787
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 290  ROWVALUE: 461763
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 312  ROWVALUE: 2748583
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 319  ROWVALUE: 2582395
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 321  ROWVALUE: 2106204
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 322  ROWVALUE: 1974530
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 329  ROWVALUE: 831946
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 332  ROWVALUE: 1541555
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 334  ROWVALUE: 1872911
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 339  ROWVALUE: 640760
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 347  ROWVALUE: 1600975
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 350  ROWVALUE: 523123
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 356  ROWVALUE: 1063201
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 358  ROWVALUE: 2255379
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 360  ROWVALUE: 650782
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 365  ROWVALUE: 128064
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 368  ROWVALUE: 1547956
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 373  ROWVALUE: 1296872
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 378  ROWVALUE: 2873357
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 403  ROWVALUE: 2635826
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 407  ROWVALUE: 2294375
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 408  ROWVALUE: 2521847
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 412  ROWVALUE: 1720229
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 414  ROWVALUE: 2539276
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 417  ROWVALUE: 1012797
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 422  ROWVALUE: 2115252
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 425  ROWVALUE: 1403630
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 426  ROWVALUE: 2062132
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 428  ROWVALUE: 104295
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 439  ROWVALUE: 2065715
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 440  ROWVALUE: 2114209
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 442  ROWVALUE: 398101
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 443  ROWVALUE: 643227
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 445  ROWVALUE: 1306152
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 448  ROWVALUE: 260974
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 450  ROWVALUE: 1734826
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 451  ROWVALUE: 1868700
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 453  ROWVALUE: 2260185
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 468  ROWVALUE: 1198309
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 475  ROWVALUE: 920368
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 493  ROWVALUE: 1628724
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 494  ROWVALUE: 2358615
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 496  ROWVALUE: 1324878
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 497  ROWVALUE: 1672929
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 499  ROWVALUE: 2386065
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 505  ROWVALUE: 420281
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 516  ROWVALUE: 58945
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 533  ROWVALUE: 564767
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 536  ROWVALUE: 1821665
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 541  ROWVALUE: 1159305
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 548  ROWVALUE: 2689012
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 563  ROWVALUE: 1096596
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 567  ROWVALUE: 1744561
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 568  ROWVALUE: 443247
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 570  ROWVALUE: 112770
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 573  ROWVALUE: 408816
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 579  ROWVALUE: 2949396
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 582  ROWVALUE: 1025122
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 584  ROWVALUE: 151953
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 593  ROWVALUE: 1427539
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 595  ROWVALUE: 1673481
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 596  ROWVALUE: 636547
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 599  ROWVALUE: 2486827
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 606  ROWVALUE: 1362635
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 607  ROWVALUE: 301198
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 615  ROWVALUE: 2767379
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 616  ROWVALUE: 609558
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 618  ROWVALUE: 38059
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 619  ROWVALUE: 1321772
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 620  ROWVALUE: 233175
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 625  ROWVALUE: 1620809
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 629  ROWVALUE: 1018563
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 632  ROWVALUE: 1022462
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 635  ROWVALUE: 478083
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 636  ROWVALUE: 1635441
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 640  ROWVALUE: 2840601
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 650  ROWVALUE: 289441
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 655  ROWVALUE: 1640677
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 658  ROWVALUE: 1129109
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 661  ROWVALUE: 1371623
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 680  ROWVALUE: 509585
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 687  ROWVALUE: 1690970
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 695  ROWVALUE: 2071099
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 696  ROWVALUE: 1554391
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 705  ROWVALUE: 1470311
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 708  ROWVALUE: 668440
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 713  ROWVALUE: 1893194
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 718  ROWVALUE: 1032344
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 743  ROWVALUE: 1181677
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 753  ROWVALUE: 1241921
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 757  ROWVALUE: 242132
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 763  ROWVALUE: 2349147
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 766  ROWVALUE: 1166011
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 797  ROWVALUE: 867410
+RS:> ERROR: the list useritems have not the length (5)!   INDEX: 798  ROWVALUE: 447495
+RS:>  >>>>>> output submission file created: ../../../Output/submission_2016-11-24_20-23-01.csv
+RS:> -----------------------------------------------------------------
+RS:>  >>>>>> TEST MODE GENERATING PRECISION 
