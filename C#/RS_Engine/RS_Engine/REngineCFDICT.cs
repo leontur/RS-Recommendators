@@ -25,6 +25,9 @@ namespace RS_Engine
         public static IDictionary<int, IDictionary<int, double>> CF_user_user_sim_dictionary = new Dictionary<int, IDictionary<int, double>>();
         public static IDictionary<int, IDictionary<int, double>> CF_user_prediction_dictionary = new Dictionary<int, IDictionary<int, double>>();
 
+        //HYBRID VARS
+        public static IDictionary<int, List<int>> HYBRID_read = new Dictionary<int, List<int>>();
+
         /////////////////////////////////////////////
         //MAIN ALGORITHM METHOD
         public static void getRecommendations()
@@ -32,6 +35,18 @@ namespace RS_Engine
             //info
             RManager.outLog("  + processing..");
             RManager.outLog("  + CF Algorithm..");
+
+            //TODO
+            //only temporary: read from another output (done with another algorithm) and add the lines in this is not good
+            //READ FROM CSV
+            RManager.outLog("  + reading from hybrid_read csv");
+            var hyb_f = File.ReadAllLines(RManager.BACKPATH + "Output/eval/hybrid_read" + ".csv");
+            RManager.outLog("  + read OK | hyb_f count= " + hyb_f.Count() + " | conversion..");
+            for (int i = 1; i < hyb_f.Length; i++)
+            {
+                List<string> row_IN = hyb_f[i].Split(',').Select(x => x).ToList();
+                HYBRID_read.Add(Int32.Parse(row_IN[0]), row_IN[1].Split('\t').Select(Int32.Parse).ToList());
+            }
 
             //Execute
             createDictionaries();
@@ -476,19 +491,21 @@ namespace RS_Engine
                     RManager.outLog(" TGT USERID " + user + "  HAS 0 RECOMMENDATIONS!");
                 }
 
-                //FINAL CHECK 1
+                //FINAL CHECK 1A
                 //if recommendations are still not enough
                 if (rec_items.Count < 5)
                 {
                     RManager.outLog(" TGT USERID " + user + " *STILL* HAS LESS THAN 5 RECOMMENDATIONS -> hybrid system");
 
-                    ///TODO:
+                    ///TODO
                     /////in questo caso, cercare per N utenti simili, e suggerire quello che hanno cliccato loro (e ancora attivo)
-                    //////praticamente prendere la riga da UCF
+                    /////praticamente prendere la riga da UCF
 
-                    //DA FARE
+                    //ATTUALMENTE SOLO IN PROVA
+                    rec_items.AddRange(HYBRID_read[user]);
                 }
-                //FINAL CHECK 1a (last chance)
+
+                //FINAL CHECK 1B (last chance)
                 if (rec_items.Count < 5)
                 {
                     //add TOP 5

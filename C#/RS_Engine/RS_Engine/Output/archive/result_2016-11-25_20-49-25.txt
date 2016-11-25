@@ -20,7 +20,7 @@ RS:>     ____________________________
 RS:>     0) exit
 RS:> -----------------------------------------------------------------
 RS:> 
-RS:>     > RS:>     ==> selected program (5)
+RS:>     > RS:>     ==> selected program (2)
 RS:> -----------------------------------------------------------------
 RS:>   + initializing RS 
 RS:>   + initializing dataset retrievement 
@@ -40,43 +40,50 @@ RS:>   -total lines | target_users      >>> 10000
 RS:>   -total lines | user_profile      >>> 40000
 RS:> 
 RS:> -----------------------------------------------------------------
-RS:>   # running program 5
+RS:>   # running program 2
 RS:> 
 RS:>   + processing..
-RS:>   + CF Algorithm..
-RS:>   + creating DICTIONARIES.. 
-RS:>   + user_items_dictionary
-RS:>   + reading serialized file CFDICT_user_items_dictionary.bin
-RS:>   + item_users_dictionary
-RS:>   + reading serialized file CFDICT_item_users_dictionary.bin
-RS:>   + computeCFUserUserSimilarity(): 
-RS:>   + calculating all coefficients 
+RS:>   + computing CBF.. 
+RS:>   >>>>>> ARE YOU SURE TO CONTINUE?  THIS IS A VERY LONG RUNNING PROGRAM
+RS:> 
+RS:>   SIM_WEIGHTS
+RS:>    -5 title
+RS:>    -10 career_level
+RS:>    -5 discipline_id
+RS:>    -3 industry_id
+RS:>    -7 country
+RS:>    -3 region
+RS:>    -6 latitude - longitude
+RS:>    -10 employment
+RS:>    -1 tags
+RS:>    -4 created_at
+RS:> 
+RS:>   + reading serialized file ICF_all_user_interactions_ids.bin
+RS:>   + generating output structured data
 
-RS:>   + calculating user_user similarity 
-
-RS:>   + predictCFRecommendation(): 
-RS:>   + aggregation of predictions 
-
-RS:>   + estimating ratings of similar items 
-
-RS:>   + generating output structured data 
-
-RS:>  TGT USERID 1286  HAS 0 RECOMMENDATIONS!
-RS:>  TGT USERID 1982  HAS 0 RECOMMENDATIONS!
-RS:>  TGT USERID 2742  HAS 0 RECOMMENDATIONS!
-
-RS:>  TGT USERID 3547  HAS 0 RECOMMENDATIONS!
-RS:>  TGT USERID 4607  HAS 0 RECOMMENDATIONS!
-RS:>  TGT USERID 5112  HAS 0 RECOMMENDATIONS!
-
-RS:>  TGT USERID 7693  HAS 0 RECOMMENDATIONS!
-
-RS:>  TGT USERID 10870  HAS 0 RECOMMENDATIONS!
-RS:>  TGT USERID 11423  HAS 0 RECOMMENDATIONS!
-RS:>  TGT USERID 12233  HAS 0 RECOMMENDATIONS!
-
-RS:>  TGT USERID 13715  HAS 0 RECOMMENDATIONS!
-
-RS:>  TGT USERID 16228  HAS 0 RECOMMENDATIONS!
-
-RS:>  TGT USERID 21578  HAS 0 RECOMMENDATIONS!
+RS:>   + writing serialized file item_sim_row_cache.bin
+RS:>  >>>>>> generating output file, wait a minute..
+RS:>  >>>>>> output submission file created: ../../../Output/submission_2016-11-25_20-49-25.csv
+RS:> 
+RS:> -----------------------------------------------------------------
+RS:>  ** RECOMMENDATORS ENGINE **
+RS:> -----------------------------------------------------------------
+RS:>     ____________________________
+RS:>     Algorithms
+RS:>     1) TOP
+RS:>     2) CB-F
+RS:>     3) U-CF
+RS:>     4) I-CF
+RS:> 
+RS:>     5) CF DICTIONARIES (*in DEV*)
+RS:>     ____________________________
+RS:>     TEST Mode
+RS:>     7) test mode: enable here to initialize the dataset as train/test and do EVAL (not use for kaggle scope)
+RS:>     ____________________________
+RS:>     8) EVAL mode: execute EVAL with input a specific csv (not use for kaggle scope)
+RS:>     9) .bin size calculator
+RS:>     ____________________________
+RS:>     0) exit
+RS:> -----------------------------------------------------------------
+RS:> 
+RS:>     > 

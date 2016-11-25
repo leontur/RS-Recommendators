@@ -22,16 +22,16 @@ namespace RS_Engine
     {
         //ALGORITHM PARAMETERS
         //number of similarities to select (for each item to be recommended)
-        private const int SIM_RANGE = 5;
-        private const int SIM_RANGE_SKIP = 5;
-        private const int INTER_RANGE = 8;
+        private const int SIM_RANGE = 1;
+        private const int SIM_RANGE_SKIP = 2;
+        private const int INTER_RANGE = 7;
 
         //weights for average similarity (weight are 1-10)
         private static int[] SIM_WEIGHTS = new int[10];
         private static int den = -1;
 
         //shrink value for weighted average
-        private static double SHRINK = 100;
+        private static double SHRINK = 1;
 
         //EXECUTION VARS
         //Getting item_profile count
@@ -47,16 +47,16 @@ namespace RS_Engine
         public static void getRecommendations()
         {
             //Assigning weights
-            SIM_WEIGHTS[0] = 6;  //title	
-            SIM_WEIGHTS[1] = 9;  //career_level	
-            SIM_WEIGHTS[2] = 7; //discipline_id	
-            SIM_WEIGHTS[3] = 6;  //industry_id	
-            SIM_WEIGHTS[4] = 8;  //country	
-            SIM_WEIGHTS[5] = 6;  //region	
-            SIM_WEIGHTS[6] = 9;  //latitude - longitude (only 1 value from distance)
+            SIM_WEIGHTS[0] = 5;  //title	
+            SIM_WEIGHTS[1] = 10;  //career_level	
+            SIM_WEIGHTS[2] = 5;  //discipline_id	
+            SIM_WEIGHTS[3] = 3;  //industry_id	
+            SIM_WEIGHTS[4] = 7;  //country	
+            SIM_WEIGHTS[5] = 3;  //region	
+            SIM_WEIGHTS[6] = 6;  //latitude - longitude (only 1 value from distance)
             SIM_WEIGHTS[7] = 10;  //employment
-            SIM_WEIGHTS[8] = 6;  //tags	
-            SIM_WEIGHTS[9] = 10; //created_at
+            SIM_WEIGHTS[8] = 1;  //tags	
+            SIM_WEIGHTS[9] = 4;  //created_at
             den = SIM_WEIGHTS.Sum();
 
             //alert and info

@@ -356,7 +356,7 @@ namespace RS_Engine
             int par_counter_out = par_length_out;
 
             //PARALLEL FOR
-            Parallel.For(0, par_length_out, 
+            Parallel.For(0, par_length_out, new ParallelOptions { MaxDegreeOfParallelism = 8 },
                 u => {
 
                     //counter

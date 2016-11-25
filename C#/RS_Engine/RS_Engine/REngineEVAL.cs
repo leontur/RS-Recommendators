@@ -20,7 +20,7 @@ namespace RS_Engine
         //Invocation method
         public static void computePrecision()
         {
-            RManager.outLog("-----------------------------------------------------------------");
+            RManager.outLog("_______________________________________________________");
             RManager.outLog(" >>>>>> TEST MODE GENERATING PRECISION ");
 
             //CALL MAP EXECUTION
@@ -31,6 +31,9 @@ namespace RS_Engine
             RManager.outLog(" >>>>>> MAP @" + MAP_K + " = " + MAP);
             RManager.outLog(" >>>>>> RECALL @SINGLE" + RECALL_SINGLE_K + " = " + RECALL);
             RManager.outLog("_______________________________________________________");
+            RManager.outLog("");
+            RManager.outLog(" press any key to main menu");
+            Console.ReadKey();
         }
 
         //MAP @K
