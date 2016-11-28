@@ -17,13 +17,17 @@ namespace RS_Engine
     {
         /////////////////////////////////////////////
         //ALGORITHM PARAMETERS
-        private const int SIM_SHRINK = 0;
-        private const int PRED_SHRINK = 0;
+        private const int SIM_SHRINK_US_US = 0;
+        private const int PRED_SHRINK_US_US = 0;
+        private const int SIM_SHRINK_IT_IT = 0;
+        private const int PRED_SHRINK_IT_IT = 0;
 
         /////////////////////////////////////////////
         //EXECUTION VARS
         public static IDictionary<int, IDictionary<int, double>> CF_user_user_sim_dictionary = new Dictionary<int, IDictionary<int, double>>();
         public static IDictionary<int, IDictionary<int, double>> CF_user_prediction_dictionary = new Dictionary<int, IDictionary<int, double>>();
+        public static IDictionary<int, IDictionary<int, double>> CF_item_item_sim_dictionary = new Dictionary<int, IDictionary<int, double>>();
+        public static IDictionary<int, IDictionary<int, double>> CF_item_prediction_dictionary = new Dictionary<int, IDictionary<int, double>>();
 
         //HYBRID VARS
         public static IDictionary<int, List<int>> HYBRID_read = new Dictionary<int, List<int>>();
@@ -55,7 +59,7 @@ namespace RS_Engine
             computeCFUserUserSimilarity();
 
             //Execute
-            predictCFRecommendations();
+            predictCFUserBasedRecommendations();
 
             //Execute
             generateOutput();
@@ -92,12 +96,14 @@ namespace RS_Engine
                         List<int> curr_user_interacted_items = RManager.interactions.Where(x => x[0] == (int)u[0]).Select(x => x[1]).Distinct().ToList();
 
             ///NOTA: in questo caso ordino in base al peso del click, ma si dovrebbe considerare anche quanto è recente!!
+            ///NOTA2: creato un nuovo file bin con ordinamento in base a quanto recente
                         //create a dictionary for every interacted item (with no interaction_type duplicates, only the bigger for each distinct interaction)
                         IDictionary<int, int> curr_user_interacted_items_dictionary = new Dictionary<int, int>();
                         foreach (var clicked in curr_user_interacted_items)
                             curr_user_interacted_items_dictionary.Add(
                                     clicked, //item_id
-                                    RManager.interactions.Where(x => x[0] == (int)u[0] && x[1] == clicked).Select(x => x[2]).OrderByDescending(y => y).ToList().First() //interaction_type
+                                    //RManager.interactions.Where(x => x[0] == (int)u[0] && x[1] == clicked).Select(x => x[2]).OrderByDescending(y => y).ToList().First() //interaction_type
+                                    RManager.interactions.Where(x => x[0] == (int)u[0] && x[1] == clicked).OrderByDescending(x => x[3]).Select(x => x[2]).ToList().First() //interaction_type
                                     );
 
                         //create an entry in the dictionary
@@ -157,12 +163,14 @@ namespace RS_Engine
                         List<int> curr_item_interacted_users = RManager.interactions.Where(x => x[1] == (int)i[0]).Select(x => x[0]).Distinct().ToList();
 
              ///NOTA: in questo caso ordino in base al peso del click, ma si dovrebbe considerare anche quanto è recente!!
+             ///NOTA2: creato un nuovo file bin con ordinamento in base a quanto recente
                         //create a dictionary for every user that clicked this item (with no interaction_type duplicates, only the bigger for each distinct user)
                         IDictionary<int, int> curr_item_interacted_users_dictionary = new Dictionary<int, int>();
                         foreach (var userclick in curr_item_interacted_users)
                             curr_item_interacted_users_dictionary.Add(
                                     userclick, //user_id
-                                    RManager.interactions.Where(x => x[1] == (int)i[0] && x[0] == userclick).Select(x => x[2]).OrderByDescending(y => y).ToList().First() //interaction_type
+                                    //RManager.interactions.Where(x => x[1] == (int)i[0] && x[0] == userclick).Select(x => x[2]).OrderByDescending(y => y).ToList().First() //interaction_type
+                                    RManager.interactions.Where(x => x[1] == (int)i[0] && x[0] == userclick).OrderByDescending(x => x[3]).Select(x => x[2]).ToList().First() //interaction_type
                                     );
 
                         //create an entry in the dictionary
@@ -201,7 +209,8 @@ namespace RS_Engine
 
         }
 
-        //////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         //CREATE AN USER_USER SIMILARITY (DICTIONARY)
         private static void computeCFUserUserSimilarity()
         {
@@ -255,12 +264,21 @@ namespace RS_Engine
                         //retrieving interaction coefficients
                         int interaction_type = i.Value;
                         int interaction_type_of_sim_user = 0;
-                        RManager.user_items_dictionary[sim_user].TryGetValue(item, out interaction_type_of_sim_user);
 
                         //creating coefficients
-                        double num = interaction_type * interaction_type_of_sim_user;
-                        double den1 = Math.Pow(interaction_type, 2);
-                        double den2 = Math.Pow(interaction_type_of_sim_user, 2);
+                        double num, den1, den2;
+
+                        //if the sim_user has interacted with same item
+                        if (RManager.user_items_dictionary[sim_user].TryGetValue(item, out interaction_type_of_sim_user))
+                        {
+                            num = interaction_type * interaction_type_of_sim_user;
+                            den1 = Math.Pow(interaction_type, 2);
+                            den2 = Math.Pow(interaction_type_of_sim_user, 2);
+                        }
+                        else
+                        {
+                            num = den1 = den2 = 0;
+                        }
 
                         //storing coefficients
                         if (user_user_similarity_dictionary_num[user].ContainsKey(sim_user)) {
@@ -311,7 +329,9 @@ namespace RS_Engine
                     int sim_user = sim_u.Key;
 
                     //evaluate prediction of that sim_user for that user
-                    double pred = user_user_similarity_dictionary_num[user][sim_user] / (Math.Sqrt(user_user_similarity_dictionary_den1[user][sim_user]) * Math.Sqrt(user_user_similarity_dictionary_den2[user][sim_user]) + SIM_SHRINK);
+                    double pred = 
+                        user_user_similarity_dictionary_num[user][sim_user] / 
+                        (Math.Sqrt(user_user_similarity_dictionary_den1[user][sim_user]) * Math.Sqrt(user_user_similarity_dictionary_den2[user][sim_user]) + SIM_SHRINK_US_US);
 
                     //storing
                     sim_users_predictions.Add(sim_user, pred);
@@ -327,10 +347,10 @@ namespace RS_Engine
 
         //////////////////////////////////////////////////////////////////////////////////////////
         //CREATE RECOMMENDATIONS 
-        private static void predictCFRecommendations()
+        private static void predictCFUserBasedRecommendations()
         {
             //info
-            RManager.outLog("  + predictCFRecommendation(): ");
+            RManager.outLog("  + predictCFUserBasedRecommendations(): ");
 
             //runtime dictionaries
             IDictionary<int, IDictionary<int, double>> users_prediction_dictionary = new Dictionary<int, IDictionary<int, double>>();
@@ -416,11 +436,17 @@ namespace RS_Engine
                     //get current item id
                     int sim_item = item_pred.Key;
 
-                    //evaluate prediction of that item for that user
-                    double pred = users_prediction_dictionary_num[user][sim_item] / (users_prediction_dictionary_den[user][sim_item] + PRED_SHRINK);
+                    //only if this item is recommendable
+                    if (RManager.item_profile_enabled_list.Contains(sim_item)) {
 
-                    //storing
-                    sim_items_predictions.Add(sim_item, pred);
+                        //evaluate prediction of that item for that user
+                        double pred =
+                            users_prediction_dictionary_num[user][sim_item] /
+                            (users_prediction_dictionary_den[user][sim_item] + PRED_SHRINK_US_US);
+
+                        //storing
+                        sim_items_predictions.Add(sim_item, pred);
+                    }
                 }
 
                 //storing
@@ -431,7 +457,249 @@ namespace RS_Engine
             CF_user_prediction_dictionary = users_prediction_dictionary;
         }
 
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //CREATE AN USER_USER SIMILARITY (DICTIONARY)
+        private static void computeCFItemItemSimilarity()
+        {
+            //info
+            RManager.outLog("  + computeCFItemItemSimilarity(): ");
+
+            //runtime dictionaries
+            IDictionary<int, IDictionary<int, double>> item_item_similarity_dictionary = new Dictionary<int, IDictionary<int, double>>();
+            IDictionary<int, IDictionary<int, double>> item_item_similarity_dictionary_num = new Dictionary<int, IDictionary<int, double>>();
+            IDictionary<int, IDictionary<int, double>> item_item_similarity_dictionary_den1 = new Dictionary<int, IDictionary<int, double>>();
+            IDictionary<int, IDictionary<int, double>> item_item_similarity_dictionary_den2 = new Dictionary<int, IDictionary<int, double>>();
+
+            //counter
+            int c_tot = RManager.item_users_dictionary.Count();
+            RManager.outLog("  + calculating all coefficients ");
+
+            //for every item
+            foreach (var i in RManager.item_users_dictionary)
+            {
+                //counter
+                if (--c_tot % 500 == 0)
+                    RManager.outLog(" - remaining " + c_tot, true, true, true);
+
+                //getting current item id
+                int item = i.Key;
+
+                //creating user key in the coefficients dictionaries
+                item_item_similarity_dictionary_num.Add(item, new Dictionary<int, double>());
+                item_item_similarity_dictionary_den1.Add(item, new Dictionary<int, double>());
+                item_item_similarity_dictionary_den2.Add(item, new Dictionary<int, double>());
+
+                //get the users that interacted with the current item and the related best interaction type for each clicked item
+                IDictionary<int, int> interacting_users = i.Value;
+
+                //for every user that interacted with this item
+                foreach (var u in interacting_users)
+                {
+                    //getting current user id
+                    int user = u.Key;
+
+                    //get the dictionary of that user (that contains the items which have interacted with)
+                    //and from that, get list of items that interacted with 
+                    IDictionary<int, int> interacted_items = RManager.user_items_dictionary[user];
+
+                    //get the list of items which have been interacted by the current user
+                    List<int> item_list = interacted_items.Keys.ToList();
+
+                    //for each item in the list of (similar) items
+                    foreach (var sim_item in item_list)
+                    {
+                        //retrieving interaction coefficients
+                        int interaction_type = u.Value;
+                        int interaction_type_of_sim_item = interacted_items[sim_item];
+
+                        //creating coefficients
+                        double num = interaction_type * interaction_type_of_sim_item;
+                        double den1 = Math.Pow(interaction_type, 2);
+                        double den2 = Math.Pow(interaction_type_of_sim_item, 2);
+
+                        //storing coefficients
+                        if (item_item_similarity_dictionary_num[item].ContainsKey(sim_item))
+                        {
+                            item_item_similarity_dictionary_num[item][sim_item] += num;
+                            item_item_similarity_dictionary_den1[item][sim_item] += den1;
+                            item_item_similarity_dictionary_den2[item][sim_item] += den2;
+                        }
+                        else
+                        {
+                            //add to similarity dictionary
+                            item_item_similarity_dictionary_num[item].Add(sim_item, num);
+                            item_item_similarity_dictionary_den1[item].Add(sim_item, den1);
+                            item_item_similarity_dictionary_den2[item].Add(sim_item, den2);
+                        }
+
+                    }
+                }
+
+                //removing from the similarity coefficients the item itself
+                if (item_item_similarity_dictionary_num[item].ContainsKey(item))
+                {
+                    item_item_similarity_dictionary_num[item].Remove(item);
+                    item_item_similarity_dictionary_den1[item].Remove(item);
+                    item_item_similarity_dictionary_den2[item].Remove(item);
+                }
+            }
+
+            //counter
+            c_tot = item_item_similarity_dictionary_num.Count();
+            RManager.outLog("  + calculating item_item similarity ");
+
+            //calculating similarity
+            //for every item
+            foreach (var i in item_item_similarity_dictionary_num)
+            {
+                //counter
+                if (--c_tot % 500 == 0)
+                    RManager.outLog(" - remaining " + c_tot, true, true, true);
+
+                //get current item id
+                int item = i.Key;
+
+                //for every sim_item to this item
+                IDictionary<int, double> sim_items_predictions = new Dictionary<int, double>();
+                foreach (var sim_i in item_item_similarity_dictionary_num[item])
+                {
+                    //get current sim_item id
+                    int sim_item = sim_i.Key;
+
+                    //evaluate prediction of that sim_item for that item
+                    double pred =
+                        item_item_similarity_dictionary_num[item][sim_item] /
+                        (Math.Sqrt(item_item_similarity_dictionary_den1[item][sim_item]) * Math.Sqrt(item_item_similarity_dictionary_den2[item][sim_item]) + SIM_SHRINK_IT_IT);
+
+                    //storing
+                    sim_items_predictions.Add(sim_item, pred);
+                }
+
+                //storing
+                item_item_similarity_dictionary.Add(item, sim_items_predictions);
+            }
+
+            //exposing
+            CF_item_item_sim_dictionary = item_item_similarity_dictionary;
+        }
+
         //////////////////////////////////////////////////////////////////////////////////////////
+        //CREATE RECOMMENDATIONS 
+        private static void predictCFItemBasedRecommendations()
+        {
+            //info
+            RManager.outLog("  + predictCFItemBasedRecommendations(): ");
+
+            //runtime dictionaries
+            IDictionary<int, IDictionary<int, double>> users_prediction_dictionary = new Dictionary<int, IDictionary<int, double>>();
+            IDictionary<int, IDictionary<int, double>> users_prediction_dictionary_num = new Dictionary<int, IDictionary<int, double>>();
+            IDictionary<int, IDictionary<int, double>> users_prediction_dictionary_den = new Dictionary<int, IDictionary<int, double>>();
+
+            //counter
+            int c_tot = RManager.target_users.Count();
+            RManager.outLog("  + aggregation of predictions ");
+
+            //for each target user
+            foreach (var user in RManager.target_users)
+            {
+                //counter
+                if (--c_tot % 500 == 0)
+                    RManager.outLog(" - remaining " + c_tot, true, true, true);
+
+                //if current target has similar users
+                if (RManager.user_items_dictionary.ContainsKey(user)) //only for security reason
+                {
+                    //creating user key in the coefficients dictionaries
+                    users_prediction_dictionary_num.Add(user, new Dictionary<int, double>());
+                    users_prediction_dictionary_den.Add(user, new Dictionary<int, double>());
+
+                    //get list of items with which the user interacted
+                    IDictionary<int, int> i_list = RManager.user_items_dictionary[user];
+
+                    //for every item in this dictionary
+                    foreach (var i in i_list)
+                    {
+                        //get item id
+                        int item = i.Key;
+
+                        //get the dictionary of similar items and the similarity value
+                        var iis_list = CF_item_item_sim_dictionary[item];
+
+                        //for every similar item of the current item
+                        foreach (var sim_item in iis_list)
+                        {
+                            //get sim_item id
+                            int item2 = sim_item.Key;
+
+                            //coefficients
+                            double num = iis_list[item2] * i.Value;
+                            double den = iis_list[item2];
+
+                            //if the current item is not predicted yet for the user, add it
+                            if (!users_prediction_dictionary_num[user].ContainsKey(item2))
+                            {
+                                users_prediction_dictionary_num[user].Add(item2, num);
+                                users_prediction_dictionary_den[user].Add(item2, den);
+                            }
+                            //else adding its contribution
+                            else
+                            {
+                                users_prediction_dictionary_num[user][item2] += num;
+                                users_prediction_dictionary_den[user][item2] += den;
+                            }
+                        }
+                    }
+                }
+            }
+
+            //counter
+            c_tot = users_prediction_dictionary_num.Count();
+            RManager.outLog("  + estimating ratings of similar items ");
+
+            //calculating similarity
+            //for every target user (users_prediction_dictionary_num contains all target users)
+            foreach (var u in users_prediction_dictionary_num)
+            {
+                //counter
+                if (--c_tot % 500 == 0)
+                    RManager.outLog(" - remaining " + c_tot, true, true, true);
+
+                //get current user id
+                int user = u.Key;
+
+                //for each item predicted for the user
+                IDictionary<int, double> sim_items_predictions = new Dictionary<int, double>();
+                foreach (var item_pred in users_prediction_dictionary_num[user])
+                {
+                    //get current item id
+                    int sim_item = item_pred.Key;
+
+                    //only if this item is recommendable
+                    if (RManager.item_profile_enabled_list.Contains(sim_item))
+                    {
+
+                        //evaluate prediction of that item for that user
+                        double pred =
+                            users_prediction_dictionary_num[user][sim_item] /
+                            (users_prediction_dictionary_den[user][sim_item] + PRED_SHRINK_IT_IT);
+
+                        //storing
+                        sim_items_predictions.Add(sim_item, pred);
+                    }
+                }
+
+                //storing
+                users_prediction_dictionary.Add(user, sim_items_predictions);
+            }
+
+            //expose
+            CF_item_prediction_dictionary = users_prediction_dictionary;
+        }
+
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         //GENERATE OUTPUT STRUCTURED DATA
         private static void generateOutput()
         {
@@ -461,11 +729,14 @@ namespace RS_Engine
                     //retrieve the id(s) of recommendable items (ordered by the best, to the poor)
                     rec_items = CF_user_prediction_dictionary[user].ToList().OrderByDescending(x => x.Value).Select(x => x.Key).ToList();
 
+                    /*
+                    non serve più perchè non li metto più nel dizionario delle predizioni
                     //ADVANCED FILTER 1
                     //removing not recommendable items
                     for (int s = rec_items.Count - 1; s >= 0; s--)
                         if (!RManager.item_profile_enabled_list.Contains(rec_items[s]))
                             rec_items.RemoveAt(s);
+                    */
 
                     //ADVANCED FILTER 2
                     List<int> already_clicked = new List<int>();
