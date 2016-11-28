@@ -19,6 +19,7 @@ namespace RS_Engine
 
         //AUXILIARY DATA STRUCTURES
         public static List<int> item_profile_enabled_list = new List<int>();
+        public static IDictionary<int, int> item_profile_enabled_dictionary = new Dictionary<int, int>();
         public static List<List<object>> item_profile_enabled = new List<List<object>>();
         //public static List<List<object>> item_profile_disabled = new List<List<object>>();
 
@@ -280,10 +281,11 @@ namespace RS_Engine
                     //add tmp to data structure
                     item_profile.Add(itm_row_tmpOUT);
 
-                    //storing not recommendable items list
+                    //storing enabled (and so recommendable) items list
                     if ((int)itm_row_tmpOUT.Last() != 0)
-                        //add id of disabled item to data structure
+                    {
                         item_profile_enabled.Add(itm_row_tmpOUT);
+                    }
 
                     /*
                     //storing not recommendable items list
@@ -329,6 +331,10 @@ namespace RS_Engine
 
             //Populate item_profile_enabled_list
             item_profile_enabled_list = item_profile_enabled.Select(x => (int)x[0]).ToList();
+
+            //Populate item_profile_enabled_dictionary
+            foreach (var en in item_profile_enabled_list.Distinct())
+                item_profile_enabled_dictionary.Add(en, 1);
 
             //INFO
             outLog("");

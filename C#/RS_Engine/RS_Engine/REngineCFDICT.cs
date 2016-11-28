@@ -19,13 +19,13 @@ namespace RS_Engine
         /////////////////////////////////////////////
         //ALGORITHM PARAMETERS
         private const int SIM_SHRINK_UB = 0;
-        private const int PRED_SHRINK_UB = 10;
+        private const int PRED_SHRINK_UB = 50;
 
         private const int SIM_SHRINK_IB = 0;
-        private const int PRED_SHRINK_IB = 10;
+        private const int PRED_SHRINK_IB = 50;
 
-        private const double HYBRID_WEIGHT = 0.6;
-        private const int HYBRID_KNN = 10;
+        private const double HYBRID_WEIGHT = 0.8;
+        private const int HYBRID_KNN = 20;
 
         /////////////////////////////////////////////
         //EXECUTION VARS
@@ -38,10 +38,8 @@ namespace RS_Engine
         public static IDictionary<int, IDictionary<int, double>> CF_HW_user_prediction_dictionary = new Dictionary<int, IDictionary<int, double>>();
         public static IDictionary<int, IDictionary<int, double>> CF_HR_user_prediction_dictionary = new Dictionary<int, IDictionary<int, double>>();
 
-        /* solo per prova, da rimuovere
-        //HYBRID VARS
+        //SUPER-HYBRID
         public static IDictionary<int, List<int>> HYBRID_read = new Dictionary<int, List<int>>();
-        */
 
         /////////////////////////////////////////////
         //MAIN ALGORITHM METHOD
@@ -51,18 +49,20 @@ namespace RS_Engine
             RManager.outLog("  + processing..");
             RManager.outLog("  + CF Algorithm..");
 
-            /* solo per prova, da rimuovere
+            //SUPER-HYBRID
             //only temporary: read from another output (done with another algorithm) and add the lines in this is not good
             //READ FROM CSV
-            RManager.outLog("  + reading from hybrid_read csv");
-            var hyb_f = File.ReadAllLines(RManager.BACKPATH + "Output/eval/hybrid_read" + ".csv");
-            RManager.outLog("  + read OK | hyb_f count= " + hyb_f.Count() + " | conversion..");
-            for (int i = 1; i < hyb_f.Length; i++)
+            if (!RManager.ISTESTMODE)
             {
-                List<string> row_IN = hyb_f[i].Split(',').Select(x => x).ToList();
-                HYBRID_read.Add(Int32.Parse(row_IN[0]), row_IN[1].Split('\t').Select(Int32.Parse).ToList());
+                RManager.outLog("  + reading from super_hybrid_read csv");
+                var s_hyb_f = File.ReadAllLines(RManager.BACKPATH + "Output/eval/super_hybrid_read" + ".csv");
+                RManager.outLog("  + read OK | s_hyb_f count= " + s_hyb_f.Count() + " | conversion..");
+                for (int i = 1; i < s_hyb_f.Length; i++)
+                {
+                    List<string> row_IN = s_hyb_f[i].Split(',').Select(x => x).ToList();
+                    HYBRID_read.Add(Int32.Parse(row_IN[0]), row_IN[1].Split('\t').Select(Int32.Parse).ToList());
+                }
             }
-            */
 
             //Execute DICTIONARIES
             createDictionaries();
@@ -442,7 +442,7 @@ namespace RS_Engine
             foreach (var u in users_prediction_dictionary_num)
             {
                 //counter
-                if (--c_tot % 500 == 0)
+                if (--c_tot % 100 == 0)
                     RManager.outLog(" - remaining " + c_tot, true, true, true);
 
                 //get current user id
@@ -456,7 +456,7 @@ namespace RS_Engine
                     int sim_item = item_pred.Key;
 
                     //only if this item is recommendable
-                    if (RManager.item_profile_enabled_list.Contains(sim_item)) {
+                    if (RManager.item_profile_enabled_dictionary.ContainsKey(sim_item)) {
 
                         //evaluate prediction of that item for that user
                         double pred =
@@ -498,7 +498,7 @@ namespace RS_Engine
             foreach (var i in RManager.item_users_dictionary)
             {
                 //counter
-                if (--c_tot % 500 == 0)
+                if (--c_tot % 2000 == 0)
                     RManager.outLog(" - remaining " + c_tot, true, true, true);
 
                 //getting current item id
@@ -573,7 +573,7 @@ namespace RS_Engine
             foreach (var i in item_item_similarity_dictionary_num)
             {
                 //counter
-                if (--c_tot % 500 == 0)
+                if (--c_tot % 2000 == 0)
                     RManager.outLog(" - remaining " + c_tot, true, true, true);
 
                 //get current item id
@@ -681,7 +681,7 @@ namespace RS_Engine
             foreach (var u in users_prediction_dictionary_num)
             {
                 //counter
-                if (--c_tot % 500 == 0)
+                if (--c_tot % 100 == 0) 
                     RManager.outLog(" - remaining " + c_tot, true, true, true);
 
                 //get current user id
@@ -695,7 +695,7 @@ namespace RS_Engine
                     int sim_item = item_pred.Key;
 
                     //only if this item is recommendable
-                    if (RManager.item_profile_enabled_list.Contains(sim_item))
+                    if (RManager.item_profile_enabled_dictionary.ContainsKey(sim_item))
                     {
 
                         //evaluate prediction of that item for that user
@@ -732,17 +732,27 @@ namespace RS_Engine
             //UB
             //for every user in the USER BASED prediction
             foreach (var u in CF_UB_user_prediction_dictionary)
+            {
+                //user instantiation
+                if (!users_prediction_dictionary.ContainsKey(u.Key))
+                    users_prediction_dictionary.Add(u.Key, new Dictionary<int, double>());
+
                 //for every item in this prediction
-                foreach (var i in CF_UB_user_prediction_dictionary[u.Key])
+                foreach (var i in u.Value)
                     //compute the weighted prediction value
-                    users_prediction_dictionary.Add(u.Key, new Dictionary<int, double> { { i.Key, (i.Value * HYBRID_WEIGHT) } });
+                    users_prediction_dictionary[u.Key].Add(i.Key, (i.Value * HYBRID_WEIGHT));
+            }
 
             //IB
             //for every user in the ITEM BASED prediction
             foreach (var u in CF_IB_user_prediction_dictionary)
             {
+                //user instantiation
+                if (!users_prediction_dictionary.ContainsKey(u.Key))
+                    users_prediction_dictionary.Add(u.Key, new Dictionary<int, double>());
+
                 //for every item in this prediction
-                foreach (var i in CF_IB_user_prediction_dictionary[u.Key])
+                foreach (var i in u.Value)
                 {
                     //if already predicted by UB
                     if (users_prediction_dictionary[u.Key].ContainsKey(i.Key))
@@ -753,7 +763,7 @@ namespace RS_Engine
                     else
                     {
                         //compute the weighted prediction value
-                        users_prediction_dictionary.Add(u.Key, new Dictionary<int, double> { { i.Key, (i.Value * (1 - HYBRID_WEIGHT)) } });
+                        users_prediction_dictionary[u.Key].Add(i.Key, (i.Value * (1 - HYBRID_WEIGHT)));
                     }
                 }
             }
@@ -770,31 +780,34 @@ namespace RS_Engine
 
             //runtime dictionaries:
             //ordered clones
-            IDictionary<int, IOrderedEnumerable<KeyValuePair<int, double>>> CF_UB_user_prediction_dictionary_ordered = CF_UB_user_prediction_dictionary.ToDictionary(item => item.Key, item => (IOrderedEnumerable<KeyValuePair<int, double>>)item.Value);
-            IDictionary<int, IOrderedEnumerable<KeyValuePair<int, double>>> CF_IB_user_prediction_dictionary_ordered = CF_IB_user_prediction_dictionary.ToDictionary(item => item.Key, item => (IOrderedEnumerable<KeyValuePair<int, double>>)item.Value);
+            IDictionary<int, IOrderedEnumerable<KeyValuePair<int, double>>> CF_UB_user_prediction_dictionary_ordered = new Dictionary<int, IOrderedEnumerable<KeyValuePair<int, double>>>(); 
+            IDictionary<int, IOrderedEnumerable<KeyValuePair<int, double>>> CF_IB_user_prediction_dictionary_ordered = new Dictionary<int, IOrderedEnumerable<KeyValuePair<int, double>>>();
             //output
             IDictionary<int, IDictionary<int, double>> users_prediction_dictionary = new Dictionary<int, IDictionary<int, double>>();
 
             //TODO commentare
             //UB
-            foreach (var u in CF_UB_user_prediction_dictionary_ordered)
-                if(u.Value.Count() > 0)
-                    CF_UB_user_prediction_dictionary_ordered[u.Key] = CF_UB_user_prediction_dictionary_ordered[u.Key].OrderByDescending(x => x.Value);
+            foreach (var u in CF_UB_user_prediction_dictionary)
+                //if (u.Value.Count() > 0)
+                    CF_UB_user_prediction_dictionary_ordered[u.Key] = CF_UB_user_prediction_dictionary[u.Key].OrderByDescending(x => x.Value);
+            
             //IB
-            foreach (var u in CF_IB_user_prediction_dictionary_ordered)
-                if (u.Value.Count() > 0)
-                    CF_IB_user_prediction_dictionary_ordered[u.Key] = CF_IB_user_prediction_dictionary_ordered[u.Key].OrderByDescending(x => x.Value);
+            foreach (var u in CF_IB_user_prediction_dictionary)
+                //if (u.Value.Count() > 0)
+                    CF_IB_user_prediction_dictionary_ordered[u.Key] = CF_IB_user_prediction_dictionary[u.Key].OrderByDescending(x => x.Value);
 
 
             //TODO commentare
             //UB
             foreach (var u in CF_UB_user_prediction_dictionary_ordered)
             {
-                users_prediction_dictionary.Add(u.Key, new Dictionary<int, double>());
+                //user instantiation
+                if (!users_prediction_dictionary.ContainsKey(u.Key))
+                    users_prediction_dictionary.Add(u.Key, new Dictionary<int, double>());
 
                 int points = HYBRID_KNN;
 
-                foreach (var item in CF_UB_user_prediction_dictionary_ordered[u.Key])
+                foreach (var item in u.Value)
                 {
                     if (points > 0)
                     {
@@ -807,12 +820,17 @@ namespace RS_Engine
                     }
                 }
             }
+
             //IB
-            foreach (var u in CF_UB_user_prediction_dictionary_ordered)
+            foreach (var u in CF_IB_user_prediction_dictionary_ordered)
             {
+                //user instantiation
+                if (!users_prediction_dictionary.ContainsKey(u.Key))
+                    users_prediction_dictionary.Add(u.Key, new Dictionary<int, double>());
+
                 int points = HYBRID_KNN;
 
-                foreach (var item in CF_IB_user_prediction_dictionary_ordered[u.Key])
+                foreach (var item in u.Value)
                 {
                     if (points > 0)
                     {
@@ -850,7 +868,7 @@ namespace RS_Engine
             //instantiating a structure for the output
             IDictionary<int, List<int>> output_dictionary = new Dictionary<int, List<int>>();
 
-            //for every target user (CF_user_prediction_dictionary contains all and only target users)
+            //for every target user (user_prediction_dictionary contains all and only target users)
             foreach (var u in users_prediction_dictionary)
             {
                 //counter
@@ -883,35 +901,36 @@ namespace RS_Engine
                     //if recommendations are not enough
                     if (rec_items.Count < 5)
                     {
-                        RManager.outLog(" TGT USERID " + user + "  HAS LESS THAN 5 RECOMMENDATIONS -> restoring already clicked..");
+                        RManager.outLog(" Target USER_ID " + user + " has LESS than 5 predictions (" + rec_items.Count + ") -> restoring already clicked..");
                         rec_items.AddRange(already_clicked);
                     }
                 }
                 else
                 {
                     //the user has not clicked anything (cannot find similar users basing on current user clicks!)
-                    RManager.outLog(" TGT USERID " + user + "  HAS 0 RECOMMENDATIONS!");
+                    //RManager.outLog(" Target USER_ID " + user + " has 0 predictions!");
                 }
 
                 //FINAL CHECK 1A
                 //if recommendations are still not enough
                 if (rec_items.Count < 5)
                 {
-                    RManager.outLog(" TGT USERID " + user + " *STILL* HAS LESS THAN 5 RECOMMENDATIONS -> super-hybrid system (TO DEVELOP)");
+                    RManager.outLog(" Target USER_ID " + user + " has LESS than 5 predictions (" + rec_items.Count + ") -> super-hybrid system (TO DEVELOP)");
 
                     ///TODO
                     /////in questo caso, cercare per N utenti simili, e suggerire quello che hanno cliccato loro (e ancora attivo)
                     /////praticamente prendere la riga da UCF
 
                     //ATTUALMENTE SOLO IN PROVA
-                    //rec_items.AddRange(HYBRID_read[user]);
+                    if (!RManager.ISTESTMODE) //non usabile in test per via della casualita dei db
+                        rec_items.AddRange(HYBRID_read[user]);
                 }
 
-                //FINAL CHECK 1B (last chance)
+                //FINAL CHECK 1B (..last way..)
                 if (rec_items.Count < 5)
                 {
                     //add TOP 5
-                    RManager.outLog(" TGT USERID " + user + " *STILL* HAS LESS THAN 5 RECOMMENDATIONS -> adding top5");
+                    RManager.outLog(" Target USER_ID " + user + " has LESS than 5 predictions (" + rec_items.Count + ") -> adding top5");
                     rec_items.AddRange(REngineTOP.getTOP5List());
                 }
 
