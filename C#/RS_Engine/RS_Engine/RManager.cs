@@ -468,6 +468,7 @@ namespace RS_Engine
         }
 
         //CSV OUTPUT FILE CREATION
+        public static int fileExportSeq = 0;
         public static void exportRecToSubmit(List<int> users, List<List<int>> useritems)
         {
             //output string
@@ -502,7 +503,8 @@ namespace RS_Engine
             }
 
             //output file name creation
-            string sub_outputFileName = BACKPATH + "Output/submission_" + uniqueFileDate + ".csv";
+            fileExportSeq++;
+            string sub_outputFileName = BACKPATH + "Output/submission_" + uniqueFileDate + "_" + fileExportSeq + ".csv";
 
             //try to create
             try

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -17,20 +18,30 @@ namespace RS_Engine
     {
         /////////////////////////////////////////////
         //ALGORITHM PARAMETERS
-        private const int SIM_SHRINK_US_US = 0;
-        private const int PRED_SHRINK_US_US = 0;
-        private const int SIM_SHRINK_IT_IT = 0;
-        private const int PRED_SHRINK_IT_IT = 0;
+        private const int SIM_SHRINK_UB = 0;
+        private const int PRED_SHRINK_UB = 10;
+
+        private const int SIM_SHRINK_IB = 0;
+        private const int PRED_SHRINK_IB = 10;
+
+        private const double HYBRID_WEIGHT = 0.6;
+        private const int HYBRID_KNN = 10;
 
         /////////////////////////////////////////////
         //EXECUTION VARS
         public static IDictionary<int, IDictionary<int, double>> CF_user_user_sim_dictionary = new Dictionary<int, IDictionary<int, double>>();
-        public static IDictionary<int, IDictionary<int, double>> CF_user_prediction_dictionary = new Dictionary<int, IDictionary<int, double>>();
-        public static IDictionary<int, IDictionary<int, double>> CF_item_item_sim_dictionary = new Dictionary<int, IDictionary<int, double>>();
-        public static IDictionary<int, IDictionary<int, double>> CF_item_prediction_dictionary = new Dictionary<int, IDictionary<int, double>>();
+        public static IDictionary<int, IDictionary<int, double>> CF_UB_user_prediction_dictionary = new Dictionary<int, IDictionary<int, double>>();
 
+        public static IDictionary<int, IDictionary<int, double>> CF_item_item_sim_dictionary = new Dictionary<int, IDictionary<int, double>>();
+        public static IDictionary<int, IDictionary<int, double>> CF_IB_user_prediction_dictionary = new Dictionary<int, IDictionary<int, double>>();
+
+        public static IDictionary<int, IDictionary<int, double>> CF_HW_user_prediction_dictionary = new Dictionary<int, IDictionary<int, double>>();
+        public static IDictionary<int, IDictionary<int, double>> CF_HR_user_prediction_dictionary = new Dictionary<int, IDictionary<int, double>>();
+
+        /* solo per prova, da rimuovere
         //HYBRID VARS
         public static IDictionary<int, List<int>> HYBRID_read = new Dictionary<int, List<int>>();
+        */
 
         /////////////////////////////////////////////
         //MAIN ALGORITHM METHOD
@@ -40,7 +51,7 @@ namespace RS_Engine
             RManager.outLog("  + processing..");
             RManager.outLog("  + CF Algorithm..");
 
-            //TODO
+            /* solo per prova, da rimuovere
             //only temporary: read from another output (done with another algorithm) and add the lines in this is not good
             //READ FROM CSV
             RManager.outLog("  + reading from hybrid_read csv");
@@ -51,18 +62,26 @@ namespace RS_Engine
                 List<string> row_IN = hyb_f[i].Split(',').Select(x => x).ToList();
                 HYBRID_read.Add(Int32.Parse(row_IN[0]), row_IN[1].Split('\t').Select(Int32.Parse).ToList());
             }
+            */
 
-            //Execute
+            //Execute DICTIONARIES
             createDictionaries();
 
-            //Execute
+            //Execute USER BASED
             computeCFUserUserSimilarity();
-
-            //Execute
             predictCFUserBasedRecommendations();
 
-            //Execute
-            generateOutput();
+            //Execute ITEM BASED
+            computeCFItemItemSimilarity();
+            predictCFItemBasedRecommendations();
+
+            //Execute HYBRID
+            computeCFHybridWeightedRecommendations();
+            computeCFHybridRankRecommendations();
+
+            //Execute OUTPUT
+            generateOutput(CF_HW_user_prediction_dictionary);
+            generateOutput(CF_HR_user_prediction_dictionary);
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////
@@ -331,7 +350,7 @@ namespace RS_Engine
                     //evaluate prediction of that sim_user for that user
                     double pred = 
                         user_user_similarity_dictionary_num[user][sim_user] / 
-                        (Math.Sqrt(user_user_similarity_dictionary_den1[user][sim_user]) * Math.Sqrt(user_user_similarity_dictionary_den2[user][sim_user]) + SIM_SHRINK_US_US);
+                        (Math.Sqrt(user_user_similarity_dictionary_den1[user][sim_user]) * Math.Sqrt(user_user_similarity_dictionary_den2[user][sim_user]) + SIM_SHRINK_UB);
 
                     //storing
                     sim_users_predictions.Add(sim_user, pred);
@@ -442,7 +461,7 @@ namespace RS_Engine
                         //evaluate prediction of that item for that user
                         double pred =
                             users_prediction_dictionary_num[user][sim_item] /
-                            (users_prediction_dictionary_den[user][sim_item] + PRED_SHRINK_US_US);
+                            (users_prediction_dictionary_den[user][sim_item] + PRED_SHRINK_UB);
 
                         //storing
                         sim_items_predictions.Add(sim_item, pred);
@@ -454,7 +473,7 @@ namespace RS_Engine
             }
 
             //expose
-            CF_user_prediction_dictionary = users_prediction_dictionary;
+            CF_UB_user_prediction_dictionary = users_prediction_dictionary;
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -570,7 +589,7 @@ namespace RS_Engine
                     //evaluate prediction of that sim_item for that item
                     double pred =
                         item_item_similarity_dictionary_num[item][sim_item] /
-                        (Math.Sqrt(item_item_similarity_dictionary_den1[item][sim_item]) * Math.Sqrt(item_item_similarity_dictionary_den2[item][sim_item]) + SIM_SHRINK_IT_IT);
+                        (Math.Sqrt(item_item_similarity_dictionary_den1[item][sim_item]) * Math.Sqrt(item_item_similarity_dictionary_den2[item][sim_item]) + SIM_SHRINK_IB);
 
                     //storing
                     sim_items_predictions.Add(sim_item, pred);
@@ -682,7 +701,7 @@ namespace RS_Engine
                         //evaluate prediction of that item for that user
                         double pred =
                             users_prediction_dictionary_num[user][sim_item] /
-                            (users_prediction_dictionary_den[user][sim_item] + PRED_SHRINK_IT_IT);
+                            (users_prediction_dictionary_den[user][sim_item] + PRED_SHRINK_IB);
 
                         //storing
                         sim_items_predictions.Add(sim_item, pred);
@@ -694,24 +713,145 @@ namespace RS_Engine
             }
 
             //expose
-            CF_item_prediction_dictionary = users_prediction_dictionary;
+            CF_IB_user_prediction_dictionary = users_prediction_dictionary;
         }
 
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //HYBRID
+
+        //Hybrid weighted
+        private static void computeCFHybridWeightedRecommendations()
+        {
+            //info
+            RManager.outLog("  + computeCFHybridWeightedRecommendations(): ");
+
+            //runtime dictionaries
+            IDictionary<int, IDictionary<int, double>> users_prediction_dictionary = new Dictionary<int, IDictionary<int, double>>();
+
+            //UB
+            //for every user in the USER BASED prediction
+            foreach (var u in CF_UB_user_prediction_dictionary)
+                //for every item in this prediction
+                foreach (var i in CF_UB_user_prediction_dictionary[u.Key])
+                    //compute the weighted prediction value
+                    users_prediction_dictionary.Add(u.Key, new Dictionary<int, double> { { i.Key, (i.Value * HYBRID_WEIGHT) } });
+
+            //IB
+            //for every user in the ITEM BASED prediction
+            foreach (var u in CF_IB_user_prediction_dictionary)
+            {
+                //for every item in this prediction
+                foreach (var i in CF_IB_user_prediction_dictionary[u.Key])
+                {
+                    //if already predicted by UB
+                    if (users_prediction_dictionary[u.Key].ContainsKey(i.Key))
+                    {
+                        //compute the weighted prediction value by adding the value computed by the IB
+                        users_prediction_dictionary[u.Key][i.Key] += i.Value * (1 - HYBRID_WEIGHT);
+                    }
+                    else
+                    {
+                        //compute the weighted prediction value
+                        users_prediction_dictionary.Add(u.Key, new Dictionary<int, double> { { i.Key, (i.Value * (1 - HYBRID_WEIGHT)) } });
+                    }
+                }
+            }
+
+            //expose
+            CF_HW_user_prediction_dictionary = users_prediction_dictionary;
+        }
+
+        //Hybrid rank
+        private static void computeCFHybridRankRecommendations()
+        {
+            //info
+            RManager.outLog("  + computeCFHybridRankRecommendations(): ");
+
+            //runtime dictionaries:
+            //ordered clones
+            IDictionary<int, IOrderedEnumerable<KeyValuePair<int, double>>> CF_UB_user_prediction_dictionary_ordered = CF_UB_user_prediction_dictionary.ToDictionary(item => item.Key, item => (IOrderedEnumerable<KeyValuePair<int, double>>)item.Value);
+            IDictionary<int, IOrderedEnumerable<KeyValuePair<int, double>>> CF_IB_user_prediction_dictionary_ordered = CF_IB_user_prediction_dictionary.ToDictionary(item => item.Key, item => (IOrderedEnumerable<KeyValuePair<int, double>>)item.Value);
+            //output
+            IDictionary<int, IDictionary<int, double>> users_prediction_dictionary = new Dictionary<int, IDictionary<int, double>>();
+
+            //TODO commentare
+            //UB
+            foreach (var u in CF_UB_user_prediction_dictionary_ordered)
+                if(u.Value.Count() > 0)
+                    CF_UB_user_prediction_dictionary_ordered[u.Key] = CF_UB_user_prediction_dictionary_ordered[u.Key].OrderByDescending(x => x.Value);
+            //IB
+            foreach (var u in CF_IB_user_prediction_dictionary_ordered)
+                if (u.Value.Count() > 0)
+                    CF_IB_user_prediction_dictionary_ordered[u.Key] = CF_IB_user_prediction_dictionary_ordered[u.Key].OrderByDescending(x => x.Value);
+
+
+            //TODO commentare
+            //UB
+            foreach (var u in CF_UB_user_prediction_dictionary_ordered)
+            {
+                users_prediction_dictionary.Add(u.Key, new Dictionary<int, double>());
+
+                int points = HYBRID_KNN;
+
+                foreach (var item in CF_UB_user_prediction_dictionary_ordered[u.Key])
+                {
+                    if (points > 0)
+                    {
+                        users_prediction_dictionary[u.Key].Add(item.Key, points);
+                        points--;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+            }
+            //IB
+            foreach (var u in CF_UB_user_prediction_dictionary_ordered)
+            {
+                int points = HYBRID_KNN;
+
+                foreach (var item in CF_IB_user_prediction_dictionary_ordered[u.Key])
+                {
+                    if (points > 0)
+                    {
+                        if (users_prediction_dictionary[u.Key].ContainsKey(item.Key))
+                        {
+                            users_prediction_dictionary[u.Key][item.Key] += points;
+                            points--;
+                        }
+                        else
+                        {
+                            users_prediction_dictionary[u.Key].Add(item.Key, points);
+                            points--;
+                        }
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+            }
+
+            //expose
+            CF_HR_user_prediction_dictionary = users_prediction_dictionary;
+        }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         //GENERATE OUTPUT STRUCTURED DATA
-        private static void generateOutput()
+        private static void generateOutput(IDictionary<int, IDictionary<int, double>> users_prediction_dictionary)
         {
             //counter
-            int c_tot = CF_user_prediction_dictionary.Count();
+            int c_tot = users_prediction_dictionary.Count();
             RManager.outLog("  + generating output structured data ");
 
             //instantiating a structure for the output
             IDictionary<int, List<int>> output_dictionary = new Dictionary<int, List<int>>();
 
             //for every target user (CF_user_prediction_dictionary contains all and only target users)
-            foreach (var u in CF_user_prediction_dictionary)
+            foreach (var u in users_prediction_dictionary)
             {
                 //counter
                 if (c_tot-- % 10 == 0)
@@ -724,21 +864,12 @@ namespace RS_Engine
                 List<int> rec_items = new List<int>();
 
                 //if the list of recommendable items is not empty
-                if (CF_user_prediction_dictionary[user].Count > 0)
+                if (u.Value.Count > 0)
                 {
                     //retrieve the id(s) of recommendable items (ordered by the best, to the poor)
-                    rec_items = CF_user_prediction_dictionary[user].ToList().OrderByDescending(x => x.Value).Select(x => x.Key).ToList();
+                    rec_items = u.Value.ToList().OrderByDescending(x => x.Value).Select(x => x.Key).ToList();
 
-                    /*
-                    non serve più perchè non li metto più nel dizionario delle predizioni
-                    //ADVANCED FILTER 1
-                    //removing not recommendable items
-                    for (int s = rec_items.Count - 1; s >= 0; s--)
-                        if (!RManager.item_profile_enabled_list.Contains(rec_items[s]))
-                            rec_items.RemoveAt(s);
-                    */
-
-                    //ADVANCED FILTER 2
+                    //ADVANCED FILTER
                     List<int> already_clicked = new List<int>();
                     if (!RManager.ISTESTMODE)
                     {
@@ -748,7 +879,7 @@ namespace RS_Engine
                         rec_items = rec_items.Except(already_clicked).ToList();
                     }
 
-                    //CHECK FOR FILTER 2
+                    //CHECK FOR FILTER
                     //if recommendations are not enough
                     if (rec_items.Count < 5)
                     {
@@ -766,14 +897,14 @@ namespace RS_Engine
                 //if recommendations are still not enough
                 if (rec_items.Count < 5)
                 {
-                    RManager.outLog(" TGT USERID " + user + " *STILL* HAS LESS THAN 5 RECOMMENDATIONS -> hybrid system");
+                    RManager.outLog(" TGT USERID " + user + " *STILL* HAS LESS THAN 5 RECOMMENDATIONS -> super-hybrid system (TO DEVELOP)");
 
                     ///TODO
                     /////in questo caso, cercare per N utenti simili, e suggerire quello che hanno cliccato loro (e ancora attivo)
                     /////praticamente prendere la riga da UCF
 
                     //ATTUALMENTE SOLO IN PROVA
-                    rec_items.AddRange(HYBRID_read[user]);
+                    //rec_items.AddRange(HYBRID_read[user]);
                 }
 
                 //FINAL CHECK 1B (last chance)
