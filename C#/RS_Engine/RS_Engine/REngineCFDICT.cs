@@ -18,14 +18,18 @@ namespace RS_Engine
     {
         /////////////////////////////////////////////
         //ALGORITHM PARAMETERS
-        private const int SIM_SHRINK_UB = 0;
-        private const int PRED_SHRINK_UB = 50;
-
-        private const int SIM_SHRINK_IB = 0;
-        private const int PRED_SHRINK_IB = 50;
-
-        private const double HYBRID_WEIGHT = 0.8;
-        private const int HYBRID_KNN = 20;
+        //UB
+        private const int SIM_SHRINK_UB = 10;
+        private const int PRED_SHRINK_UB = 0;
+        //IB
+        private const int SIM_SHRINK_IB = 20;
+        private const int PRED_SHRINK_IB = 0;
+        //HW
+        private const double HYBRID_W_WEIGHT = 0.6;
+        //HR
+        private const int HYBRID_R_WEIGHT_I = 3;
+        private const int HYBRID_R_WEIGHT_U = 4;
+        private const int HYBRID_R_KNN = 30;
 
         /////////////////////////////////////////////
         //EXECUTION VARS
@@ -76,11 +80,11 @@ namespace RS_Engine
             predictCFItemBasedRecommendations();
 
             //Execute HYBRID
-            computeCFHybridWeightedRecommendations();
+            //computeCFHybridWeightedRecommendations();
             computeCFHybridRankRecommendations();
 
             //Execute OUTPUT
-            generateOutput(CF_HW_user_prediction_dictionary);
+            //generateOutput(CF_HW_user_prediction_dictionary);
             generateOutput(CF_HR_user_prediction_dictionary);
         }
 
@@ -740,7 +744,7 @@ namespace RS_Engine
                 //for every item in this prediction
                 foreach (var i in u.Value)
                     //compute the weighted prediction value
-                    users_prediction_dictionary[u.Key].Add(i.Key, (i.Value * HYBRID_WEIGHT));
+                    users_prediction_dictionary[u.Key].Add(i.Key, (i.Value * HYBRID_W_WEIGHT));
             }
 
             //IB
@@ -758,12 +762,12 @@ namespace RS_Engine
                     if (users_prediction_dictionary[u.Key].ContainsKey(i.Key))
                     {
                         //compute the weighted prediction value by adding the value computed by the IB
-                        users_prediction_dictionary[u.Key][i.Key] += i.Value * (1 - HYBRID_WEIGHT);
+                        users_prediction_dictionary[u.Key][i.Key] += i.Value * (1 - HYBRID_W_WEIGHT);
                     }
                     else
                     {
                         //compute the weighted prediction value
-                        users_prediction_dictionary[u.Key].Add(i.Key, (i.Value * (1 - HYBRID_WEIGHT)));
+                        users_prediction_dictionary[u.Key].Add(i.Key, (i.Value * (1 - HYBRID_W_WEIGHT)));
                     }
                 }
             }
@@ -785,70 +789,79 @@ namespace RS_Engine
             //output
             IDictionary<int, IDictionary<int, double>> users_prediction_dictionary = new Dictionary<int, IDictionary<int, double>>();
 
-            //TODO commentare
             //UB
+            //for each user in User Based prediction
             foreach (var u in CF_UB_user_prediction_dictionary)
                 //if (u.Value.Count() > 0)
+                    //sort the predictions
                     CF_UB_user_prediction_dictionary_ordered[u.Key] = CF_UB_user_prediction_dictionary[u.Key].OrderByDescending(x => x.Value);
-            
+
             //IB
+            //for each user in Item Based prediction
             foreach (var u in CF_IB_user_prediction_dictionary)
                 //if (u.Value.Count() > 0)
+                    //sort the predictions
                     CF_IB_user_prediction_dictionary_ordered[u.Key] = CF_IB_user_prediction_dictionary[u.Key].OrderByDescending(x => x.Value);
 
 
-            //TODO commentare
             //UB
+            //for each user in the User based prediction (ordered)
             foreach (var u in CF_UB_user_prediction_dictionary_ordered)
             {
                 //user instantiation
                 if (!users_prediction_dictionary.ContainsKey(u.Key))
                     users_prediction_dictionary.Add(u.Key, new Dictionary<int, double>());
 
-                int points = HYBRID_KNN;
+                //k represent the rank position of the item in the user predictions
+                int k = 0;
 
+                //for each item in the User based prediction (ordered)
                 foreach (var item in u.Value)
                 {
-                    if (points > 0)
+                    //if the position of the item is < than the number of items to consider -> assign the value to the new dictionary
+                    if (k < HYBRID_R_KNN)
                     {
+                        //weight
+                        double points = HYBRID_R_WEIGHT_U * (1 - (k / Math.Min(u.Value.Count(), HYBRID_R_KNN)));
+                        k++;
+
+                        //assign
                         users_prediction_dictionary[u.Key].Add(item.Key, points);
-                        points--;
                     }
                     else
-                    {
                         break;
-                    }
                 }
             }
 
             //IB
+            //for each user in the Item based prediction (ordered)
             foreach (var u in CF_IB_user_prediction_dictionary_ordered)
             {
                 //user instantiation
                 if (!users_prediction_dictionary.ContainsKey(u.Key))
                     users_prediction_dictionary.Add(u.Key, new Dictionary<int, double>());
 
-                int points = HYBRID_KNN;
+                //k represent the rank position of the item in the user predictions
+                int k = 0;
 
+                //for each item in the Item based prediction (ordered)
                 foreach (var item in u.Value)
                 {
-                    if (points > 0)
+                    //if the position of the item is < than the number of items to consider -> assign the value to the new dictionary
+                    if (k < HYBRID_R_KNN)
                     {
+                        //weight
+                        double points = HYBRID_R_WEIGHT_I * (1 - (k / Math.Min(u.Value.Count(), HYBRID_R_KNN)));
+                        k++;
+
+                        //assign
                         if (users_prediction_dictionary[u.Key].ContainsKey(item.Key))
-                        {
                             users_prediction_dictionary[u.Key][item.Key] += points;
-                            points--;
-                        }
                         else
-                        {
                             users_prediction_dictionary[u.Key].Add(item.Key, points);
-                            points--;
-                        }
                     }
                     else
-                    {
                         break;
-                    }
                 }
             }
 

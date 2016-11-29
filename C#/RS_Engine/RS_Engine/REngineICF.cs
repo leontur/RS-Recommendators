@@ -253,6 +253,8 @@ namespace RS_Engine
 
             RManager.outLog("  + computing TGTuser-ALLuser distance similarity matrix");
 
+            /*
+            
             //DISTANCE BETWEEN 2 USERS IS BASED ON THE SIMILARITY BETWEEN THEIR CLICKED JOBS TITLES
             //compute the similarity between two users
             // rows: each target user (count: from target_users)
@@ -344,6 +346,8 @@ namespace RS_Engine
                     tgtuser_to_allusers_distance_similarity = (List<List<double>>)bformatter.Deserialize(stream);
                 }
             }
+
+            */
 
             /////////////////////////////////////////////
 

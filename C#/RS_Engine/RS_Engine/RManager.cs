@@ -414,11 +414,12 @@ namespace RS_Engine
             outLog("    ____________________________");
             outLog("    Algorithms");
             outLog("    1) TOP");
-            outLog("    2) CB-F");
+            outLog("    2) CB-F (ok)");
             outLog("    3) U-CF");
             outLog("    4) I-CF");
             outLog("");
-            outLog("    5) CF DICTIONARIES (*in DEV*)");
+            outLog("    5) CF DICT UB/IB/HYBRID (ok)");
+            outLog("    6) HYBRID CB+CF 2.0 (dev)");
 
             if (!ISTESTMODE)
             {

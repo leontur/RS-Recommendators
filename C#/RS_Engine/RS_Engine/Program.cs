@@ -90,7 +90,7 @@ namespace RS_Engine
             }
             else if (RManager.EXEMODE == 6)
             {
-                //PROCESSING - XXX
+                //PROCESSING - HYBRID CB+CF 2.0
                 ;
             }
             else if (RManager.EXEMODE == 7)

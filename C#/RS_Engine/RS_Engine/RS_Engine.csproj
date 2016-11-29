@@ -66,6 +66,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="REngineCBF.cs" />
+    <Compile Include="REngineCBCF2.cs" />
     <Compile Include="REngineICF.cs" />
     <Compile Include="REngineOUTPUT.cs" />
     <Compile Include="REngineUCF.cs" />
