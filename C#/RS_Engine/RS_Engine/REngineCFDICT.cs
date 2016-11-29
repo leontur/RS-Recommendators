@@ -68,6 +68,9 @@ namespace RS_Engine
                 }
             }
 
+            ///////////////////////////////////////////////
+            //CF
+
             //Execute DICTIONARIES
             createDictionaries();
 
@@ -83,6 +86,13 @@ namespace RS_Engine
             //computeCFHybridWeightedRecommendations();
             computeCFHybridRankRecommendations();
 
+            ///////////////////////////////////////////////
+            //CB
+
+            //Execute
+            REngineCBCF2.getRecommendations();
+
+            ///////////////////////////////////////////////
             //Execute OUTPUT
             //generateOutput(CF_HW_user_prediction_dictionary);
             generateOutput(CF_HR_user_prediction_dictionary);
@@ -460,7 +470,7 @@ namespace RS_Engine
                     int sim_item = item_pred.Key;
 
                     //only if this item is recommendable
-                    if (RManager.item_profile_enabled_dictionary.ContainsKey(sim_item)) {
+                    if (RManager.item_profile_enabled_hashset.Contains(sim_item)) {
 
                         //evaluate prediction of that item for that user
                         double pred =
@@ -699,7 +709,7 @@ namespace RS_Engine
                     int sim_item = item_pred.Key;
 
                     //only if this item is recommendable
-                    if (RManager.item_profile_enabled_dictionary.ContainsKey(sim_item))
+                    if (RManager.item_profile_enabled_hashset.Contains(sim_item))
                     {
 
                         //evaluate prediction of that item for that user
@@ -891,55 +901,96 @@ namespace RS_Engine
                 //get user id
                 int user = u.Key;
 
-                //instantiate the list of most similar items
-                List<int> rec_items = new List<int>();
+                //////////////////////////////
+                //GET LISTS OF PREDICTIONS
 
+                //CF
                 //if the list of recommendable items is not empty
-                if (u.Value.Count > 0)
-                {
+                //if (u.Value.Count > 0)
                     //retrieve the id(s) of recommendable items (ordered by the best, to the poor)
-                    rec_items = u.Value.ToList().OrderByDescending(x => x.Value).Select(x => x.Key).ToList();
-
-                    //ADVANCED FILTER
-                    List<int> already_clicked = new List<int>();
-                    if (!RManager.ISTESTMODE)
-                    {
-                        //retrieving interactions already used by the current user (not recommending a job already applied)
-                        already_clicked = RManager.interactions.Where(i => i[0] == user && i[2] <= 3).Select(i => i[1]).ToList();
-                        //removing already clicked
-                        rec_items = rec_items.Except(already_clicked).ToList();
-                    }
-
-                    //CHECK FOR FILTER
-                    //if recommendations are not enough
-                    if (rec_items.Count < 5)
-                    {
-                        RManager.outLog(" Target USER_ID " + user + " has LESS than 5 predictions (" + rec_items.Count + ") -> restoring already clicked..");
-                        rec_items.AddRange(already_clicked);
-                    }
-                }
-                else
-                {
+                    List<int> CF_rec_items = u.Value.ToList().OrderByDescending(x => x.Value).Select(x => x.Key).ToList();
+                //else
                     //the user has not clicked anything (cannot find similar users basing on current user clicks!)
                     //RManager.outLog(" Target USER_ID " + user + " has 0 predictions!");
+
+                //CB (USER)
+                //retrieve the (variable) list of plausible items
+                List<int> CB_U_rec_items = REngineCBCF2.getListOfPlausibleItems(user);
+
+                //CB (ITEMS)
+                //TODO 
+                //ancora più ibrido?
+                //List<int> CB_I_rec_items = ...
+
+                //////////////////////////////
+                //MERGE LISTS OF PREDICTIONS
+
+                //instantiate the list of (final) most similar items
+                List<int> rec_items = new List<int>();
+
+                //adding all predictions (NOTE: the way I add the lists makes the CF with more 'priority' that the others)
+                rec_items.AddRange(CF_rec_items);
+                rec_items.AddRange(CB_U_rec_items);
+
+                //ADVANCED FILTER (ALREADY CLICKED)
+                if (!RManager.ISTESTMODE)
+                {
+                    //retrieving interactions already used by the current user (not recommending a job already applied)
+                    List<int> already_clicked = RManager.interactions.Where(i => i[0] == user && i[2] > 1).OrderBy(i => i[3]).Select(i => i[1]).ToList(); //TODO check with MAP
+
+                    //find commons
+                    List<int> clicked_and_predicted = already_clicked.Intersect(rec_items).ToList();
+
+                    //try removing already clicked
+                    var rec_items_try = rec_items.Except(clicked_and_predicted).ToList();
+
+                    //CHECK
+                    //if recommendations are not enough
+                    if (rec_items_try.Count > 5)
+                        //try success
+                        rec_items = rec_items_try.ToList();
+                    else
+                    {
+                        RManager.outLog(" Target USER_ID " + user + " has LESS than 5 predictions (" + rec_items.Count + ") -> restoring the minimum number of already clicked..");
+                        for (int r=0; r < rec_items.Count() - 5; r++)
+                            rec_items.Remove(clicked_and_predicted[r]);
+                    }
                 }
 
-                //FINAL CHECK 1A
+                //grouping to order the list by the most recurring items
+                //(if an item is present many times is because is predicted by many algorithms simultaneously!)
+                var rec_items_group = rec_items.GroupBy(i => i).OrderByDescending(grp => grp.Count());//.Select(x => x.Key).ToList();
+
+                //removing duplicates (no more necessaries because of the groupby)
+                rec_items = rec_items.Distinct().ToList();
+
+                //check to know if there is only a single entry for each item, in this case the group by is futile
+                foreach (var gr in rec_items_group)
+                {
+                    if (gr.Count() > 1)
+                    {
+                        rec_items.Remove(gr.Key);
+                        rec_items.Insert(0, gr.Key); //jump in the head if found a multiple entry
+                    }
+                }
+
+                /*
+                //FINAL CHECK
                 //if recommendations are still not enough
                 if (rec_items.Count < 5)
                 {
                     RManager.outLog(" Target USER_ID " + user + " has LESS than 5 predictions (" + rec_items.Count + ") -> super-hybrid system (TO DEVELOP)");
 
-                    ///TODO
-                    /////in questo caso, cercare per N utenti simili, e suggerire quello che hanno cliccato loro (e ancora attivo)
-                    /////praticamente prendere la riga da UCF
+                    //SUPER-HYBRID
+                    //get the similar
 
                     //ATTUALMENTE SOLO IN PROVA
                     if (!RManager.ISTESTMODE) //non usabile in test per via della casualita dei db
                         rec_items.AddRange(HYBRID_read[user]);
                 }
+                */
 
-                //FINAL CHECK 1B (..last way..)
+                //FINAL CHECK (..last way..)
                 if (rec_items.Count < 5)
                 {
                     //add TOP 5
@@ -947,13 +998,9 @@ namespace RS_Engine
                     rec_items.AddRange(REngineTOP.getTOP5List());
                 }
 
-                //FINAL CHECK 2
                 //trim of list for top 5
-                rec_items = rec_items.Take(5).ToList();
-
-                //saving
-                output_dictionary.Add(user, rec_items);
-
+                //and saving
+                output_dictionary.Add(user, rec_items.Take(5).ToList());
             }
 
             //consistency check
@@ -966,5 +1013,10 @@ namespace RS_Engine
             //OUTPUT_SUBMISSION
             RManager.exportRecToSubmit(RManager.target_users, output_dictionary_as_target_users_list);
         }
+
+
+        //Super Hybrid Runtime
+        //Input: a user id
+        //Output: a dictionary with 
     }
 }

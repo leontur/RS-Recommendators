@@ -19,7 +19,7 @@ namespace RS_Engine
 
         //AUXILIARY DATA STRUCTURES
         public static List<int> item_profile_enabled_list = new List<int>();
-        public static IDictionary<int, int> item_profile_enabled_dictionary = new Dictionary<int, int>();
+        public static HashSet<int> item_profile_enabled_hashset = new HashSet<int>();
         public static List<List<object>> item_profile_enabled = new List<List<object>>();
         //public static List<List<object>> item_profile_disabled = new List<List<object>>();
 
@@ -334,7 +334,7 @@ namespace RS_Engine
 
             //Populate item_profile_enabled_dictionary
             foreach (var en in item_profile_enabled_list.Distinct())
-                item_profile_enabled_dictionary.Add(en, 1);
+                item_profile_enabled_hashset.Add(en);
 
             //INFO
             outLog("");
@@ -418,8 +418,8 @@ namespace RS_Engine
             outLog("    3) U-CF");
             outLog("    4) I-CF");
             outLog("");
-            outLog("    5) CF DICT UB/IB/HYBRID (ok)");
-            outLog("    6) HYBRID CB+CF 2.0 (dev)");
+            outLog("    5) CF DICT UB/IB/HYBRID (chiama anche 6)");
+            outLog("    6) HYBRID CB+CF 2.0");
 
             if (!ISTESTMODE)
             {
