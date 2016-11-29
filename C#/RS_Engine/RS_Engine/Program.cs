@@ -91,7 +91,7 @@ namespace RS_Engine
             else if (RManager.EXEMODE == 6)
             {
                 //PROCESSING - HYBRID CB+CF 2.0
-                ;
+                REngineCBCF2.getRecommendations();
             }
             else if (RManager.EXEMODE == 7)
             {

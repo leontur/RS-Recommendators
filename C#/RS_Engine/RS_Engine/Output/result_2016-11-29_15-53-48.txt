@@ -1,0 +1,295 @@
+RS:> 
+RS:> -----------------------------------------------------------------
+RS:>  ** RECOMMENDATORS ENGINE **
+RS:> -----------------------------------------------------------------
+RS:>     ____________________________
+RS:>     Algorithms
+RS:>     1) TOP
+RS:>     2) CB-F (ok)
+RS:>     3) U-CF
+RS:>     4) I-CF
+RS:> 
+RS:>     5) CF DICT UB/IB/HYBRID (ok)
+RS:>     6) HYBRID CB+CF 2.0 (dev)
+RS:>     ____________________________
+RS:>     TEST Mode
+RS:>     7) test mode: enable here to initialize the dataset as train/test and do EVAL (not use for kaggle scope)
+RS:>     ____________________________
+RS:>     8) EVAL mode: execute EVAL with input a specific csv (not use for kaggle scope)
+RS:>     9) .bin size calculator
+RS:>     ____________________________
+RS:>     0) exit
+RS:> -----------------------------------------------------------------
+RS:> 
+RS:>     > RS:>     ==> selected program (7)
+RS:> -----------------------------------------------------------------
+RS:> 
+RS:> -----------------------------------------------------------------
+RS:>  ** RECOMMENDATORS ENGINE **
+RS:> -----------------------------------------------------------------
+RS:>     ____________________________
+RS:>     +++ TEST MODE ENABLED +++
+RS:>     >> datasets are initialized as train/test (not use for kaggle scope)
+RS:>     >> after the algorithm is invoked EVAL
+RS:>     ____________________________
+RS:>     Algorithms
+RS:>     1) TOP
+RS:>     2) CB-F (ok)
+RS:>     3) U-CF
+RS:>     4) I-CF
+RS:> 
+RS:>     5) CF DICT UB/IB/HYBRID (ok)
+RS:>     6) HYBRID CB+CF 2.0 (dev)
+RS:>     ____________________________
+RS:>     8) EVAL mode: execute EVAL with input a specific csv (not use for kaggle scope)
+RS:>     9) .bin size calculator
+RS:>     ____________________________
+RS:>     0) exit
+RS:> -----------------------------------------------------------------
+RS:> 
+RS:>     > RS:>     ==> selected program (5)
+RS:> -----------------------------------------------------------------
+RS:>   + initializing RS 
+RS:>   + initializing dataset retrievement 
+RS:>   + reading dataset: interactions
+RS:>   + dataset read OK | interactions_f count= 546865 | conversion..
+RS:>   + reading serialized file target_users.bin
+RS:>   + reading serialized file user_profile.bin
+RS:>   + reading serialized file item_profile.bin
+RS:>   + reading serialized file item_profile_enabled.bin
+RS:>   + populating auxiliary data structures 
+RS:> 
+RS:>   + all datasets conversion: OK
+RS:>   -total lines | interactions      >>> 546864
+RS:>   -total lines | item_profile      >>> 167956
+RS:>   -total lines | item_profile_enab >>> 63446
+RS:>   -total lines | target_users      >>> 10000
+RS:>   -total lines | user_profile      >>> 40000
+RS:> 
+RS:>   + TEST MODE - INSERT LIMIT=RS:>   + TINY TEST MODE ENABLED - LIMIT=2000
+RS:>   + tiny random list size: 2000
+RS:>   + thining out datasets (1m)
+RS:>   -total lines | user_profile (tiny) >>> 2000
+RS:>   -total lines | interactions (tiny) >>> 27258
+RS:>   + creating random list..  percentage is set to 20%
+RS:>   + random list size: 400
+RS:>   + splitting data into train and test..
+RS:>   -total lines | user_profile (train)    >>> 2000
+RS:>   -total lines | user_profile_test       >>> 400
+RS:>   -total lines | target_users (replaced) >>> 400
+RS:> -----------------------------------------------------------------
+RS:>   # running program 5
+RS:> 
+RS:>   + processing..
+RS:>   + CF Algorithm..
+RS:>   + creating DICTIONARIES.. 
+RS:>   + user_items_dictionary
+RS:>   + reading serialized file CFDICT_user_items_dictionary.bin
+RS:>   + item_users_dictionary
+RS:>   + reading serialized file CFDICT_item_users_dictionary.bin
+RS:>   + computeCFUserUserSimilarity(): 
+RS:>   + calculating all coefficients 
+
+RS:>   + calculating user_user similarity 
+
+RS:>   + predictCFUserBasedRecommendations(): 
+RS:>   + aggregation of predictions 
+
+RS:>   + estimating ratings of similar items 
+
+RS:>   + computeCFItemItemSimilarity(): 
+RS:>   + calculating all coefficients 
+
+RS:>   + calculating item_item similarity 
+
+RS:>   + predictCFItemBasedRecommendations(): 
+RS:>   + aggregation of predictions 
+
+RS:>   + estimating ratings of similar items 
+
+RS:>   + computeCFHybridRankRecommendations(): 
+RS:>   + generating output structured data 
+
+RS:>  Target USER_ID 940077 has LESS than 5 predictions (0) -> super-hybrid system (TO DEVELOP)
+RS:>  Target USER_ID 940077 has LESS than 5 predictions (0) -> adding top5
+
+RS:>  Target USER_ID 2132914 has LESS than 5 predictions (0) -> super-hybrid system (TO DEVELOP)
+RS:>  Target USER_ID 2132914 has LESS than 5 predictions (0) -> adding top5
+RS:>  Target USER_ID 2143551 has LESS than 5 predictions (0) -> super-hybrid system (TO DEVELOP)
+RS:>  Target USER_ID 2143551 has LESS than 5 predictions (0) -> adding top5
+
+RS:>  Target USER_ID 1843365 has LESS than 5 predictions (0) -> super-hybrid system (TO DEVELOP)
+RS:>  Target USER_ID 1843365 has LESS than 5 predictions (0) -> adding top5
+
+RS:>  Target USER_ID 1270293 has LESS than 5 predictions (0) -> super-hybrid system (TO DEVELOP)
+RS:>  Target USER_ID 1270293 has LESS than 5 predictions (0) -> adding top5
+
+RS:>  Target USER_ID 1932861 has LESS than 5 predictions (0) -> super-hybrid system (TO DEVELOP)
+RS:>  Target USER_ID 1932861 has LESS than 5 predictions (0) -> adding top5
+RS:>  Target USER_ID 200234 has LESS than 5 predictions (0) -> super-hybrid system (TO DEVELOP)
+RS:>  Target USER_ID 200234 has LESS than 5 predictions (0) -> adding top5
+
+RS:>  Target USER_ID 557740 has LESS than 5 predictions (0) -> super-hybrid system (TO DEVELOP)
+RS:>  Target USER_ID 557740 has LESS than 5 predictions (0) -> adding top5
+RS:>  Target USER_ID 1059972 has LESS than 5 predictions (2) -> restoring already clicked..
+RS:>  Target USER_ID 1059972 has LESS than 5 predictions (2) -> super-hybrid system (TO DEVELOP)
+RS:>  Target USER_ID 1059972 has LESS than 5 predictions (2) -> adding top5
+
+RS:>  Target USER_ID 492852 has LESS than 5 predictions (0) -> super-hybrid system (TO DEVELOP)
+RS:>  Target USER_ID 492852 has LESS than 5 predictions (0) -> adding top5
+RS:>  Target USER_ID 421206 has LESS than 5 predictions (0) -> super-hybrid system (TO DEVELOP)
+RS:>  Target USER_ID 421206 has LESS than 5 predictions (0) -> adding top5
+
+RS:>  Target USER_ID 2744140 has LESS than 5 predictions (0) -> super-hybrid system (TO DEVELOP)
+RS:>  Target USER_ID 2744140 has LESS than 5 predictions (0) -> adding top5
+RS:>  Target USER_ID 2362352 has LESS than 5 predictions (4) -> restoring already clicked..
+RS:>  Target USER_ID 2362352 has LESS than 5 predictions (4) -> super-hybrid system (TO DEVELOP)
+RS:>  Target USER_ID 2362352 has LESS than 5 predictions (4) -> adding top5
+
+RS:>  Target USER_ID 225564 has LESS than 5 predictions (3) -> restoring already clicked..
+RS:>  Target USER_ID 225564 has LESS than 5 predictions (3) -> super-hybrid system (TO DEVELOP)
+RS:>  Target USER_ID 225564 has LESS than 5 predictions (3) -> adding top5
+RS:>  Target USER_ID 1023032 has LESS than 5 predictions (0) -> super-hybrid system (TO DEVELOP)
+RS:>  Target USER_ID 1023032 has LESS than 5 predictions (0) -> adding top5
+
+RS:>  Target USER_ID 3547 has LESS than 5 predictions (0) -> super-hybrid system (TO DEVELOP)
+RS:>  Target USER_ID 3547 has LESS than 5 predictions (0) -> adding top5
+
+RS:>  Target USER_ID 693213 has LESS than 5 predictions (0) -> super-hybrid system (TO DEVELOP)
+RS:>  Target USER_ID 693213 has LESS than 5 predictions (0) -> adding top5
+RS:>  Target USER_ID 1485967 has LESS than 5 predictions (0) -> super-hybrid system (TO DEVELOP)
+RS:>  Target USER_ID 1485967 has LESS than 5 predictions (0) -> adding top5
+RS:>  Target USER_ID 1449517 has LESS than 5 predictions (0) -> super-hybrid system (TO DEVELOP)
+RS:>  Target USER_ID 1449517 has LESS than 5 predictions (0) -> adding top5
+
+RS:>  Target USER_ID 2674830 has LESS than 5 predictions (0) -> super-hybrid system (TO DEVELOP)
+RS:>  Target USER_ID 2674830 has LESS than 5 predictions (0) -> adding top5
+
+RS:>  Target USER_ID 1064279 has LESS than 5 predictions (0) -> super-hybrid system (TO DEVELOP)
+RS:>  Target USER_ID 1064279 has LESS than 5 predictions (0) -> adding top5
+
+RS:>  Target USER_ID 283939 has LESS than 5 predictions (0) -> super-hybrid system (TO DEVELOP)
+RS:>  Target USER_ID 283939 has LESS than 5 predictions (0) -> adding top5
+RS:>  Target USER_ID 442687 has LESS than 5 predictions (0) -> super-hybrid system (TO DEVELOP)
+RS:>  Target USER_ID 442687 has LESS than 5 predictions (0) -> adding top5
+
+RS:>  Target USER_ID 134993 has LESS than 5 predictions (0) -> super-hybrid system (TO DEVELOP)
+RS:>  Target USER_ID 134993 has LESS than 5 predictions (0) -> adding top5
+RS:>  Target USER_ID 616214 has LESS than 5 predictions (1) -> restoring already clicked..
+RS:>  Target USER_ID 616214 has LESS than 5 predictions (1) -> super-hybrid system (TO DEVELOP)
+RS:>  Target USER_ID 616214 has LESS than 5 predictions (1) -> adding top5
+RS:>  Target USER_ID 1383481 has LESS than 5 predictions (0) -> super-hybrid system (TO DEVELOP)
+RS:>  Target USER_ID 1383481 has LESS than 5 predictions (0) -> adding top5
+
+RS:>  Target USER_ID 2886642 has LESS than 5 predictions (0) -> super-hybrid system (TO DEVELOP)
+RS:>  Target USER_ID 2886642 has LESS than 5 predictions (0) -> adding top5
+RS:>  Target USER_ID 1520320 has LESS than 5 predictions (0) -> super-hybrid system (TO DEVELOP)
+RS:>  Target USER_ID 1520320 has LESS than 5 predictions (0) -> adding top5
+
+RS:>  Target USER_ID 651222 has LESS than 5 predictions (0) -> super-hybrid system (TO DEVELOP)
+RS:>  Target USER_ID 651222 has LESS than 5 predictions (0) -> adding top5
+
+RS:>  Target USER_ID 1517476 has LESS than 5 predictions (0) -> super-hybrid system (TO DEVELOP)
+RS:>  Target USER_ID 1517476 has LESS than 5 predictions (0) -> adding top5
+RS:>  Target USER_ID 1952806 has LESS than 5 predictions (0) -> super-hybrid system (TO DEVELOP)
+RS:>  Target USER_ID 1952806 has LESS than 5 predictions (0) -> adding top5
+RS:>  Target USER_ID 688872 has LESS than 5 predictions (0) -> super-hybrid system (TO DEVELOP)
+RS:>  Target USER_ID 688872 has LESS than 5 predictions (0) -> adding top5
+RS:>  Target USER_ID 388624 has LESS than 5 predictions (0) -> super-hybrid system (TO DEVELOP)
+RS:>  Target USER_ID 388624 has LESS than 5 predictions (0) -> adding top5
+
+RS:>  Target USER_ID 365212 has LESS than 5 predictions (0) -> super-hybrid system (TO DEVELOP)
+RS:>  Target USER_ID 365212 has LESS than 5 predictions (0) -> adding top5
+
+RS:>  Target USER_ID 2353629 has LESS than 5 predictions (0) -> super-hybrid system (TO DEVELOP)
+RS:>  Target USER_ID 2353629 has LESS than 5 predictions (0) -> adding top5
+RS:>  Target USER_ID 955794 has LESS than 5 predictions (0) -> super-hybrid system (TO DEVELOP)
+RS:>  Target USER_ID 955794 has LESS than 5 predictions (0) -> adding top5
+RS:>  Target USER_ID 1262220 has LESS than 5 predictions (0) -> super-hybrid system (TO DEVELOP)
+RS:>  Target USER_ID 1262220 has LESS than 5 predictions (0) -> adding top5
+
+RS:>  Target USER_ID 1714064 has LESS than 5 predictions (0) -> super-hybrid system (TO DEVELOP)
+RS:>  Target USER_ID 1714064 has LESS than 5 predictions (0) -> adding top5
+
+RS:>  Target USER_ID 1539221 has LESS than 5 predictions (0) -> super-hybrid system (TO DEVELOP)
+RS:>  Target USER_ID 1539221 has LESS than 5 predictions (0) -> adding top5
+RS:>  Target USER_ID 1274790 has LESS than 5 predictions (0) -> super-hybrid system (TO DEVELOP)
+RS:>  Target USER_ID 1274790 has LESS than 5 predictions (0) -> adding top5
+
+RS:>  Target USER_ID 2024920 has LESS than 5 predictions (0) -> super-hybrid system (TO DEVELOP)
+RS:>  Target USER_ID 2024920 has LESS than 5 predictions (0) -> adding top5
+RS:>  Target USER_ID 1931213 has LESS than 5 predictions (0) -> super-hybrid system (TO DEVELOP)
+RS:>  Target USER_ID 1931213 has LESS than 5 predictions (0) -> adding top5
+
+RS:>  Target USER_ID 1191722 has LESS than 5 predictions (0) -> super-hybrid system (TO DEVELOP)
+RS:>  Target USER_ID 1191722 has LESS than 5 predictions (0) -> adding top5
+
+RS:>  Target USER_ID 1403688 has LESS than 5 predictions (0) -> super-hybrid system (TO DEVELOP)
+RS:>  Target USER_ID 1403688 has LESS than 5 predictions (0) -> adding top5
+
+RS:>  Target USER_ID 1825133 has LESS than 5 predictions (0) -> super-hybrid system (TO DEVELOP)
+RS:>  Target USER_ID 1825133 has LESS than 5 predictions (0) -> adding top5
+RS:>  Target USER_ID 1794453 has LESS than 5 predictions (0) -> super-hybrid system (TO DEVELOP)
+RS:>  Target USER_ID 1794453 has LESS than 5 predictions (0) -> adding top5
+
+RS:>  Target USER_ID 2787540 has LESS than 5 predictions (0) -> super-hybrid system (TO DEVELOP)
+RS:>  Target USER_ID 2787540 has LESS than 5 predictions (0) -> adding top5
+RS:>  Target USER_ID 467149 has LESS than 5 predictions (0) -> super-hybrid system (TO DEVELOP)
+RS:>  Target USER_ID 467149 has LESS than 5 predictions (0) -> adding top5
+
+RS:>  Target USER_ID 572568 has LESS than 5 predictions (0) -> super-hybrid system (TO DEVELOP)
+RS:>  Target USER_ID 572568 has LESS than 5 predictions (0) -> adding top5
+
+RS:>  Target USER_ID 1827234 has LESS than 5 predictions (0) -> super-hybrid system (TO DEVELOP)
+RS:>  Target USER_ID 1827234 has LESS than 5 predictions (0) -> adding top5
+RS:>  Target USER_ID 2839533 has LESS than 5 predictions (0) -> super-hybrid system (TO DEVELOP)
+RS:>  Target USER_ID 2839533 has LESS than 5 predictions (0) -> adding top5
+
+RS:>  Target USER_ID 908215 has LESS than 5 predictions (1) -> restoring already clicked..
+RS:>  Target USER_ID 908215 has LESS than 5 predictions (1) -> super-hybrid system (TO DEVELOP)
+RS:>  Target USER_ID 908215 has LESS than 5 predictions (1) -> adding top5
+RS:>  Target USER_ID 1541513 has LESS than 5 predictions (0) -> super-hybrid system (TO DEVELOP)
+RS:>  Target USER_ID 1541513 has LESS than 5 predictions (0) -> adding top5
+RS:>  Target USER_ID 1611696 has LESS than 5 predictions (0) -> super-hybrid system (TO DEVELOP)
+RS:>  Target USER_ID 1611696 has LESS than 5 predictions (0) -> adding top5
+
+RS:>  Target USER_ID 2540845 has LESS than 5 predictions (0) -> super-hybrid system (TO DEVELOP)
+RS:>  Target USER_ID 2540845 has LESS than 5 predictions (0) -> adding top5
+RS:>  Target USER_ID 1301640 has LESS than 5 predictions (0) -> super-hybrid system (TO DEVELOP)
+RS:>  Target USER_ID 1301640 has LESS than 5 predictions (0) -> adding top5
+
+RS:>  Target USER_ID 1995377 has LESS than 5 predictions (0) -> super-hybrid system (TO DEVELOP)
+RS:>  Target USER_ID 1995377 has LESS than 5 predictions (0) -> adding top5
+RS:>  Target USER_ID 2930471 has LESS than 5 predictions (0) -> super-hybrid system (TO DEVELOP)
+RS:>  Target USER_ID 2930471 has LESS than 5 predictions (0) -> adding top5
+RS:>  Target USER_ID 2223299 has LESS than 5 predictions (0) -> super-hybrid system (TO DEVELOP)
+RS:>  Target USER_ID 2223299 has LESS than 5 predictions (0) -> adding top5
+
+RS:>  Target USER_ID 2917833 has LESS than 5 predictions (0) -> super-hybrid system (TO DEVELOP)
+RS:>  Target USER_ID 2917833 has LESS than 5 predictions (0) -> adding top5
+
+RS:>  Target USER_ID 1258059 has LESS than 5 predictions (0) -> super-hybrid system (TO DEVELOP)
+RS:>  Target USER_ID 1258059 has LESS than 5 predictions (0) -> adding top5
+RS:>  Target USER_ID 2417687 has LESS than 5 predictions (0) -> super-hybrid system (TO DEVELOP)
+RS:>  Target USER_ID 2417687 has LESS than 5 predictions (0) -> adding top5
+
+RS:>  Target USER_ID 1680148 has LESS than 5 predictions (0) -> super-hybrid system (TO DEVELOP)
+RS:>  Target USER_ID 1680148 has LESS than 5 predictions (0) -> adding top5
+RS:>  Target USER_ID 2934591 has LESS than 5 predictions (0) -> super-hybrid system (TO DEVELOP)
+RS:>  Target USER_ID 2934591 has LESS than 5 predictions (0) -> adding top5
+
+RS:>  Target USER_ID 895470 has LESS than 5 predictions (0) -> super-hybrid system (TO DEVELOP)
+RS:>  Target USER_ID 895470 has LESS than 5 predictions (0) -> adding top5
+RS:>  Target USER_ID 2032908 has LESS than 5 predictions (0) -> super-hybrid system (TO DEVELOP)
+RS:>  Target USER_ID 2032908 has LESS than 5 predictions (0) -> adding top5
+RS:>  >>>>>> generating output file, wait a minute..
+RS:>  >>>>>> output submission file created: ../../../Output/submission_2016-11-29_15-53-48_1.csv
+RS:> _______________________________________________________
+RS:>  >>>>>> TEST MODE GENERATING PRECISION 
+
+RS:> 
+RS:>  >>>>>> MAP @5 = 0
+RS:>  >>>>>> RECALL @SINGLE3 = 0,0025
+RS:> _______________________________________________________
+RS:> 
+RS:>  press any key to main menu
