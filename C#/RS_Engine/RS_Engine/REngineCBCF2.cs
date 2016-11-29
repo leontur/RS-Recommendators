@@ -302,15 +302,19 @@ namespace RS_Engine
 
             //getting interactions
             List<List<int>> interactions_batch = RManager.interactions.Where(i => i[0] == u).ToList();
-            List<int> interactions = interactions_batch.Select(i => i[1]).ToList();
+            List<int> interactions_all = interactions_batch.Select(i => i[1]).ToList();
+            List<int> interactions_dist = interactions_all.Distinct().ToList();
 
             //removing not recommendables
-            foreach (var i in interactions)
+            foreach (var i in interactions_dist)
                 if (!RManager.item_profile_enabled_hashset.Contains(i))
-                    interactions.RemoveAll(item => item == i);
+                {
+                    interactions_all.RemoveAll(item => item == i);
+                    interactions_dist.Remove(i);
+                }
 
             //instantiating ranked list
-            foreach (var i in interactions.Distinct())
+            foreach (var i in interactions_dist)
                 output_dictionary.Add(i, 0);
 
             ///////////////////////////
@@ -318,43 +322,44 @@ namespace RS_Engine
 
             //1
             //BY CLICK NUMBER
-            
-            //counting number of clicks
-            var click_n = interactions_batch.GroupBy(x => x).Select(g => new { Value = g.Key, Count = g.Count() }).OrderByDescending(x => x.Count);
-
-            foreach (var i in interactions)
-            {
-                interactions_batch.
-
-
-            }
+            foreach (var i in interactions_all)
+                //increasing rank (counting number of clicks)
                 output_dictionary[i] += 1;
 
             //2
             //BY CLICK TYPE
-            //getting interactions types (the max interaction_type for every item)
-            IDictionary<int, int> interactions_best_for_item = n
+            foreach (var i in interactions_dist)
+            {
+                //get interaction type (the bigger)
+                int type = interactions_batch.Where(x => x[1] == i).Select(x => x[2]).OrderByDescending(x => x).First();
+
+                //calculating weight
+                int w = 2 * type;
+
+                //increasing rank
+                output_dictionary[i] *= w;
+            }
 
             //3
             //BY FRESHNESS
+            
+            //creating list of interactions_dist item with its bigger timestamp
+            IDictionary<int, int> temporary_timestamps = new Dictionary<int, int>();
+            foreach (var i in interactions_dist)
+                //get interaction timestamp (the bigger) for this item click
+                temporary_timestamps.Add(i, interactions_batch.Where(x => x[1] == i).Select(x => x[3]).OrderByDescending(x => x).First());
 
+            //ordering by timestamp
+            var ordered_temporary_timestamps = temporary_timestamps.OrderByDescending(x => x.Value);
+            int total = ordered_temporary_timestamps.Count();
+            foreach (var i in ordered_temporary_timestamps)
+            {
+                //increasing rank
+                output_dictionary[i.Key] += total;
+                total--;
+            }
 
-
-            int rank = 0;
-
-
-
-
-
-
-            //TODO aspettare sara 
-            //
-            //not insert not recommendable
-
-
-
-
-
+            //note that this function assigns only ranks, the output is NOT ordered
             return output_dictionary;
         }
 
