@@ -67,14 +67,9 @@ namespace RS_Engine
             RManager.outLog("");
 
             //Execute DICTIONARIES
-            //createDictionaries();
+            //createDictionaries(); //too long
 
-            //Execute HYBRID
-
-            //Execute OUTPUT
-
-
-
+            
             //TEST VARI
             /*
             //Generating list of target users who have no one interaction
@@ -99,11 +94,12 @@ namespace RS_Engine
             {
 
                 //counter
-                int par_counter = RManager.user_profile.Count();
+                int par_counter = RManager.target_users.Count();
                 RManager.outLog("  + (tgt)user_(all)user_similarity_dictionary");
 
                 //CREATE USER USER SIMILARITY DICTIONARY (without ITSELF)
                 //for every target user
+                object sync = new object();
                 Parallel.ForEach(
                     RManager.target_users,
                     new ParallelOptions { MaxDegreeOfParallelism = 8 },
@@ -115,7 +111,8 @@ namespace RS_Engine
                             if (count % 20 == 0) RManager.outLog("  - remaining: " + count, true, true, true);
 
                         //instantiate a new row in dictionary
-                        CF2_user_user_sim_dictionary.Add(u1, getSimilarityDictionaryForTheUserWithId(u1));
+                        lock (sync)
+                            CF2_user_user_sim_dictionary.Add(u1, getSimilarityDictionaryForTheUserWithId(u1));
                     }
                 );
 
@@ -153,15 +150,13 @@ namespace RS_Engine
             object sync = new object();
             Parallel.ForEach(
                 RManager.user_profile,
-                new ParallelOptions { MaxDegreeOfParallelism = 1 },
+                new ParallelOptions { MaxDegreeOfParallelism = 8 },
                 u2 =>
                 {
                     //COMPUTE SIMILARITY for these two users
                     //create an entry in the dictionary
                     lock (sync)
-                    {
                         output_sim_users.Add((int)u2[0], computeWeightAvgSimilarityForUsers(user, u2));
-                    }
                 }
             );
 
@@ -303,15 +298,15 @@ namespace RS_Engine
             //getting interactions
             List<List<int>> interactions_batch = RManager.interactions.Where(i => i[0] == u).ToList();
             List<int> interactions_all = interactions_batch.Select(i => i[1]).ToList();
-            List<int> interactions_dist = interactions_all.Distinct().ToList();
 
             //removing not recommendables
-            foreach (var i in interactions_dist)
-                if (!RManager.item_profile_enabled_hashset.Contains(i))
-                {
-                    interactions_all.RemoveAll(item => item == i);
-                    interactions_dist.Remove(i);
-                }
+            for (int i = interactions_all.Count - 1; i >= 0; i--)
+                if (!RManager.item_profile_enabled_hashset.Contains(interactions_all[i]))
+                    interactions_all.RemoveAt(i);
+                
+
+            //distincts
+            List<int> interactions_dist = interactions_all.Distinct().ToList();
 
             //instantiating ranked list
             foreach (var i in interactions_dist)
@@ -367,7 +362,7 @@ namespace RS_Engine
         public static List<int> getListOfPlausibleItems(int u)
         {
             //get top SIM_USER_RANGE most similar users
-            List<int> most_sim = CF2_user_user_sim_dictionary[u].ToList().OrderByDescending(x => x.Value).Select(x => x.Key).Take(SIM_USER_RANGE).ToList();
+            List<int> most_sim = getSimilarityDictionaryForTheUserWithId(u).ToList().OrderByDescending(x => x.Value).Select(x => x.Key).Take(SIM_USER_RANGE).ToList();
 
             //instantiate a dictionary for the merge of all the items
             //key: item_id, value: rankingpoints
