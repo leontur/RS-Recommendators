@@ -12,7 +12,7 @@ namespace RS_Engine
         private const int TESTPERCENTAGE = 20;
 
         //Fast test mode with datasets reduced at 10000
-        private const bool TINYTEST = true;
+        private static bool TINYTEST = true;
 
         //TRAIN AND TEST SET SPLIT
         public static void splitTrainTestData()
@@ -23,6 +23,7 @@ namespace RS_Engine
 
             RManager.outLog("  + TEST MODE - INSERT LIMIT=", true);
             keepOnly = Convert.ToInt32(Console.ReadLine());
+            TINYTEST = keepOnly == 0 ? false : true; //if inserted 0, make full test
 
             //if tiny test, thin out the datasets
             if (TINYTEST)

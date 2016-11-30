@@ -170,6 +170,16 @@ namespace RS_Engine
     ////////////////////////////////////////////////////////
     //JUNK
     /*
+    +------------+--------+-------------+-----------+----------+----------+-----------+
+    | Collection | Random | Containment | Insertion | Addition |  Removal | Memory    |
+    |            | access |             |           |          |          |           |
+    +------------+--------+-------------+-----------+----------+----------+-----------+
+    | List<T>    | O(1)   | O(n)        | O(n)      | O(1)*    | O(n)     | Lesser    |
+    | HashSet<T> | O(n)   | O(1)        | n/a       | O(1)     | O(1)     | Greater** |
+    +------------+--------+-------------+-----------+----------+----------+-----------+
+    */
+
+    /*
     //MULTITHREAD 8 tasks / 1 per core
     int threads = 8;
     int tot = RManager.target_users.Count;
@@ -186,5 +196,5 @@ namespace RS_Engine
         });
     }
     Task.WaitAll(tasks);  
-    */              
+    */
 }

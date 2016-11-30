@@ -20,10 +20,10 @@ namespace RS_Engine
         //ALGORITHM PARAMETERS
         //UB
         private const int SIM_SHRINK_UB = 10;
-        private const int PRED_SHRINK_UB = 0;
+        private const int PRED_SHRINK_UB = 1;
         //IB
         private const int SIM_SHRINK_IB = 20;
-        private const int PRED_SHRINK_IB = 0;
+        private const int PRED_SHRINK_IB = 1;
         //HW
         private const double HYBRID_W_WEIGHT = 0.6;
         //HR
@@ -43,7 +43,7 @@ namespace RS_Engine
         public static IDictionary<int, IDictionary<int, double>> CF_HR_user_prediction_dictionary = new Dictionary<int, IDictionary<int, double>>();
 
         //SUPER-HYBRID
-        public static IDictionary<int, List<int>> HYBRID_read = new Dictionary<int, List<int>>();
+        public static IDictionary<int, List<int>> SUPER_HYBRID_read = new Dictionary<int, List<int>>();
 
         /////////////////////////////////////////////
         //MAIN ALGORITHM METHOD
@@ -53,6 +53,7 @@ namespace RS_Engine
             RManager.outLog("  + processing..");
             RManager.outLog("  + CF Algorithm..");
 
+            /*
             //SUPER-HYBRID
             //only temporary: read from another output (done with another algorithm) and add the lines in this is not good
             //READ FROM CSV
@@ -64,13 +65,13 @@ namespace RS_Engine
                 for (int i = 1; i < s_hyb_f.Length; i++)
                 {
                     List<string> row_IN = s_hyb_f[i].Split(',').Select(x => x).ToList();
-                    HYBRID_read.Add(Int32.Parse(row_IN[0]), row_IN[1].Split('\t').Select(Int32.Parse).ToList());
+                    SUPER_HYBRID_read.Add(Int32.Parse(row_IN[0]), row_IN[1].Split('\t').Select(Int32.Parse).ToList());
                 }
             }
+            */
 
             ///////////////////////////////////////////////
             //CF
-
             //Execute DICTIONARIES
             createDictionaries();
 
@@ -88,7 +89,6 @@ namespace RS_Engine
 
             ///////////////////////////////////////////////
             //CB
-
             //Execute
             REngineCBCF2.getRecommendations();
 
@@ -123,35 +123,40 @@ namespace RS_Engine
                         //counter
                         Interlocked.Decrement(ref par_counter);
                         int count = Interlocked.CompareExchange(ref par_counter, 0, 0);
-                        if (count % 20 == 0) RManager.outLog("  - remaining: " + count, true, true, true);
+                        if (count % 200 == 0) RManager.outLog("  - remaining: " + count, true, true, true);
 
+                        //getting user id
+                        int user = (int)u[0];
+
+                        //retrieving the ranked interactions dict of the user
+                        IDictionary<int, int> user_r_i = REngineCBCF2.getRankedInteractionsForUser(user, false);
+
+                        /*
+                        //OLD way (get interactions by ordering by most heavy or most recent)
                         //retrieving the list of interactions made by the user
                         List<int> curr_user_interacted_items = RManager.interactions.Where(x => x[0] == (int)u[0]).Select(x => x[1]).Distinct().ToList();
-
-            ///NOTA: in questo caso ordino in base al peso del click, ma si dovrebbe considerare anche quanto è recente!!
-            ///NOTA2: creato un nuovo file bin con ordinamento in base a quanto recente
                         //create a dictionary for every interacted item (with no interaction_type duplicates, only the bigger for each distinct interaction)
                         IDictionary<int, int> curr_user_interacted_items_dictionary = new Dictionary<int, int>();
                         foreach (var clicked in curr_user_interacted_items)
                             curr_user_interacted_items_dictionary.Add(
                                     clicked, //item_id
-                                    //RManager.interactions.Where(x => x[0] == (int)u[0] && x[1] == clicked).Select(x => x[2]).OrderByDescending(y => y).ToList().First() //interaction_type
-                                    RManager.interactions.Where(x => x[0] == (int)u[0] && x[1] == clicked).OrderByDescending(x => x[3]).Select(x => x[2]).ToList().First() //interaction_type
+                                    //RManager.interactions.Where(x => x[0] == user && x[1] == clicked).Select(x => x[2]).OrderByDescending(y => y).ToList().First() //interaction_type
+                                    RManager.interactions.Where(x => x[0] == user && x[1] == clicked).OrderByDescending(x => x[3]).Select(x => x[2]).ToList().First() //interaction_type
                                     );
+                        */
 
                         //create an entry in the dictionary
                         //associating all the interactions of the user (with no duplicates)
                         lock (sync)
                         {
-                            if (!RManager.user_items_dictionary.ContainsKey((int)u[0]))
+                            if (!RManager.user_items_dictionary.ContainsKey(user))
                                     RManager.user_items_dictionary.Add(
-                                                (int)u[0], //user_id
-                                                curr_user_interacted_items_dictionary //dictionary with inside every clicked item and its bigger interaction_type value
+                                                user, //user_id
+                                                user_r_i //dictionary with inside every clicked item and its ranked interaction
                                                 );
                         }
                     }
                 );
-                //OLD: foreach (var u in RManager.user_profile){}
 
                 //serialize
                 using (Stream stream = File.Open(Path.Combine(RManager.SERIALTPATH, "CFDICT_user_items_dictionary.bin"), FileMode.Create))
@@ -171,7 +176,7 @@ namespace RS_Engine
                     RManager.user_items_dictionary = (IDictionary<int, IDictionary<int, int>>)bformatter.Deserialize(stream);
                 }
             }
-
+    
             //counter
             par_counter = RManager.item_profile.Count();
             RManager.outLog("  + item_users_dictionary");
@@ -191,20 +196,26 @@ namespace RS_Engine
                         Interlocked.Decrement(ref par_counter);
                         int count = Interlocked.CompareExchange(ref par_counter, 0, 0);
                         if (count % 200 == 0) RManager.outLog("  - remaining: " + count, true, true, true);
+                        
+                        //getting user id
+                        int item = (int)i[0];
 
+                        //retrieving the ranked interactions dict of the user
+                        IDictionary<int, int> item_r_u = REngineCBCF2.getRankedInteractionsForItem(item);
+
+                        /*
+                        //OLD way (get interactions by ordering by most heavy or most recent)
                         //retrieving the list of users that interacted with this item
-                        List<int> curr_item_interacted_users = RManager.interactions.Where(x => x[1] == (int)i[0]).Select(x => x[0]).Distinct().ToList();
-
-             ///NOTA: in questo caso ordino in base al peso del click, ma si dovrebbe considerare anche quanto è recente!!
-             ///NOTA2: creato un nuovo file bin con ordinamento in base a quanto recente
+                        List<int> curr_item_interacted_users = RManager.interactions.Where(x => x[1] == item).Select(x => x[0]).Distinct().ToList();
                         //create a dictionary for every user that clicked this item (with no interaction_type duplicates, only the bigger for each distinct user)
                         IDictionary<int, int> curr_item_interacted_users_dictionary = new Dictionary<int, int>();
                         foreach (var userclick in curr_item_interacted_users)
                             curr_item_interacted_users_dictionary.Add(
                                     userclick, //user_id
-                                    //RManager.interactions.Where(x => x[1] == (int)i[0] && x[0] == userclick).Select(x => x[2]).OrderByDescending(y => y).ToList().First() //interaction_type
-                                    RManager.interactions.Where(x => x[1] == (int)i[0] && x[0] == userclick).OrderByDescending(x => x[3]).Select(x => x[2]).ToList().First() //interaction_type
+                                    //RManager.interactions.Where(x => x[1] == item && x[0] == userclick).Select(x => x[2]).OrderByDescending(y => y).ToList().First() //interaction_type
+                                    RManager.interactions.Where(x => x[1] == item && x[0] == userclick).OrderByDescending(x => x[3]).Select(x => x[2]).ToList().First() //interaction_type
                                     );
+                        */
 
                         //create an entry in the dictionary
                         //associating all the users that interacted (with no duplicates)
@@ -212,14 +223,13 @@ namespace RS_Engine
                         {
                             if(!RManager.item_users_dictionary.ContainsKey((int)i[0]))
                                     RManager.item_users_dictionary.Add(
-                                                    (int)i[0], //(item_)id
-                                                    curr_item_interacted_users_dictionary //dictionary with inside every user (that clicked) and its bigger interaction_type value
+                                                    item, //(item_)id
+                                                    item_r_u //dictionary with inside every user (that clicked) and its ranked interaction
                                                     );
                         }
 
                     }
                 );
-                //OLD: foreach (var i in RManager.item_profile)
 
                 //serialize
                 using (Stream stream = File.Open(Path.Combine(RManager.SERIALTPATH, "CFDICT_item_users_dictionary.bin"), FileMode.Create))
@@ -739,8 +749,9 @@ namespace RS_Engine
 
                         //evaluate prediction of that item for that user
                         double pred =
-                            users_prediction_dictionary_num[user][sim_item] / (users_prediction_dictionary_norm[sim_item] + PRED_SHRINK_IB);
-                                                                        //  / (users_prediction_dictionary_den[user][sim_item] + PRED_SHRINK_IB);
+                            users_prediction_dictionary_num[user][sim_item] / 
+                                                    (users_prediction_dictionary_norm[sim_item] + PRED_SHRINK_IB);
+                                                    //  / (users_prediction_dictionary_den[user][sim_item] + PRED_SHRINK_IB);
 
                         //storing
                         sim_items_predictions.Add(sim_item, pred);
@@ -945,6 +956,11 @@ namespace RS_Engine
             //counter
             int c_tot = users_prediction_dictionary.Count();
             RManager.outLog("  + generating output structured data ");
+            RManager.outLog("  + the input dictionary count is: " + c_tot);
+
+            //consistency check
+            if (c_tot != RManager.target_users.Count)
+                RManager.outLog(" ERROR: the input dictionary count is not equal to the target user list!");
 
             //instantiating a structure for the output
             IDictionary<int, List<int>> output_dictionary = new Dictionary<int, List<int>>();
@@ -953,7 +969,7 @@ namespace RS_Engine
             foreach (var u in users_prediction_dictionary)
             {
                 //counter
-                if (c_tot-- % 10 == 0)
+                if (--c_tot % 10 == 0)
                     RManager.outLog(" - remaining " + c_tot, true, true, true);
 
                 //get user id
@@ -1003,15 +1019,21 @@ namespace RS_Engine
                     var rec_items_try = rec_items.Except(clicked_and_predicted).ToList();
 
                     //CHECK
-                    //if recommendations are not enough
-                    if (rec_items_try.Count > 5)
+                    //if recommendations are enough
+                    if (rec_items_try.Count >= 5)
+                    {
                         //try success
                         rec_items = rec_items_try.ToList();
+                    }
                     else
                     {
-                        RManager.outLog(" Target USER_ID " + user + " has LESS than 5 predictions (" + rec_items.Count + ") -> restoring the minimum number of already clicked..");
-                        for (int r=0; r < rec_items.Count() - 5; r++)
-                            rec_items.Remove(clicked_and_predicted[r]);
+                        RManager.outLog(" Target USER_ID " + user + " has LESS than 5 predictions (" + rec_items.Count + ") -> considering even already clicked..");
+                        if (rec_items.Count > 5)
+                        {
+                            //try to leave the minimum number of already clicked and remove all the rest of these ones
+                            for (int r = 0; r < rec_items.Count() - 5; r++)
+                                rec_items.Remove(clicked_and_predicted[r]);
+                        }
                     }
                 }
 
@@ -1024,13 +1046,11 @@ namespace RS_Engine
 
                 //check to know if there is only a single entry for each item, in this case the group by is futile
                 foreach (var gr in rec_items_group)
-                {
                     if (gr.Count() > 1)
                     {
                         rec_items.Remove(gr.Key);
                         rec_items.Insert(0, gr.Key); //jump in the head if found a multiple entry
                     }
-                }
 
                 /*
                 //FINAL CHECK
@@ -1044,7 +1064,7 @@ namespace RS_Engine
 
                     //ATTUALMENTE SOLO IN PROVA (MA CREDO NON SERVA PIU..)
                     if (!RManager.ISTESTMODE) //non usabile in test per via della casualita dei db
-                        rec_items.AddRange(HYBRID_read[user]);
+                        rec_items.AddRange(SUPER_HYBRID_read[user]);
                 }
                 */
 

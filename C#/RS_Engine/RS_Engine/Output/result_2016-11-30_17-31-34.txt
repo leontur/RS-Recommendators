@@ -1,0 +1,177 @@
+RS:> 
+RS:> -----------------------------------------------------------------
+RS:>  ** RECOMMENDATORS ENGINE **
+RS:> -----------------------------------------------------------------
+RS:>     ____________________________
+RS:>     Algorithms
+RS:>     1) TOP
+RS:>     2) CB-F (ok)
+RS:>     3) U-CF
+RS:>     4) I-CF
+RS:> 
+RS:>     5) CF DICT UB/IB/HYBRID (chiama anche 6)
+RS:>     6) HYBRID CB+CF 2.0
+RS:>     ____________________________
+RS:>     TEST Mode
+RS:>     7) test mode: enable here to initialize the dataset as train/test and do EVAL (not use for kaggle scope)
+RS:>     ____________________________
+RS:>     8) EVAL mode: execute EVAL with input a specific csv (not use for kaggle scope)
+RS:>     9) .bin size calculator
+RS:>     ____________________________
+RS:>     0) exit
+RS:> -----------------------------------------------------------------
+RS:> 
+RS:>     > RS:>     ==> selected program (7)
+RS:> -----------------------------------------------------------------
+RS:> 
+RS:> -----------------------------------------------------------------
+RS:>  ** RECOMMENDATORS ENGINE **
+RS:> -----------------------------------------------------------------
+RS:>     ____________________________
+RS:>     +++ TEST MODE ENABLED +++
+RS:>     >> datasets are initialized as train/test (not use for kaggle scope)
+RS:>     >> after the algorithm is invoked EVAL
+RS:>     ____________________________
+RS:>     Algorithms
+RS:>     1) TOP
+RS:>     2) CB-F (ok)
+RS:>     3) U-CF
+RS:>     4) I-CF
+RS:> 
+RS:>     5) CF DICT UB/IB/HYBRID (chiama anche 6)
+RS:>     6) HYBRID CB+CF 2.0
+RS:>     ____________________________
+RS:>     8) EVAL mode: execute EVAL with input a specific csv (not use for kaggle scope)
+RS:>     9) .bin size calculator
+RS:>     ____________________________
+RS:>     0) exit
+RS:> -----------------------------------------------------------------
+RS:> 
+RS:>     > RS:>     ==> selected program (5)
+RS:> -----------------------------------------------------------------
+RS:>   + initializing RS 
+RS:>   + initializing dataset retrievement 
+RS:>   + reading dataset: interactions
+RS:>   + dataset read OK | interactions_f count= 546865 | conversion..
+RS:>   + reading serialized file target_users.bin
+RS:>   + reading serialized file user_profile.bin
+RS:>   + reading serialized file item_profile.bin
+RS:>   + reading serialized file item_profile_enabled.bin
+RS:>   + populating auxiliary data structures 
+RS:> 
+RS:>   + all datasets conversion: OK
+RS:>   -total lines | interactions      >>> 546864
+RS:>   -total lines | item_profile      >>> 167956
+RS:>   -total lines | item_profile_enab >>> 63446
+RS:>   -total lines | target_users      >>> 10000
+RS:>   -total lines | user_profile      >>> 40000
+RS:> 
+RS:>   + TEST MODE - INSERT LIMIT=RS:>   + creating random list..  percentage is set to 20%
+RS:>   + random list size: 8000
+RS:>   + splitting data into train and test..
+RS:>   -total lines | user_profile (train)    >>> 40000
+RS:>   -total lines | user_profile_test       >>> 8000
+RS:>   -total lines | target_users (replaced) >>> 8000
+RS:> -----------------------------------------------------------------
+RS:>   # running program 5
+RS:> 
+RS:>   + processing..
+RS:>   + CF Algorithm..
+RS:>   + creating DICTIONARIES.. 
+RS:>   + user_items_dictionary
+RS:>   + reading serialized file CFDICT_user_items_dictionary.bin
+RS:>   + item_users_dictionary
+RS:>   + reading serialized file CFDICT_item_users_dictionary.bin
+RS:>   + computeCFUserUserSimilarity(): 
+RS:>   + calculating all coefficients 
+
+RS:>   + calculating user_user similarity 
+
+RS:>   + predictCFUserBasedRecommendations(): 
+RS:>   + aggregation of predictions 
+
+RS:>   + estimating ratings of similar items 
+
+RS:>   + computeCFItemItemSimilarity(): 
+RS:>   + calculating all coefficients 
+
+RS:>   + calculating item_item similarity 
+
+RS:>   + predictCFItemBasedRecommendations(): 
+RS:>   + aggregation of predictions 
+
+RS:>   + estimating ratings of similar items 
+
+RS:>   + computeCFHybridRankRecommendations(): 
+RS:>   + computing points for UB 
+
+RS:>   + computing points for IB 
+
+RS:>   + processing..
+RS:>   + CB+CF 2.0 Algorithm..
+RS:> 
+RS:>  SIM_WEIGHTS
+RS:>  -5 jobroles
+RS:>  -9 career_level
+RS:>  -3 discipline_id
+RS:>  -5 industry_id
+RS:>  -7 country
+RS:>  -2 region
+RS:>  -3 experience_n_entries_class
+RS:>  -6 experience_years_experience
+RS:>  -1 experience_years_in_current
+RS:>  -10 edu_degree
+RS:>  -7 edu_fieldofstudies
+RS:> 
+RS:>   + generating output structured data 
+RS:>   + the input dictionary count is: 8000
+
+RS:>  Target USER_ID 56238 has LESS than 5 predictions (4) -> adding top5
+
+RS:>  Target USER_ID 719492 has LESS than 5 predictions (4) -> adding top5
+
+RS:>  Target USER_ID 1625215 has LESS than 5 predictions (3) -> adding top5
+
+RS:>  Target USER_ID 2457224 has LESS than 5 predictions (3) -> adding top5
+
+RS:>  Target USER_ID 2778546 has LESS than 5 predictions (4) -> adding top5
+
+RS:>  Target USER_ID 2927669 has LESS than 5 predictions (3) -> adding top5
+
+RS:>  Target USER_ID 202029 has LESS than 5 predictions (4) -> adding top5
+
+RS:>  Target USER_ID 1236772 has LESS than 5 predictions (4) -> adding top5
+
+RS:>  Target USER_ID 73123 has LESS than 5 predictions (4) -> adding top5
+
+RS:>  Target USER_ID 2482256 has LESS than 5 predictions (4) -> adding top5
+
+RS:>  Target USER_ID 1209575 has LESS than 5 predictions (4) -> adding top5
+
+RS:>  Target USER_ID 504041 has LESS than 5 predictions (4) -> adding top5
+
+RS:>  Target USER_ID 126820 has LESS than 5 predictions (4) -> adding top5
+
+RS:>  Target USER_ID 1318475 has LESS than 5 predictions (4) -> adding top5
+
+RS:>  Target USER_ID 1208732 has LESS than 5 predictions (3) -> adding top5
+
+RS:>  Target USER_ID 873695 has LESS than 5 predictions (4) -> adding top5
+
+RS:>  Target USER_ID 456303 has LESS than 5 predictions (2) -> adding top5
+
+RS:>  Target USER_ID 2092505 has LESS than 5 predictions (4) -> adding top5
+
+RS:>  Target USER_ID 1788657 has LESS than 5 predictions (4) -> adding top5
+
+RS:>  >>>>>> generating output file, wait a minute..
+RS:>  >>>>>> output submission file created: ../../../Output/submission_2016-11-30_17-31-34_1.csv
+RS:> _______________________________________________________
+RS:>  >>>>>> TEST MODE GENERATING PRECISION 
+
+RS:> 
+RS:>  >>>>>> MAP @5 = 0,0013125
+RS:>  >>>>>> RECALL @SINGLE3 = 0,0036875
+RS:> _______________________________________________________
+RS:> 
+RS:>  press any key to main menu

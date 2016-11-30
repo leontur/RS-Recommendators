@@ -14,8 +14,8 @@ namespace RS_Engine
         //ALGORITHM PARAMETERS
 
         //number of similarities to select
-        private const int SIM_USER_RANGE = 10;
-        private const int SIM_USER_RANGE_TAKE_ITEMS = 5;
+        private const int SIM_USER_RANGE = 6;
+        private const int SIM_USER_RANGE_TAKE_ITEMS = 10;
 
         //weights for average similarity (weight are 1-11)
         private static int[] SIM_WEIGHTS = new int[11];
@@ -37,17 +37,17 @@ namespace RS_Engine
             RManager.outLog("  + CB+CF 2.0 Algorithm..");
 
             //Assigning weights
-            SIM_WEIGHTS[0] = 8;   //jobroles	
-            SIM_WEIGHTS[1] = 10;   //career_level	
-            SIM_WEIGHTS[2] = 10;  //discipline_id	
-            SIM_WEIGHTS[3] = 9;   //industry_id	
-            SIM_WEIGHTS[4] = 8;   //country	
-            SIM_WEIGHTS[5] = 0;   //region	
-            SIM_WEIGHTS[6] = 0;   //experience_n_entries_class	
-            SIM_WEIGHTS[7] = 5;   //experience_years_experience	
-            SIM_WEIGHTS[8] = 2;   //experience_years_in_current
+            SIM_WEIGHTS[0] = 5;   //jobroles	
+            SIM_WEIGHTS[1] = 9;   //career_level	
+            SIM_WEIGHTS[2] = 3;   //discipline_id	
+            SIM_WEIGHTS[3] = 5;   //industry_id	
+            SIM_WEIGHTS[4] = 7;   //country	
+            SIM_WEIGHTS[5] = 2;   //region	
+            SIM_WEIGHTS[6] = 3;   //experience_n_entries_class	
+            SIM_WEIGHTS[7] = 6;   //experience_years_experience	
+            SIM_WEIGHTS[8] = 1;   //experience_years_in_current
             SIM_WEIGHTS[9] = 10;  //edu_degree	
-            SIM_WEIGHTS[10] = 10; //edu_fieldofstudies
+            SIM_WEIGHTS[10] = 7;  //edu_fieldofstudies
             den = SIM_WEIGHTS.Sum();
 
             //printing weights for log
@@ -67,9 +67,8 @@ namespace RS_Engine
             RManager.outLog("");
 
             //Execute DICTIONARIES
-            //createDictionaries(); //too long
+            //createDictionaries(); //too long, matrix too big (computed at runtime)
 
-            
             //TEST VARI
             /*
             //Generating list of target users who have no one interaction
@@ -82,7 +81,8 @@ namespace RS_Engine
 
         }
 
-        //////////////////////////////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //(SIMILARITY BETWEEN USERS)
         //DICTIONARIES CREATION
         private static void createDictionaries()
         {
@@ -135,7 +135,7 @@ namespace RS_Engine
                 }
             }
         }
-
+        
         //////////////////////////////////////////////////////////////////////////////////////////
         //SINGLE COMPUTATION OF USER SIMILARITY BY USER ID (without ITSELF) (same as above but can call it by user id)
         public static IDictionary<int, double> getSimilarityDictionaryForTheUserWithId(int u1)
@@ -166,7 +166,7 @@ namespace RS_Engine
 
             return output_sim_users;
         }
-
+        
         //////////////////////////////////////////////////////////////////////////////////////////
         //COMPUTE WEIGHTED AVERAGE SIMILARITY FOR PASSED COUPLE OF ROWS (Lists<obj>) of user_profile
         private static double computeWeightAvgSimilarityForUsers(List<object> user1, List<object> user2)
@@ -219,7 +219,6 @@ namespace RS_Engine
             //return in similarity matrix
             return num / (den + SHRINK);
         }
-
         //CALLED MANY TIMES FOR WEIGHTED AVERAGE
         private static double computeWeightAvgSimilarityForUsersCells_0_10(List<int> row1CList, List<int> row2CList)
         {
@@ -253,7 +252,7 @@ namespace RS_Engine
         {
             //if unknown
             if (c1 == 0 || c2 == 0)
-                return 0.25;
+                return 0.4;
             //if equal
             else if (c1 == c2)
                 return 1;
@@ -261,19 +260,19 @@ namespace RS_Engine
             else if (c1 == c2 + 1 || c2 == c1 + 1)
                 return 0.9;
             else if (c1 == c2 + 2 || c2 == c1 + 2)
-                return 0.8;
+                return 0.85;
             else if (c1 == c2 + 3 || c2 == c1 + 3)
-                return 0.7;
+                return 0.8;
             else if (c1 == c2 + 4 || c2 == c1 + 4)
-                return 0.6;
+                return 0.75;
             else if (c1 == c2 + 5 || c2 == c1 + 5)
-                return 0.5;
+                return 0.7;
             else if (c1 == c2 + 6 || c2 == c1 + 6)
-                return 0.5;
+                return 0.6;
             else if (c1 == c2 + 7 || c2 == c1 + 7)
-                return 0.4;
+                return 0.5;
             else if (c1 == c2 + 8 || c2 == c1 + 8)
-                return 0.3;
+                return 0.4;
             //if no match
             else
                 return 0;
@@ -286,23 +285,29 @@ namespace RS_Engine
             else
                 return 0;
         }
+        //
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-        //////////////////////////////////////////////////////////////////////////////////////////
-        //GET THE MOST PLAUSIBLE ITEMS OF THE USER (based on this user clicks)
-        private static IDictionary<int, double> getUserRankedInteractedItems(int u)
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //(INTERACTIONS RANKING)
+        //GET the RANKED INTERACTIONS for THE USER (based on this user clicks)
+        //key: item_id, value: computed-rank
+        public static IDictionary<int, int> getRankedInteractionsForUser(int u, bool onlyactive)
         {
             //keys are interacted items, values are the item plausibility
-            IDictionary<int, double> output_dictionary = new Dictionary<int, double>();
+            IDictionary<int, int> output_dictionary = new Dictionary<int, int>();
 
             //getting interactions
             List<List<int>> interactions_batch = RManager.interactions.Where(i => i[0] == u).ToList();
+
+            //retrieving the list of interactions made by the user
             List<int> interactions_all = interactions_batch.Select(i => i[1]).ToList();
 
             //removing not recommendables
-            for (int i = interactions_all.Count - 1; i >= 0; i--)
-                if (!RManager.item_profile_enabled_hashset.Contains(interactions_all[i]))
-                    interactions_all.RemoveAt(i);
+            if(onlyactive)
+                for (int i = interactions_all.Count - 1; i >= 0; i--)
+                    if (!RManager.item_profile_enabled_hashset.Contains(interactions_all[i]))
+                        interactions_all.RemoveAt(i);
                 
 
             //distincts
@@ -357,7 +362,74 @@ namespace RS_Engine
             //note that this function assigns only ranks, the output is NOT ordered
             return output_dictionary;
         }
+        
+        //GET the RANKED INTERACTIONS for THE ITEM (based on every user clicks)
+        //key: user_id, value: computed-rank
+        public static IDictionary<int, int> getRankedInteractionsForItem(int i)
+        {
+            //keys are users that interact, values are the item plausibility
+            IDictionary<int, int> output_dictionary = new Dictionary<int, int>();
 
+            //getting interactions
+            List<List<int>> interactions_batch = RManager.interactions.Where(x => x[1] == i).ToList();
+
+            //retrieving the list of users that interacted with this item
+            List<int> users_all = interactions_batch.Select(x => x[0]).ToList();
+
+            //distincts
+            List<int> users_dist = users_all.Distinct().ToList();
+
+            //instantiating ranked list
+            foreach (var u in users_dist)
+                output_dictionary.Add(u, 0);
+
+            ///////////////////////////
+            //ASSIGNING RANKINGS
+
+            //1
+            //BY CLICK NUMBER
+            foreach (var u in users_all)
+                //increasing rank (counting number of clicks)
+                output_dictionary[u] += 1;
+
+            //2
+            //BY CLICK TYPE
+            foreach (var u in users_dist)
+            {
+                //get interaction type (the bigger)
+                int type = interactions_batch.Where(x => x[0] == u).Select(x => x[2]).OrderByDescending(x => x).First();
+
+                //calculating weight
+                int w = 2 * type;
+
+                //increasing rank
+                output_dictionary[u] *= w;
+            }
+
+            //3
+            //BY FRESHNESS
+
+            //creating list of users_dist item with its bigger timestamp
+            IDictionary<int, int> temporary_timestamps = new Dictionary<int, int>();
+            foreach (var u in users_dist)
+                //get interaction timestamp (the bigger) for this user click
+                temporary_timestamps.Add(u, interactions_batch.Where(x => x[0] == u).Select(x => x[3]).OrderByDescending(x => x).First());
+
+            //ordering by timestamp
+            var ordered_temporary_timestamps = temporary_timestamps.OrderByDescending(x => x.Value);
+            int total = ordered_temporary_timestamps.Count();
+            foreach (var u in ordered_temporary_timestamps)
+            {
+                //increasing rank
+                output_dictionary[u.Key] += total;
+                total--;
+            }
+
+            //note that this function assigns only ranks, the output is NOT ordered
+            return output_dictionary;
+        }
+
+        //////////////////////////////////////////////////////////////////////////////////////////
         //GET THE (variable size) LIST OF PLAUSIBLE ITEMS (recommendable active only) FOR THE USER u
         public static List<int> getListOfPlausibleItems(int u)
         {
@@ -372,8 +444,8 @@ namespace RS_Engine
             foreach (var su in most_sim)
             {
                 //get top SIM_USER_RANGE_TAKE_ITEMS most ranked items
-                IDictionary<int, double> su_sim_interaction_ranked_dictionary = 
-                    getUserRankedInteractedItems(su).OrderByDescending(x => x.Value).Take(SIM_USER_RANGE_TAKE_ITEMS).ToDictionary(kp => kp.Key, kp => kp.Value);
+                IDictionary<int, int> su_sim_interaction_ranked_dictionary = 
+                    getRankedInteractionsForUser(su, true).OrderByDescending(x => x.Value).Take(SIM_USER_RANGE_TAKE_ITEMS).ToDictionary(kp => kp.Key, kp => kp.Value);
 
                 //TODO non è detto che incrementi, potrebbe pescare tutti item diversi
                 //add items to 'concone'
@@ -387,5 +459,25 @@ namespace RS_Engine
             //ordering (basing on the rank) and returning a variable size ordered list of items
             return most_sim_interaction_ranked_dictionary.ToList().OrderByDescending(x => x.Value).Select(x => x.Key).ToList();
         }
+        //
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //(COLLABORATIVE FILTERING BASED ON JOB TITLES)
+        //
+        public static List<int> retrieveTitlesForInteraction(int item_id)
+        {
+            //to store all in a global var 
+            //not in use (now called 1by1) IDictionary<int, List<int>> interaction_titles = new Dictionary<int, List<int>>();
+            return (List<int>)RManager.item_profile.Where(x => (int)x[0] == item_id).Select(x => x[1]);
+        }
+        public static List<int> collectTitlesOfInterestForUser(int user_id)
+        {
+            //TODO QUI
+
+            return null;
+        }
+        //
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     }
 }
