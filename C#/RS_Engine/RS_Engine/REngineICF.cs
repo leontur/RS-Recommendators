@@ -406,7 +406,7 @@ namespace RS_Engine
 
         //JOBS TITLES
         //JACCARD SIMILARITY
-        private static double computeJaccardSimilarity(List<int> titleU1, List<int> titleU2)
+        public static double computeJaccardSimilarity(List<int> titleU1, List<int> titleU2)
         {
             //compute the distance
             double intersect = titleU1.Intersect(titleU2).ToList().Count();
