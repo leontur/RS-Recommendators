@@ -21,32 +21,6 @@ RS:>     ____________________________
 RS:>     0) exit
 RS:> -----------------------------------------------------------------
 RS:> 
-RS:>     > RS:>     ==> selected program (7)
-RS:> -----------------------------------------------------------------
-RS:> 
-RS:> -----------------------------------------------------------------
-RS:>  ** RECOMMENDATORS ENGINE **
-RS:> -----------------------------------------------------------------
-RS:>     ____________________________
-RS:>     +++ TEST MODE ENABLED +++
-RS:>     >> datasets are initialized as train/test (not use for kaggle scope)
-RS:>     >> after the algorithm is invoked EVAL
-RS:>     ____________________________
-RS:>     Algorithms
-RS:>     1) TOP
-RS:>     2) CB-F (ok)
-RS:>     3) U-CF
-RS:>     4) I-CF
-RS:> 
-RS:>     5) CF DICT UB/IB/HYBRID (chiama anche 6)
-RS:>     6) HYBRID CB+CF 2.0
-RS:>     ____________________________
-RS:>     8) EVAL mode: execute EVAL with input a specific csv (not use for kaggle scope)
-RS:>     9) .bin size calculator
-RS:>     ____________________________
-RS:>     0) exit
-RS:> -----------------------------------------------------------------
-RS:> 
 RS:>     > RS:>     ==> selected program (5)
 RS:> -----------------------------------------------------------------
 RS:>   + initializing RS 
@@ -66,17 +40,6 @@ RS:>   -total lines | item_profile_enab >>> 63446
 RS:>   -total lines | target_users      >>> 10000
 RS:>   -total lines | user_profile      >>> 40000
 RS:> 
-RS:>   + TEST MODE - INSERT LIMIT=RS:>   + TINY TEST MODE ENABLED - LIMIT=8000
-RS:>   + tiny random list size: 8000
-RS:>   + thining out datasets (1m)
-RS:>   -total lines | user_profile (tiny) >>> 8000
-RS:>   -total lines | interactions (tiny) >>> 103362
-RS:>   + creating random list..  percentage is set to 20%
-RS:>   + random list size: 1600
-RS:>   + splitting data into train and test..
-RS:>   -total lines | user_profile (train)    >>> 8000
-RS:>   -total lines | user_profile_test       >>> 1600
-RS:>   -total lines | target_users (replaced) >>> 1600
 RS:> -----------------------------------------------------------------
 RS:>   # running program 5
 RS:> 
@@ -137,17 +100,38 @@ RS:>  + Output CF RAT  :> True
 RS:>  + Output CF UU   :> True
 RS:>  + Output CF II   :> False
 RS:>   + generating output structured data 
-RS:>   + the input dictionary count is: 1600
+RS:>   + the input dictionary count is: 10000
 
-RS:>  INFO: added top5 for in 0 cases!
+RS:>  Target USER_ID 338903 has LESS than 5 predictions (1) -> considering even already clicked..
+RS:>  Target USER_ID 338903 has LESS than 5 predictions (1) -> adding top5
+
+RS:>  Target USER_ID 1794619 has LESS than 5 predictions (2) -> considering even already clicked..
+RS:>  Target USER_ID 1794619 has LESS than 5 predictions (2) -> adding top5
+
+RS:>  INFO: added top5 for in 2 cases!
 RS:>  >>>>>> generating output file, wait a minute..
-RS:>  >>>>>> output submission file created: ../../../Output/submission_2016-12-01_20-31-38_1.csv
-RS:> _______________________________________________________
-RS:>  >>>>>> TEST MODE GENERATING PRECISION 
-
+RS:>  >>>>>> output submission file created: ../../../Output/submission_2016-12-01_21-49-08_1.csv
 RS:> 
-RS:>  >>>>>> MAP @5 = 0,000625
-RS:>  >>>>>> RECALL @SINGLE3 = 0,00125
-RS:> _______________________________________________________
+RS:> -----------------------------------------------------------------
+RS:>  ** RECOMMENDATORS ENGINE **
+RS:> -----------------------------------------------------------------
+RS:>     ____________________________
+RS:>     Algorithms
+RS:>     1) TOP
+RS:>     2) CB-F (ok)
+RS:>     3) U-CF
+RS:>     4) I-CF
 RS:> 
-RS:>  press any key to main menu
+RS:>     5) CF DICT UB/IB/HYBRID (chiama anche 6)
+RS:>     6) HYBRID CB+CF 2.0
+RS:>     ____________________________
+RS:>     TEST Mode
+RS:>     7) test mode: enable here to initialize the dataset as train/test and do EVAL (not use for kaggle scope)
+RS:>     ____________________________
+RS:>     8) EVAL mode: execute EVAL with input a specific csv (not use for kaggle scope)
+RS:>     9) .bin size calculator
+RS:>     ____________________________
+RS:>     0) exit
+RS:> -----------------------------------------------------------------
+RS:> 
+RS:>     > 

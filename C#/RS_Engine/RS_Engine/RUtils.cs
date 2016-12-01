@@ -26,13 +26,14 @@ namespace RS_Engine
             RManager.outLog(" >>>>>> output .bin dimensions and RAM consumption (about): " + mb + " MB" + " | for a jagged array use (about): " + mb/2 + " MB");
         }
 
-        //SHAKE AND REPROPOSE (g-IT)
+        //SHAKE AND REPROPOSE (g(rab)-IT)
         public static void shakeNpropose()
         {
             RManager.outLog("  + SHAKE N PROPOSE");
 
             //generate n rndms (items to 'substitute')
-            int subst = 400;
+            int subst = 180; //<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
             RManager.outLog("  + creating random list SUB of " + subst);
             int[] randomList = new int[subst];
             int rnd;
@@ -48,7 +49,8 @@ namespace RS_Engine
             RManager.outLog("  + random list size: " + randomList.Count());
 
             //generate n rndms (items to 'shake')
-            int shake = 800;
+            int shake = 2000; //<<<<<<<<<<<<<<<<<<<<
+
             RManager.outLog("  + creating random list SHK of " + shake);
             int[] randomList2 = new int[shake];
             int rnd2;
@@ -64,9 +66,11 @@ namespace RS_Engine
             RManager.outLog("  + random list size: " + randomList2.Count());
 
             //temp arrays
-            int[][] input1 = new int[10000][];
+            //int[][] input1 = new int[10000][];
+            Dictionary<int, List<int>> input1D = new Dictionary<int, List<int>>();
             int[][] input2 = new int[10000][];
             int[][] output = new int[10000][];
+
             List<int> userlist = new List<int>();
 
             ///////GOOD FILE
@@ -79,10 +83,18 @@ namespace RS_Engine
             for (int i = 1; i < submission_f.Length; i++)
             {
                 List<string> row_IN = submission_f[i].Split(',').Select(x => x).ToList();
-                userlist.Add(Int32.Parse(row_IN[0]));
-                input1[i - 1] = row_IN[1].Split(' ').Select(Int32.Parse).ToArray();
+                //input1[i - 1] = row_IN[1].Split(' ').Select(Int32.Parse).ToArray(); //space delimited
+                try
+                {
+                    input1D.Add(Int32.Parse(row_IN[0]), row_IN[1].Split(' ').Select(Int32.Parse).ToList()); //space delimited
+                }
+                catch
+                {
+                    //nothing to recommend
+                    input1D.Add(Int32.Parse(row_IN[0]), new List<int>()); //space delimited
+                }
             }
-            RManager.outLog("  + input OK. Count= " + input1.Count());
+            RManager.outLog("  + input OK. Count= " + input1D.Count());
 
             ///////BAD FILE
             //source file
@@ -94,14 +106,17 @@ namespace RS_Engine
             for (int i = 1; i < submission_f2.Length; i++)
             {
                 List<string> row_IN = submission_f2[i].Split(',').Select(x => x).ToList();
-                input2[i - 1] = row_IN[1].Split('\t').Select(Int32.Parse).ToArray();
+                userlist.Add(Int32.Parse(row_IN[0]));
+                input2[i - 1] = row_IN[1].Split('\t').Select(Int32.Parse).ToArray(); //tab delimited
             }
             RManager.outLog("  + input OK. Count= " + input2.Count());
 
             //SUB
             //create destination
-            for(int i=0; i < input1.Count(); i++)
+            int emptycount = 0;
+            for(int i=0; i < 10000; i++)
             {
+                int id = userlist[i];
                 if (randomList.Contains(i))
                 {
                     output[i] = input2[i];
@@ -109,7 +124,13 @@ namespace RS_Engine
                 }
                 else
                 {
-                    output[i] = input1[i];
+                    output[i] = input1D[id].ToArray();
+                }
+                //fill empty rows
+                if(input1D[id].Count() < 5)
+                {
+                    output[i] = input2[i];
+                    emptycount++;
                 }
             }
             //SHK
@@ -121,16 +142,18 @@ namespace RS_Engine
 
                     if (new Random(Guid.NewGuid().GetHashCode()).Next(0, 10000) % 2 == 0)
                     {
-                        if (i % 2 == 0)
-                        {
-                            output[i][0] = tmp[1];
-                            output[i][1] = tmp[0];
-                        }
-                        else
-                        {
-                            output[i][1] = tmp[3];
-                            output[i][2] = tmp[1];
-                            output[i][3] = tmp[2];
+                        if (tmp.Count()==5) {
+                            if (i % 2 == 0)
+                            {
+                                output[i][0] = tmp[1];
+                                output[i][1] = tmp[0];
+                            }
+                            else
+                            {
+                                output[i][1] = tmp[3];
+                                output[i][2] = tmp[1];
+                                output[i][3] = tmp[2];
+                            }
                         }
                     }
                     RManager.outLog("  - SHK hit at row " + i);
@@ -138,6 +161,7 @@ namespace RS_Engine
             }
 
             RManager.outLog("  + output OK. Count= " + output.Count());
+            RManager.outLog("  + emptycount= " + emptycount);
             RManager.outLog("  + output csv generation ");
             RManager.exportRecToSubmit(userlist, output.Select(p => p.ToList()).ToList());
 

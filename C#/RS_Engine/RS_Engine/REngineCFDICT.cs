@@ -707,26 +707,26 @@ namespace RS_Engine
                         foreach (var sim_item in ij_s_dict)
                         {
                             //get sim_item id
-                            int item2 = sim_item.Key;
+                            int ii = sim_item.Key;
 
-                            if (i_r_dict.ContainsKey(item2))
+                            if (i_r_dict.ContainsKey(ii))
                                 continue;
 
                             //coefficients
-                            double num = i_r_dict[item2] * sim_item.Value;
+                            double num = i_r_dict[item] * sim_item.Value;
                             double den = sim_item.Value;
 
                             //if the current item is not predicted yet for the user, add it
-                            if (!users_prediction_dictionary_num[uu].ContainsKey(item2))
+                            if (!users_prediction_dictionary_num[uu].ContainsKey(ii))
                             {
-                                users_prediction_dictionary_num[uu].Add(item2, num);
-                                users_prediction_dictionary_den[uu].Add(item2, den);
+                                users_prediction_dictionary_num[uu].Add(ii, num);
+                                users_prediction_dictionary_den[uu].Add(ii, den);
                             }
                             //else adding its contribution
                             else
                             {
-                                users_prediction_dictionary_num[uu][item2] += num;
-                                users_prediction_dictionary_den[uu][item2] += den;
+                                users_prediction_dictionary_num[uu][ii] += num;
+                                users_prediction_dictionary_den[uu][ii] += den;
                             }
                         }
                     }
@@ -979,10 +979,10 @@ namespace RS_Engine
         {
             //ENABLED ALGORITHMS
             bool A_CF_DICT  = true; //CF from dictionaries DICT
-            bool A_CF_TIT   = true;   //CF over TITLES
-            bool A_CF_TAG   = true;   //CF over TAGS
-            bool A_CF_RAT   = true;   //CF over RATING
-            bool A_CB_UU    = true;   //CB over user-user similarity
+            bool A_CF_TIT   = false;   //CF over TITLES
+            bool A_CF_TAG   = false;   //CF over TAGS
+            bool A_CF_RAT   = false;   //CF over RATING
+            bool A_CB_UU    = false;   //CB over user-user similarity
             bool A_CB_II    = false;   //CB over item-item similarity (<<<<<<< to be implemented FROM CBF)
 
             RManager.outLog(" + Output CF DICT :> " + A_CF_DICT);
