@@ -20,16 +20,16 @@ namespace RS_Engine
         //ALGORITHM PARAMETERS
         //UB
         private const int SIM_SHRINK_UB = 10;
-        private const int PRED_SHRINK_UB = 1;
+        private const int PRED_SHRINK_UB = 10;
         //IB
         private const int SIM_SHRINK_IB = 20;
-        private const int PRED_SHRINK_IB = 1;
+        private const int PRED_SHRINK_IB = 10;
         //HW
         private const double HYBRID_W_WEIGHT = 0.6;
         //HR
-        private const int HYBRID_R_WEIGHT_I = 3;
-        private const int HYBRID_R_WEIGHT_U = 4;
-        private const int HYBRID_R_KNN = 15;
+        private const int HYBRID_R_WEIGHT_I = 1;
+        private const double HYBRID_R_WEIGHT_U = 0.99;
+        private const int HYBRID_R_KNN = 30;
 
         /////////////////////////////////////////////
         //EXECUTION VARS
@@ -263,8 +263,9 @@ namespace RS_Engine
             //runtime dictionaries
             IDictionary<int, IDictionary<int, double>> user_user_similarity_dictionary = new Dictionary<int, IDictionary<int, double>>();
             IDictionary<int, IDictionary<int, double>> user_user_similarity_dictionary_num = new Dictionary<int, IDictionary<int, double>>();
-            IDictionary<int, IDictionary<int, double>> user_user_similarity_dictionary_den1 = new Dictionary<int, IDictionary<int, double>>();
-            IDictionary<int, IDictionary<int, double>> user_user_similarity_dictionary_den2 = new Dictionary<int, IDictionary<int, double>>();
+            //IDictionary<int, IDictionary<int, double>> user_user_similarity_dictionary_den1 = new Dictionary<int, IDictionary<int, double>>();
+            //IDictionary<int, IDictionary<int, double>> user_user_similarity_dictionary_den2 = new Dictionary<int, IDictionary<int, double>>();
+            IDictionary<int, double> user_similarity_dictionary_norm = new Dictionary<int, double>();
 
             //counter
             int c_tot = RManager.user_items_dictionary.Count();
@@ -282,8 +283,8 @@ namespace RS_Engine
 
                 //creating user key in the coefficients dictionaries
                 user_user_similarity_dictionary_num.Add(user, new Dictionary<int, double>());
-                user_user_similarity_dictionary_den1.Add(user, new Dictionary<int, double>());
-                user_user_similarity_dictionary_den2.Add(user, new Dictionary<int, double>());
+                //user_user_similarity_dictionary_den1.Add(user, new Dictionary<int, double>());
+                //user_user_similarity_dictionary_den2.Add(user, new Dictionary<int, double>());
 
                 //get the interacted items and the related best interaction type for each clicked item
                 IDictionary<int, int> interacted_items = u.Value;
@@ -326,15 +327,15 @@ namespace RS_Engine
                         //storing coefficients
                         if (user_user_similarity_dictionary_num[user].ContainsKey(sim_user)) {
                             user_user_similarity_dictionary_num[user][sim_user] += num;
-                            user_user_similarity_dictionary_den1[user][sim_user] += den1;
-                            user_user_similarity_dictionary_den2[user][sim_user] += den2;
+                            //user_user_similarity_dictionary_den1[user][sim_user] += den1;
+                            //user_user_similarity_dictionary_den2[user][sim_user] += den2;
                         }
                         else
                         {
                             //add to similarity dictionary
                             user_user_similarity_dictionary_num[user].Add(sim_user, num);
-                            user_user_similarity_dictionary_den1[user].Add(sim_user, den1);
-                            user_user_similarity_dictionary_den2[user].Add(sim_user, den2);
+                            //user_user_similarity_dictionary_den1[user].Add(sim_user, den1);
+                            //user_user_similarity_dictionary_den2[user].Add(sim_user, den2);
                         }
 
                     }
@@ -344,9 +345,16 @@ namespace RS_Engine
                 if (user_user_similarity_dictionary_num[user].ContainsKey(user))
                 {
                     user_user_similarity_dictionary_num[user].Remove(user);
-                    user_user_similarity_dictionary_den1[user].Remove(user);
-                    user_user_similarity_dictionary_den2[user].Remove(user);
+                    //user_user_similarity_dictionary_den1[user].Remove(user);
+                    //user_user_similarity_dictionary_den2[user].Remove(user);
                 }
+            }
+
+            //for each item in the dictionary
+            foreach (var u in RManager.user_items_dictionary)
+            {
+                //increase norm
+                user_similarity_dictionary_norm[u.Key] = Math.Sqrt(u.Value.Count());
             }
 
             //counter
@@ -374,7 +382,7 @@ namespace RS_Engine
                     //evaluate prediction of that sim_user for that user
                     double pred = 
                         user_user_similarity_dictionary_num[user][sim_user] / 
-                        (Math.Sqrt(user_user_similarity_dictionary_den1[user][sim_user]) * Math.Sqrt(user_user_similarity_dictionary_den2[user][sim_user]) + SIM_SHRINK_UB);
+                        ((user_similarity_dictionary_norm[user] * user_similarity_dictionary_norm[sim_user]) + SIM_SHRINK_UB);
 
                     //storing
                     sim_users_predictions.Add(sim_user, pred);
@@ -523,8 +531,9 @@ namespace RS_Engine
             //runtime dictionaries
             IDictionary<int, IDictionary<int, double>> item_item_similarity_dictionary = new Dictionary<int, IDictionary<int, double>>();
             IDictionary<int, IDictionary<int, double>> item_item_similarity_dictionary_num = new Dictionary<int, IDictionary<int, double>>();
-            IDictionary<int, IDictionary<int, double>> item_item_similarity_dictionary_den1 = new Dictionary<int, IDictionary<int, double>>();
-            IDictionary<int, IDictionary<int, double>> item_item_similarity_dictionary_den2 = new Dictionary<int, IDictionary<int, double>>();
+            //IDictionary<int, IDictionary<int, double>> item_item_similarity_dictionary_den1 = new Dictionary<int, IDictionary<int, double>>();
+            //IDictionary<int, IDictionary<int, double>> item_item_similarity_dictionary_den2 = new Dictionary<int, IDictionary<int, double>>();
+            IDictionary<int, double> item_similarity_dictionary_norm = new Dictionary<int, double>();
 
             //counter
             int c_tot = RManager.item_users_dictionary.Count();
@@ -542,8 +551,8 @@ namespace RS_Engine
 
                 //creating user key in the coefficients dictionaries
                 item_item_similarity_dictionary_num.Add(item, new Dictionary<int, double>());
-                item_item_similarity_dictionary_den1.Add(item, new Dictionary<int, double>());
-                item_item_similarity_dictionary_den2.Add(item, new Dictionary<int, double>());
+                //item_item_similarity_dictionary_den1.Add(item, new Dictionary<int, double>());
+                //item_item_similarity_dictionary_den2.Add(item, new Dictionary<int, double>());
 
                 //get the users that interacted with the current item and the related best interaction type for each clicked item
                 IDictionary<int, int> interacting_users = i.Value;
@@ -564,33 +573,37 @@ namespace RS_Engine
                     //for each item in the list of (similar) items
                     foreach (var sim_item in item_list)
                     {
+                        if (sim_item == user)
+                            continue;
+
                         //retrieving interaction coefficients
-                        int interaction_type = u.Value;
+                        int interaction_type = interacted_items[item];//u.Value;
                         int interaction_type_of_sim_item = interacted_items[sim_item];
 
                         //creating coefficients
                         double num = interaction_type * interaction_type_of_sim_item;
-                        double den1 = Math.Pow(interaction_type, 2);
-                        double den2 = Math.Pow(interaction_type_of_sim_item, 2);
+                        //double den1 = Math.Pow(interaction_type, 2);
+                        //double den2 = Math.Pow(interaction_type_of_sim_item, 2);
 
                         //storing coefficients
                         if (item_item_similarity_dictionary_num[item].ContainsKey(sim_item))
                         {
                             item_item_similarity_dictionary_num[item][sim_item] += num;
-                            item_item_similarity_dictionary_den1[item][sim_item] += den1;
-                            item_item_similarity_dictionary_den2[item][sim_item] += den2;
+                            //item_item_similarity_dictionary_den1[item][sim_item] += den1;
+                            //item_item_similarity_dictionary_den2[item][sim_item] += den2;
                         }
                         else
                         {
                             //add to similarity dictionary
                             item_item_similarity_dictionary_num[item].Add(sim_item, num);
-                            item_item_similarity_dictionary_den1[item].Add(sim_item, den1);
-                            item_item_similarity_dictionary_den2[item].Add(sim_item, den2);
+                            //item_item_similarity_dictionary_den1[item].Add(sim_item, den1);
+                            //item_item_similarity_dictionary_den2[item].Add(sim_item, den2);
                         }
 
                     }
                 }
 
+                /*
                 //removing from the similarity coefficients the item itself
                 if (item_item_similarity_dictionary_num[item].ContainsKey(item))
                 {
@@ -598,6 +611,14 @@ namespace RS_Engine
                     item_item_similarity_dictionary_den1[item].Remove(item);
                     item_item_similarity_dictionary_den2[item].Remove(item);
                 }
+                */
+            }
+
+            //for each item in the dictionary
+            foreach (var i in RManager.item_users_dictionary)
+            {
+                //increase norm
+                item_similarity_dictionary_norm[i.Key] = Math.Sqrt(i.Value.Count());
             }
 
             //counter
@@ -625,7 +646,7 @@ namespace RS_Engine
                     //evaluate prediction of that sim_item for that item
                     double pred =
                         item_item_similarity_dictionary_num[item][sim_item] /
-                        (Math.Sqrt(item_item_similarity_dictionary_den1[item][sim_item]) * Math.Sqrt(item_item_similarity_dictionary_den2[item][sim_item]) + SIM_SHRINK_IB);
+                        ((item_similarity_dictionary_norm[item] * item_similarity_dictionary_norm[sim_item]) + SIM_SHRINK_IB);
 
                     //storing
                     sim_items_predictions.Add(sim_item, pred);
@@ -649,66 +670,70 @@ namespace RS_Engine
             //runtime dictionaries
             IDictionary<int, IDictionary<int, double>> users_prediction_dictionary = new Dictionary<int, IDictionary<int, double>>();
             IDictionary<int, IDictionary<int, double>> users_prediction_dictionary_num = new Dictionary<int, IDictionary<int, double>>();
-            //IDictionary<int, IDictionary<int, double>> users_prediction_dictionary_den = new Dictionary<int, IDictionary<int, double>>();
-            IDictionary<int, double> users_prediction_dictionary_norm = new Dictionary<int, double>();
+            IDictionary<int, IDictionary<int, double>> users_prediction_dictionary_den = new Dictionary<int, IDictionary<int, double>>();
+            //IDictionary<int, double> users_prediction_dictionary_norm = new Dictionary<int, double>();
 
             //counter
             int c_tot = RManager.target_users.Count();
             RManager.outLog("  + aggregation of predictions ");
 
             //for each target user
-            foreach (var user in RManager.target_users)
+            foreach (var uu in RManager.target_users)
             {
                 //counter
                 if (--c_tot % 500 == 0)
                     RManager.outLog(" - remaining " + c_tot, true, true, true);
 
                 //if current target has similar users
-                if (RManager.user_items_dictionary.ContainsKey(user)) //only for security reason
+                if (RManager.user_items_dictionary.ContainsKey(uu)) //only for security reason
                 {
                     //creating user key in the coefficients dictionaries
-                    users_prediction_dictionary_num.Add(user, new Dictionary<int, double>());
-                    //users_prediction_dictionary_den.Add(user, new Dictionary<int, double>());
+                    users_prediction_dictionary_num.Add(uu, new Dictionary<int, double>());
+                    users_prediction_dictionary_den.Add(uu, new Dictionary<int, double>());
 
                     //get list of items with which the user interacted
-                    IDictionary<int, int> i_list = RManager.user_items_dictionary[user];
+                    IDictionary<int, int> i_r_dict = RManager.user_items_dictionary[uu];
 
                     //for every item in this dictionary
-                    foreach (var i in i_list)
+                    foreach (var ij in i_r_dict)
                     {
                         //get item id
-                        int item = i.Key;
+                        int item = ij.Key;
 
                         //get the dictionary of similar items and the similarity value
-                        var iis_list = CF_item_item_sim_dictionary[item];
+                        var ij_s_dict = CF_item_item_sim_dictionary[item];
 
                         //for every similar item of the current item
-                        foreach (var sim_item in iis_list)
+                        foreach (var sim_item in ij_s_dict)
                         {
                             //get sim_item id
                             int item2 = sim_item.Key;
 
+                            if (i_r_dict.ContainsKey(item2))
+                                continue;
+
                             //coefficients
-                            double num = iis_list[item2] * i.Value;
-                            double den = iis_list[item2];
+                            double num = i_r_dict[item2] * sim_item.Value;
+                            double den = sim_item.Value;
 
                             //if the current item is not predicted yet for the user, add it
-                            if (!users_prediction_dictionary_num[user].ContainsKey(item2))
+                            if (!users_prediction_dictionary_num[uu].ContainsKey(item2))
                             {
-                                users_prediction_dictionary_num[user].Add(item2, num);
-                                //users_prediction_dictionary_den[user].Add(item2, den);
+                                users_prediction_dictionary_num[uu].Add(item2, num);
+                                users_prediction_dictionary_den[uu].Add(item2, den);
                             }
                             //else adding its contribution
                             else
                             {
-                                users_prediction_dictionary_num[user][item2] += num;
-                                //users_prediction_dictionary_den[user][item2] += den;
+                                users_prediction_dictionary_num[uu][item2] += num;
+                                users_prediction_dictionary_den[uu][item2] += den;
                             }
                         }
                     }
                 }
             }
 
+            /*
             //for each item in the dictionary
             foreach (var item in CF_item_item_sim_dictionary)
             {
@@ -720,6 +745,7 @@ namespace RS_Engine
                 foreach (var other_items in sim_items)
                     users_prediction_dictionary_norm[item.Key] += other_items.Value;
             }
+            */
 
             //counter
             c_tot = users_prediction_dictionary_num.Count();
@@ -749,9 +775,7 @@ namespace RS_Engine
 
                         //evaluate prediction of that item for that user
                         double pred =
-                            users_prediction_dictionary_num[user][sim_item] / 
-                                                    (users_prediction_dictionary_norm[sim_item] + PRED_SHRINK_IB);
-                                                    //  / (users_prediction_dictionary_den[user][sim_item] + PRED_SHRINK_IB);
+                            users_prediction_dictionary_num[user][sim_item] /  (users_prediction_dictionary_den[user][sim_item] + PRED_SHRINK_IB);
 
                         //storing
                         sim_items_predictions.Add(sim_item, pred);

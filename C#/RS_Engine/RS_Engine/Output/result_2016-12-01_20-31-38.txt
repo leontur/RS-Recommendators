@@ -56,3 +56,98 @@ RS:>   + dataset read OK | interactions_f count= 546865 | conversion..
 RS:>   + reading serialized file target_users.bin
 RS:>   + reading serialized file user_profile.bin
 RS:>   + reading serialized file item_profile.bin
+RS:>   + reading serialized file item_profile_enabled.bin
+RS:>   + populating auxiliary data structures 
+RS:> 
+RS:>   + all datasets conversion: OK
+RS:>   -total lines | interactions      >>> 546864
+RS:>   -total lines | item_profile      >>> 167956
+RS:>   -total lines | item_profile_enab >>> 63446
+RS:>   -total lines | target_users      >>> 10000
+RS:>   -total lines | user_profile      >>> 40000
+RS:> 
+RS:>   + TEST MODE - INSERT LIMIT=RS:>   + TINY TEST MODE ENABLED - LIMIT=8000
+RS:>   + tiny random list size: 8000
+RS:>   + thining out datasets (1m)
+RS:>   -total lines | user_profile (tiny) >>> 8000
+RS:>   -total lines | interactions (tiny) >>> 103362
+RS:>   + creating random list..  percentage is set to 20%
+RS:>   + random list size: 1600
+RS:>   + splitting data into train and test..
+RS:>   -total lines | user_profile (train)    >>> 8000
+RS:>   -total lines | user_profile_test       >>> 1600
+RS:>   -total lines | target_users (replaced) >>> 1600
+RS:> -----------------------------------------------------------------
+RS:>   # running program 5
+RS:> 
+RS:>   + processing..
+RS:>   + CF Algorithm..
+RS:>   + creating DICTIONARIES.. 
+RS:>   + user_items_dictionary
+RS:>   + reading serialized file CFDICT_user_items_dictionary.bin
+RS:>   + item_users_dictionary
+RS:>   + reading serialized file CFDICT_item_users_dictionary.bin
+RS:>   + computeCFUserUserSimilarity(): 
+RS:>   + calculating all coefficients 
+
+RS:>   + calculating user_user similarity 
+
+RS:>   + predictCFUserBasedRecommendations(): 
+RS:>   + aggregation of predictions 
+
+RS:>   + estimating ratings of similar items 
+
+RS:>   + computeCFItemItemSimilarity(): 
+RS:>   + calculating all coefficients 
+
+RS:>   + calculating item_item similarity 
+
+RS:>   + predictCFItemBasedRecommendations(): 
+RS:>   + aggregation of predictions 
+
+RS:>   + estimating ratings of similar items 
+
+RS:>   + computeCFHybridRankRecommendations(): 
+RS:>   + computing points for UB 
+
+RS:>   + computing points for IB 
+
+RS:>   + processing..
+RS:>   + CB+CF 2.0 Algorithm..
+RS:> 
+RS:>  SIM_WEIGHTS
+RS:>  -5 jobroles
+RS:>  -10 career_level
+RS:>  -3 discipline_id
+RS:>  -3 industry_id
+RS:>  -5 country
+RS:>  -2 region
+RS:>  -3 experience_n_entries_class
+RS:>  -4 experience_years_experience
+RS:>  -1 experience_years_in_current
+RS:>  -8 edu_degree
+RS:>  -10 edu_fieldofstudies
+RS:> 
+RS:>   + reading serialized file CF2_interactions_titles.bin
+RS:>   + reading serialized file CF2_interactions_tags.bin
+RS:>  + Output CF DICT :> True
+RS:>  + Output CF TIT  :> True
+RS:>  + Output CF TAG  :> True
+RS:>  + Output CF RAT  :> True
+RS:>  + Output CF UU   :> True
+RS:>  + Output CF II   :> False
+RS:>   + generating output structured data 
+RS:>   + the input dictionary count is: 1600
+
+RS:>  INFO: added top5 for in 0 cases!
+RS:>  >>>>>> generating output file, wait a minute..
+RS:>  >>>>>> output submission file created: ../../../Output/submission_2016-12-01_20-31-38_1.csv
+RS:> _______________________________________________________
+RS:>  >>>>>> TEST MODE GENERATING PRECISION 
+
+RS:> 
+RS:>  >>>>>> MAP @5 = 0,000625
+RS:>  >>>>>> RECALL @SINGLE3 = 0,00125
+RS:> _______________________________________________________
+RS:> 
+RS:>  press any key to main menu
