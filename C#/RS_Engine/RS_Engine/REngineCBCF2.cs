@@ -25,6 +25,10 @@ namespace RS_Engine
         private const int SIM_TITLE_USER_RANGE = 20;
         private const int SIM_TITLE_USER_RANGE_TAKE_ITEMS = 3;
 
+        //number of similarities to select (tag based similarity)
+        private const int SIM_TAG_USER_RANGE = 10;
+        private const int SIM_TAG_USER_RANGE_TAKE_ITEMS = 5;
+
         //weights for average similarity (weight are 1-11)
         private static int[] SIM_WEIGHTS = new int[11];
         private static int den = -1;
@@ -36,6 +40,7 @@ namespace RS_Engine
         //EXECUTION VARS
         public static IDictionary<int, IDictionary<int, double>> CF2_user_user_sim_dictionary = new Dictionary<int, IDictionary<int, double>>();
         private static IDictionary<int, List<int>> interactions_titles = new Dictionary<int, List<int>>();
+        private static IDictionary<int, List<int>> interactions_tags = new Dictionary<int, List<int>>();
 
         /////////////////////////////////////////////
         //MAIN ALGORITHM METHOD
@@ -78,6 +83,7 @@ namespace RS_Engine
             //Execute DICTIONARIES
             //createDictionaries(); //too long, matrix too big (computed at runtime)
             createInteractionsTitlesLists();
+            createInteractionsTagsLists();
 
             //TEST VARI
             /*
@@ -152,7 +158,7 @@ namespace RS_Engine
             {
                 //counter
                 int par_counter = RManager.item_profile_and_interaction_merge_nodup.Count();
-                RManager.outLog("  + CF2_interactions_titles");
+                RManager.outLog("  + CF2_interactions_titles creation");
 
                 //for every global interaction
                 object sync = new object();
@@ -191,6 +197,55 @@ namespace RS_Engine
                     RManager.outLog("  + reading serialized file " + "CF2_interactions_titles.bin");
                     var bformatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
                     interactions_titles = (IDictionary<int, List<int>>)bformatter.Deserialize(stream);
+                }
+            }
+        }
+        private static void createInteractionsTagsLists()
+        {
+            //check if already serialized (for fast fetching)
+            if (!File.Exists(Path.Combine(RManager.SERIALTPATH, "CF2_interactions_tags.bin")))
+            {
+                //counter
+                int par_counter = RManager.item_profile_and_interaction_merge_nodup.Count();
+                RManager.outLog("  + CF2_interactions_tags creation");
+
+                //for every global interaction
+                object sync = new object();
+                Parallel.ForEach(
+                    RManager.item_profile_and_interaction_merge_nodup,
+                    new ParallelOptions { MaxDegreeOfParallelism = 32 },
+                    i =>
+                    {
+                        //counter
+                        Interlocked.Decrement(ref par_counter);
+                        int count = Interlocked.CompareExchange(ref par_counter, 0, 0);
+                        if (count % 1000 == 0) RManager.outLog("  - remaining: " + count, true, true, true);
+
+                        //get titles list
+                        List<int> tags = RManager.item_profile.Where(x => (int)x[0] == i).Select(x => (List<int>)x[10]).First().ToList();
+
+                        //instantiate a new row in dictionary
+                        lock (sync)
+                            interactions_tags.Add(i, tags);
+                    }
+                );
+
+                //serialize
+                using (Stream stream = File.Open(Path.Combine(RManager.SERIALTPATH, "CF2_interactions_tags.bin"), FileMode.Create))
+                {
+                    RManager.outLog("  + writing serialized file " + "CF2_interactions_tags.bin");
+                    var bformatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+                    bformatter.Serialize(stream, interactions_tags);
+                }
+            }
+            else
+            {
+                //deserialize
+                using (Stream stream = File.Open(Path.Combine(RManager.SERIALTPATH, "CF2_interactions_tags.bin"), FileMode.Open))
+                {
+                    RManager.outLog("  + reading serialized file " + "CF2_interactions_tags.bin");
+                    var bformatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+                    interactions_tags = (IDictionary<int, List<int>>)bformatter.Deserialize(stream);
                 }
             }
         }
@@ -653,6 +708,139 @@ namespace RS_Engine
                 {
                     //if items are the same
                     if(i1.Key == i2.Key)
+                    {
+                        //get rank values of current item of user 2 (that indicate how much other user has interacted with this item)
+                        int rank2 = i2.Value.Value2;
+
+                        //get the two lists of titles
+                        List<int> titles1 = i1.Value.Value1;
+                        List<int> titles2 = i2.Value.Value1;
+
+                        //compute jaccard
+                        double jac = REngineICF.computeJaccardSimilarity(titles1, titles2);
+
+                        //increase sim
+                        num += jac * rank2;
+                        den += rank2;
+                        common++;
+                    }
+                }
+            }
+
+            if (den > 0)
+            {
+                //compute sim
+                sim = num / den;
+                //normalize sim
+                sim /= (double)(R1Count + R2Count - common); ;
+            }
+
+            return sim;
+        }
+        //
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //(COLLABORATIVE FILTERING BASED ON JOB TAGS)
+        //SINGLE COMPUTATION OF USER SIMILARITY BY USER ID (without ITSELF)
+        //GET THE (variable size) LIST OF PLAUSIBLE ITEMS (recommendable active only) FOR THE USER u
+        public static List<int> getListOfPlausibleTagBasedItems(int user_id)
+        {
+            //get all the similar users
+            var sim_users_dict = computeSimilarItemsBasingOnTags(user_id);
+
+            //get top SIM_USER_RANGE most similar users
+            var most_sim = sim_users_dict.OrderByDescending(x => x.Value).Select(x => x.Key).Take(SIM_TAG_USER_RANGE).ToList();
+
+            //instantiate a dictionary for the merge of all the items
+            //key: item_id, value: rankingpoints
+            IDictionary<int, double> most_sim_interaction_ranked_dictionary = new Dictionary<int, double>();
+
+            //for each similar user get its plausible list of interacted items
+            foreach (var su in most_sim)
+            {
+                //get top SIM_USER_RANGE_TAKE_ITEMS most ranked items
+                IDictionary<int, int> su_sim_interaction_ranked_dictionary =
+                    getRankedInteractionsForUser(su, true).OrderByDescending(x => x.Value).Take(SIM_TAG_USER_RANGE_TAKE_ITEMS).ToDictionary(kp => kp.Key, kp => kp.Value);
+
+                //TODO non è detto che incrementi, potrebbe pescare tutti item diversi
+                //add items to 'concone'
+                foreach (var i in su_sim_interaction_ranked_dictionary)
+                    if (!most_sim_interaction_ranked_dictionary.ContainsKey(i.Key))
+                        most_sim_interaction_ranked_dictionary.Add(i.Key, i.Value);
+                    else
+                        most_sim_interaction_ranked_dictionary[i.Key] += i.Value;
+            }
+
+            //ordering (basing on the rank) and returning a variable size ordered list of items
+            var rank_ordered = most_sim_interaction_ranked_dictionary.OrderByDescending(x => x.Value).Select(x => x.Key).ToList();
+            return rank_ordered;
+        }
+        public static IDictionary<int, double> computeSimilarItemsBasingOnTags(int user_id)
+        {
+            //instance to return
+            IDictionary<int, double> output_sim_users = new Dictionary<int, double>();
+
+            //get tags for user1
+            var tit1 = collectTagsOfInterestForUser(user_id);
+
+            //for every user
+            object sync = new object();
+            Parallel.ForEach(
+                RManager.user_profile,
+                new ParallelOptions { MaxDegreeOfParallelism = 32 },
+                su =>
+                {
+                    //COMPUTE SIMILARITY with this user
+                    double sim = computeTagsBasedSimilarityForRankedInteractions(tit1, collectTagsOfInterestForUser((int)su[0]));
+
+                    //create an entry in the dictionary only if >0
+                    if (sim > 0)
+                        lock (sync)
+                            output_sim_users.Add((int)su[0], sim);
+                }
+            );
+
+            //remove the user itself
+            if (output_sim_users.ContainsKey(user_id))
+                output_sim_users.Remove(user_id);
+
+            return output_sim_users;
+        }
+        public static IDictionary<int, DoubleValueListInt> collectTagsOfInterestForUser(int user_id)
+        {
+            //retrieve the user ranked interactions
+            IDictionary<int, int> ranked_interaction = getRankedInteractionsForUser(user_id, false);
+
+            //get for each ranked interaction the related tags and rank
+            //key: item_id, Value (doubled): list of tags, rank of item(and so of tags)
+            IDictionary<int, DoubleValueListInt> ranked_interaction_tags_rank = new Dictionary<int, DoubleValueListInt>();
+            foreach (var ri in ranked_interaction)
+                ranked_interaction_tags_rank.Add(ri.Key, new DoubleValueListInt { Value1 = interactions_tags[ri.Key], Value2 = ri.Value });
+
+            return ranked_interaction_tags_rank;
+        }
+        //return the value of similarity
+        public static double computeTagsBasedSimilarityForRankedInteractions(IDictionary<int, DoubleValueListInt> R1, IDictionary<int, DoubleValueListInt> R2)
+        {
+            double sim = 0;
+            double num = 0;
+            double den = 0;
+            int common = 0;
+
+            double R1Count = R1.Count();
+            double R2Count = R2.Count();
+
+            if (R1Count == 0 || R2Count == 0)
+                return 0;
+
+            //for each item
+            foreach (var i1 in R1)
+            {
+                foreach (var i2 in R2)
+                {
+                    //if items are the same
+                    if (i1.Key == i2.Key)
                     {
                         //get rank values of current item of user 2 (that indicate how much other user has interacted with this item)
                         int rank2 = i2.Value.Value2;

@@ -953,6 +953,21 @@ namespace RS_Engine
         //GENERATE OUTPUT STRUCTURED DATA
         private static void generateOutput(IDictionary<int, IDictionary<int, double>> users_prediction_dictionary)
         {
+            //ENABLED ALGORITHMS
+            bool A_CF_DICT  = false; //CF from dictionaries DICT
+            bool A_CF_TIT   = false;   //CF over TITLES
+            bool A_CF_TAG   = true;   //CF over TAGS
+            bool A_CF_RAT   = false;   //CF over RATING
+            bool A_CB_UU    = false;   //CB over user-user similarity
+            bool A_CB_II    = false;   //CB over item-item similarity (*******to be implemented FROM CBF)
+
+            RManager.outLog(" + Output CF DICT :> " + A_CF_DICT);
+            RManager.outLog(" + Output CF TIT  :> " + A_CF_TIT);
+            RManager.outLog(" + Output CF TAG  :> " + A_CF_TAG);
+            RManager.outLog(" + Output CF RAT  :> " + A_CF_RAT);
+            RManager.outLog(" + Output CF UU   :> " + A_CB_UU);
+            RManager.outLog(" + Output CF II   :> " + A_CB_II);
+
             //counter
             int c_tot = users_prediction_dictionary.Count();
             RManager.outLog("  + generating output structured data ");
@@ -975,53 +990,63 @@ namespace RS_Engine
                 //get user id
                 int user = u.Key;
 
-                //////////////////////////////
-                //GET LISTS OF PREDICTIONS
-
-                //CF DICT
-                //if (u.Value.Count > 0) //if the list of recommendable items is not empty
-                //retrieve the id(s) of recommendable items (ordered by the best, to the poor)
-                List<int> CF_rec_items = u.Value.ToList().OrderByDescending(x => x.Value).Select(x => x.Key).ToList();
-                //else
-                //the user has not clicked anything (cannot find similar users basing on current user clicks!)
-                //RManager.outLog(" Target USER_ID " + user + " has 0 predictions!");
-
-                //CF (RATINGS)
-                List<int> CF_RAT_rec_items = REngineCBCF2.getListOfPlausibleRatingBasedItems(user);
-
-                //CB (USER)
-                //retrieve the (variable) list of plausible items
-                //List<int> CB_U_rec_items = REngineCBCF2.getListOfPlausibleItems(user);
-
-                //CF (TITLES)
-                //retrieve the (variable) list of plausible items
-                List<int> CF_TIT_rec_items = REngineCBCF2.getListOfPlausibleTitleBasedItems(user);
-
-                //////////////////////////////
+                /////////////////////////////////////////////////
                 
                 //instantiate the list of (final) most similar items
                 List<int> rec_items = new List<int>();
 
+                //ALGORITHMS EXECUTION
                 //MERGE LISTS OF PREDICTIONS
                 //adding all predictions 
                 //NOTE: the way I add the lists makes the CF with more 'priority' that the others
 
-                //CF
-                //rec_items.AddRange(CF_rec_items);
-                //RManager.outLog(" + Output addrange: CF DICT");
-
-                //CF over TITLES
-                rec_items.AddRange(CF_TIT_rec_items);
-                RManager.outLog(" + Output addrange: CF TIT");
-
-                //CF over RATING
-                rec_items.AddRange(CF_RAT_rec_items);
-                RManager.outLog(" + Output addrange: CF RAT");
-
-                //CB over user-user similarity
-                //rec_items.AddRange(CB_U_rec_items);
-                //RManager.outLog(" + Output addrange: CB user-user");
-
+                if (A_CF_DICT)
+                {
+                    //get list of predictions
+                        //if (u.Value.Count > 0) //if the list of recommendable items is not empty
+                    //retrieve the id(s) of recommendable items (ordered by the best, to the poor)
+                    List<int> CF_rec_items = u.Value.ToList().OrderByDescending(x => x.Value).Select(x => x.Key).ToList();
+                    //else
+                        //the user has not clicked anything (cannot find similar users basing on current user clicks!)
+                        //RManager.outLog(" Target USER_ID " + user + " has 0 predictions!");
+                    //adding predictions 
+                    rec_items.AddRange(CF_rec_items);
+                }
+                if (A_CF_TIT)
+                {
+                    //get list of predictions
+                    List<int> CF_TIT_rec_items = REngineCBCF2.getListOfPlausibleTitleBasedItems(user);
+                    //adding predictions 
+                    rec_items.AddRange(CF_TIT_rec_items);
+                }
+                if (A_CF_TAG)
+                {
+                    //get list of predictions
+                    List<int> CF_TAG_rec_items = REngineCBCF2.getListOfPlausibleTagBasedItems(user);
+                    //adding predictions 
+                    rec_items.AddRange(CF_TAG_rec_items);
+                }
+                if (A_CF_RAT)
+                {
+                    //get list of predictions
+                    List<int> CF_RAT_rec_items = REngineCBCF2.getListOfPlausibleRatingBasedItems(user);
+                    //adding predictions 
+                    rec_items.AddRange(CF_RAT_rec_items);
+                }
+                if (A_CB_UU)
+                {
+                    //get list of predictions
+                    List<int> CB_U_rec_items = REngineCBCF2.getListOfPlausibleItems(user);
+                    //adding predictions 
+                    rec_items.AddRange(CB_U_rec_items);
+                }
+                if (A_CB_II)
+                {
+                    //get list of predictions
+                    //List<int> CB_I_rec_items = ...;
+                    //adding predictions 
+                    //rec_items.AddRange(CB_I_rec_items);
+                }
 
 
                 //////////////////////////////

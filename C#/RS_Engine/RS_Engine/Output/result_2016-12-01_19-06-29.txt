@@ -1,0 +1,54 @@
+RS:> 
+RS:> -----------------------------------------------------------------
+RS:>  ** RECOMMENDATORS ENGINE **
+RS:> -----------------------------------------------------------------
+RS:>     ____________________________
+RS:>     Algorithms
+RS:>     1) TOP
+RS:>     2) CB-F (ok)
+RS:>     3) U-CF
+RS:>     4) I-CF
+RS:> 
+RS:>     5) CF DICT UB/IB/HYBRID (chiama anche 6)
+RS:>     6) HYBRID CB+CF 2.0
+RS:>     ____________________________
+RS:>     TEST Mode
+RS:>     7) test mode: enable here to initialize the dataset as train/test and do EVAL (not use for kaggle scope)
+RS:>     ____________________________
+RS:>     8) EVAL mode: execute EVAL with input a specific csv (not use for kaggle scope)
+RS:>     9) .bin size calculator
+RS:>     ____________________________
+RS:>     0) exit
+RS:> -----------------------------------------------------------------
+RS:> 
+RS:>     > RS:>     ==> selected program (5)
+RS:> -----------------------------------------------------------------
+RS:>   + initializing RS 
+RS:>   + initializing dataset retrievement 
+RS:>   + reading dataset: interactions
+RS:>   + dataset read OK | interactions_f count= 546865 | conversion..
+RS:>   + reading serialized file target_users.bin
+RS:>   + reading serialized file user_profile.bin
+RS:>   + reading serialized file item_profile.bin
+RS:>   + reading serialized file item_profile_enabled.bin
+RS:>   + populating auxiliary data structures 
+RS:> 
+RS:>   + all datasets conversion: OK
+RS:>   -total lines | interactions      >>> 546864
+RS:>   -total lines | item_profile      >>> 167956
+RS:>   -total lines | item_profile_enab >>> 63446
+RS:>   -total lines | target_users      >>> 10000
+RS:>   -total lines | user_profile      >>> 40000
+RS:> 
+RS:> -----------------------------------------------------------------
+RS:>   # running program 5
+RS:> 
+RS:>   + processing..
+RS:>   + CF Algorithm..
+RS:>   + creating DICTIONARIES.. 
+RS:>   + user_items_dictionary
+RS:>   + reading serialized file CFDICT_user_items_dictionary.bin
+RS:>   + item_users_dictionary
+RS:>   + reading serialized file CFDICT_item_users_dictionary.bin
+RS:>   + computeCFUserUserSimilarity(): 
+RS:>   + calculating all coefficients 
