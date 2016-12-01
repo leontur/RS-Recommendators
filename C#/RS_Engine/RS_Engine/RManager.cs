@@ -22,6 +22,7 @@ namespace RS_Engine
         public static HashSet<int> item_profile_enabled_hashset = new HashSet<int>();
         public static List<List<object>> item_profile_enabled = new List<List<object>>();
         //public static List<List<object>> item_profile_disabled = new List<List<object>>();
+        public static List<int> item_profile_and_interaction_merge_nodup = new List<int>();
 
         //TEST DATA STRUCTURES
         public static List<List<object>> user_profile_test = new List<List<object>>();
@@ -335,6 +336,11 @@ namespace RS_Engine
             //Populate item_profile_enabled_dictionary
             foreach (var en in item_profile_enabled_list.Distinct())
                 item_profile_enabled_hashset.Add(en);
+
+            //create a list with a merge of item_profiles and globally interacted items with no duplicates
+            item_profile_and_interaction_merge_nodup.AddRange(interactions.Select(x => x[1]).ToList());
+            item_profile_and_interaction_merge_nodup.Union(item_profile.Select(x => (int)x[0]).ToList());
+            item_profile_and_interaction_merge_nodup = item_profile_and_interaction_merge_nodup.Distinct().ToList();
 
             //INFO
             outLog("");

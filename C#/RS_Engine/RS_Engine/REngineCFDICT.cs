@@ -984,8 +984,11 @@ namespace RS_Engine
                     //retrieve the id(s) of recommendable items (ordered by the best, to the poor)
                     List<int> CF_rec_items = u.Value.ToList().OrderByDescending(x => x.Value).Select(x => x.Key).ToList();
                 //else
-                    //the user has not clicked anything (cannot find similar users basing on current user clicks!)
-                    //RManager.outLog(" Target USER_ID " + user + " has 0 predictions!");
+                //the user has not clicked anything (cannot find similar users basing on current user clicks!)
+                //RManager.outLog(" Target USER_ID " + user + " has 0 predictions!");
+
+                //CF (RATINGS)
+                List<int> CF_RAT_rec_items = REngineCBCF2.getListOfPlausibleRatingBasedItems(user);
 
                 //CB (USER)
                 //retrieve the (variable) list of plausible items
@@ -1003,8 +1006,13 @@ namespace RS_Engine
                 List<int> rec_items = new List<int>();
 
                 //adding all predictions (NOTE: the way I add the lists makes the CF with more 'priority' that the others)
-                rec_items.AddRange(CF_rec_items);
-                rec_items.AddRange(CB_U_rec_items);
+                //CF
+                //rec_items.AddRange(CF_rec_items);
+                //CF over RATING
+                rec_items.AddRange(CF_RAT_rec_items);
+                //CB over user-user similarity
+                //rec_items.AddRange(CB_U_rec_items);
+                
 
                 //ADVANCED FILTER (ALREADY CLICKED)
                 if (!RManager.ISTESTMODE)

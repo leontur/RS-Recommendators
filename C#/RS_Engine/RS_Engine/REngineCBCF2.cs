@@ -13,16 +13,20 @@ namespace RS_Engine
         /////////////////////////////////////////////
         //ALGORITHM PARAMETERS
 
-        //number of similarities to select
+        //number of similarities to select (user based similarity)
         private const int SIM_USER_RANGE = 6;
         private const int SIM_USER_RANGE_TAKE_ITEMS = 10;
+
+        //number of similarities to select (rating based similarity)
+        private const int SIM_RATING_USER_RANGE = 20;
+        private const int SIM_RATING_USER_RANGE_TAKE_ITEMS = 2;
 
         //weights for average similarity (weight are 1-11)
         private static int[] SIM_WEIGHTS = new int[11];
         private static int den = -1;
 
         //shrink value for weighted average
-        private static double SHRINK = 1;
+        private static double SHRINK = 0;
 
         /////////////////////////////////////////////
         //EXECUTION VARS
@@ -38,16 +42,16 @@ namespace RS_Engine
 
             //Assigning weights
             SIM_WEIGHTS[0] = 5;   //jobroles	
-            SIM_WEIGHTS[1] = 9;   //career_level	
+            SIM_WEIGHTS[1] = 10;  //career_level	
             SIM_WEIGHTS[2] = 3;   //discipline_id	
-            SIM_WEIGHTS[3] = 5;   //industry_id	
-            SIM_WEIGHTS[4] = 7;   //country	
+            SIM_WEIGHTS[3] = 3;   //industry_id	
+            SIM_WEIGHTS[4] = 5;   //country	
             SIM_WEIGHTS[5] = 2;   //region	
             SIM_WEIGHTS[6] = 3;   //experience_n_entries_class	
-            SIM_WEIGHTS[7] = 6;   //experience_years_experience	
+            SIM_WEIGHTS[7] = 4;   //experience_years_experience	
             SIM_WEIGHTS[8] = 1;   //experience_years_in_current
-            SIM_WEIGHTS[9] = 10;  //edu_degree	
-            SIM_WEIGHTS[10] = 7;  //edu_fieldofstudies
+            SIM_WEIGHTS[9] = 8;   //edu_degree	
+            SIM_WEIGHTS[10] = 10; //edu_fieldofstudies
             den = SIM_WEIGHTS.Sum();
 
             //printing weights for log
@@ -161,8 +165,8 @@ namespace RS_Engine
             );
 
             //remove the user itself
-            if (output_sim_users.ContainsKey((int)user[0]))
-                output_sim_users.Remove((int)user[0]);
+            if (output_sim_users.ContainsKey(u1))
+                output_sim_users.Remove(u1);
 
             return output_sim_users;
         }
@@ -434,7 +438,7 @@ namespace RS_Engine
         public static List<int> getListOfPlausibleItems(int u)
         {
             //get top SIM_USER_RANGE most similar users
-            List<int> most_sim = getSimilarityDictionaryForTheUserWithId(u).ToList().OrderByDescending(x => x.Value).Select(x => x.Key).Take(SIM_USER_RANGE).ToList();
+            List<int> most_sim = getSimilarityDictionaryForTheUserWithId(u).OrderByDescending(x => x.Value).Select(x => x.Key).Take(SIM_USER_RANGE).ToList();
 
             //instantiate a dictionary for the merge of all the items
             //key: item_id, value: rankingpoints
@@ -457,7 +461,7 @@ namespace RS_Engine
             }
 
             //ordering (basing on the rank) and returning a variable size ordered list of items
-            return most_sim_interaction_ranked_dictionary.ToList().OrderByDescending(x => x.Value).Select(x => x.Key).ToList();
+            return most_sim_interaction_ranked_dictionary.OrderByDescending(x => x.Value).Select(x => x.Key).ToList();
         }
         //
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -465,18 +469,180 @@ namespace RS_Engine
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         //(COLLABORATIVE FILTERING BASED ON JOB TITLES)
         //
+        public static int computeSimilarItemsBasingOnTitles()
+        {
+            //TODO
+
+            return 0;
+        }
         public static List<int> retrieveTitlesForInteraction(int item_id)
         {
             //to store all in a global var 
             //not in use (now called 1by1) IDictionary<int, List<int>> interaction_titles = new Dictionary<int, List<int>>();
             return (List<int>)RManager.item_profile.Where(x => (int)x[0] == item_id).Select(x => x[1]);
         }
-        public static List<int> collectTitlesOfInterestForUser(int user_id)
+        public static IDictionary<int, DoubleValueListInt> collectTitlesOfInterestForUser(int user_id)
         {
-            //TODO QUI
+            //retrieve the user ranked interactions
+            IDictionary<int, int> ranked_interaction = getRankedInteractionsForUser(user_id, false);
 
-            return null;
+            //get for each ranked interaction the related titles and rank
+            //key: item_id, Value (doubled): list of titles, rank of item
+            IDictionary<int, DoubleValueListInt> ranked_interaction_titles_rank = new Dictionary<int, DoubleValueListInt>();
+            foreach (var ri in ranked_interaction)
+                ranked_interaction_titles_rank.Add(ri.Key, new DoubleValueListInt { Value1 = retrieveTitlesForInteraction(ri.Key), Value2 = ri.Value});
+
+            return ranked_interaction_titles_rank;
         }
+        public struct DoubleValueListInt
+        {
+            public List<int> Value1;
+            public int Value2;
+        }
+        //
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //(COLLABORATIVE FILTERING BASED ON ITEM RATINGS)
+        //GET THE (variable size) LIST OF PLAUSIBLE ITEMS (recommendable active only) FOR THE USER u
+        public static List<int> getListOfPlausibleRatingBasedItems(int user_id)
+        {
+            //get all the similar users
+            var sim_users_dict = getRatingBasedSimilaritiesForUser(user_id);
+
+            //get top SIM_USER_RANGE most similar users
+            var most_sim = sim_users_dict.OrderByDescending(x => x.Value).Select(x => x.Key).Take(SIM_RATING_USER_RANGE).ToList();
+
+            //instantiate a dictionary for the merge of all the items
+            //key: item_id, value: rankingpoints
+            IDictionary<int, double> most_sim_interaction_ranked_dictionary = new Dictionary<int, double>();
+
+            //for each similar user get its plausible list of interacted items
+            foreach (var su in most_sim)
+            {
+                //get top SIM_USER_RANGE_TAKE_ITEMS most ranked items
+                IDictionary<int, int> su_sim_interaction_ranked_dictionary =
+                    getRankedInteractionsForUser(su, true).OrderByDescending(x => x.Value).Take(SIM_RATING_USER_RANGE_TAKE_ITEMS).ToDictionary(kp => kp.Key, kp => kp.Value);
+
+                //TODO non è detto che incrementi, potrebbe pescare tutti item diversi
+                //add items to 'concone'
+                foreach (var i in su_sim_interaction_ranked_dictionary)
+                    if (!most_sim_interaction_ranked_dictionary.ContainsKey(i.Key))
+                        most_sim_interaction_ranked_dictionary.Add(i.Key, i.Value);
+                    else
+                        most_sim_interaction_ranked_dictionary[i.Key] += i.Value;
+            }
+
+            //ordering (basing on the rank) and returning a variable size ordered list of items
+            return most_sim_interaction_ranked_dictionary.OrderByDescending(x => x.Value).Select(x => x.Key).ToList();
+        }
+        //return dicionary containing all similarities with other users (without itself)
+        public static IDictionary<int, double> getRatingBasedSimilaritiesForUser(int user_id)
+        {
+            //instance to return
+            //key: (sim_)user_id, value: computed-similarity
+            IDictionary<int, double> output_sim_users = new Dictionary<int, double>();
+
+            //for every user
+            object sync = new object();
+            Parallel.ForEach(
+                RManager.user_profile,
+                new ParallelOptions { MaxDegreeOfParallelism = 32 },
+                su =>
+                {
+                    //COMPUTE SIMILARITY with this user
+                    //create an entry in the dictionary
+                    lock (sync)
+                        output_sim_users.Add((int)su[0], computeRatingBasedPearsonSimilarityForUsers(user_id, (int)su[0]));
+                }
+            );
+
+            //remove the user itself
+            if (output_sim_users.ContainsKey(user_id))
+                output_sim_users.Remove(user_id);
+
+            return output_sim_users;
+        }
+        //return the value of similarity
+        public static double computeRatingBasedPearsonSimilarityForUsers(int u1, int u2)
+        {
+            //get rows
+            var u1Ratings = RManager.user_items_dictionary[u1];
+            var u2Ratings = RManager.user_items_dictionary[u2];
+
+            double sum_num = 0;
+            double sum_den1 = 0;
+            double sum_den2 = 0;
+            double mean1 = 0;
+            double mean2 = 0;
+            int common = 0;
+
+            double u1RCount = u1Ratings.Count();
+            double u2RCount = u2Ratings.Count();
+
+            //normalized values
+            IDictionary<int, double> u1RatingsNorm = new Dictionary<int, double>();
+            IDictionary<int, double> u2RatingsNorm = new Dictionary<int, double>();
+
+            //standardizing ratings (values) in a 0-100 scale
+            if (u1RCount > 0)
+            {
+                double u1Max = u1Ratings.Select(x => x.Value).Max();
+                foreach (var i in u1Ratings)
+                    u1RatingsNorm[i.Key] = i.Value * 100 / u1Max;
+                mean1 = u1RatingsNorm.Select(x => x.Value).Sum() / u1RCount;
+            }
+            else
+                return 0;
+
+            if (u2RCount > 0)
+            {
+                double u2Max = u2Ratings.Select(x => x.Value).Max();
+                foreach (var i in u2Ratings)
+                    u2RatingsNorm[i.Key] = i.Value * 100 / u2Max;
+                mean2 = u2RatingsNorm.Select(x => x.Value).Sum() / u2RCount;
+            }
+            else
+                return 0;
+
+            //compute similarity
+            foreach (var c1 in u1RatingsNorm)
+            {
+                foreach (var c2 in u2RatingsNorm)
+                {
+                    if(c1.Key == c2.Key)
+                    {
+                        //num
+                        double sum1 = c1.Value;// - mean1;
+                        double sum2 = c2.Value;// - mean2;
+                        sum_num += (sum1 * sum2);
+
+                        //den
+                        sum_den1 += Math.Pow(sum1, 2);
+                        sum_den2 += Math.Pow(sum2, 2);
+
+                        //count
+                        common++;
+                    }
+                }
+            }
+
+            /*
+            //debug
+            int common2 = u1Ratings.Select(x => x.Key).ToList().Intersect(u2Ratings.Select(x => x.Key).ToList()).Count();
+            if (common2 > 1)
+                ;
+            */
+
+            double sim = 0;
+            if (sum_den1 > 0 && sum_den2 > 0)
+            {
+                sim = sum_num / (Math.Sqrt(sum_den1) * Math.Sqrt(sum_den2));
+                sim /= (double)(u1RCount + u2RCount - common);
+            }
+
+            return sim;
+        } 
         //
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     }
