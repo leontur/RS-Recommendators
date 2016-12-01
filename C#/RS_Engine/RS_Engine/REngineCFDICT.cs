@@ -29,7 +29,7 @@ namespace RS_Engine
         //HR
         private const int HYBRID_R_WEIGHT_I = 3;
         private const int HYBRID_R_WEIGHT_U = 4;
-        private const int HYBRID_R_KNN = 30;
+        private const int HYBRID_R_KNN = 15;
 
         /////////////////////////////////////////////
         //EXECUTION VARS
@@ -954,12 +954,12 @@ namespace RS_Engine
         private static void generateOutput(IDictionary<int, IDictionary<int, double>> users_prediction_dictionary)
         {
             //ENABLED ALGORITHMS
-            bool A_CF_DICT  = false; //CF from dictionaries DICT
-            bool A_CF_TIT   = false;   //CF over TITLES
+            bool A_CF_DICT  = true; //CF from dictionaries DICT
+            bool A_CF_TIT   = true;   //CF over TITLES
             bool A_CF_TAG   = true;   //CF over TAGS
-            bool A_CF_RAT   = false;   //CF over RATING
-            bool A_CB_UU    = false;   //CB over user-user similarity
-            bool A_CB_II    = false;   //CB over item-item similarity (*******to be implemented FROM CBF)
+            bool A_CF_RAT   = true;   //CF over RATING
+            bool A_CB_UU    = true;   //CB over user-user similarity
+            bool A_CB_II    = false;   //CB over item-item similarity (<<<<<<< to be implemented FROM CBF)
 
             RManager.outLog(" + Output CF DICT :> " + A_CF_DICT);
             RManager.outLog(" + Output CF TIT  :> " + A_CF_TIT);
@@ -970,6 +970,7 @@ namespace RS_Engine
 
             //counter
             int c_tot = users_prediction_dictionary.Count();
+            int top5_counter = 0;
             RManager.outLog("  + generating output structured data ");
             RManager.outLog("  + the input dictionary count is: " + c_tot);
 
@@ -999,7 +1000,6 @@ namespace RS_Engine
                 //MERGE LISTS OF PREDICTIONS
                 //adding all predictions 
                 //NOTE: the way I add the lists makes the CF with more 'priority' that the others
-
                 if (A_CF_DICT)
                 {
                     //get list of predictions
@@ -1119,6 +1119,7 @@ namespace RS_Engine
                     //add TOP 5
                     RManager.outLog(" Target USER_ID " + user + " has LESS than 5 predictions (" + rec_items.Count + ") -> adding top5");
                     rec_items.AddRange(REngineTOP.getTOP5List());
+                    top5_counter++;
                 }
 
                 //trim of list for top 5
@@ -1129,6 +1130,8 @@ namespace RS_Engine
             //consistency check
             if(output_dictionary.Count != RManager.target_users.Count)
                 RManager.outLog(" ERROR: the output dictionary count is not equal to the target user list!");
+
+            RManager.outLog(" INFO: added top5 for in " + top5_counter + " cases!");
 
             //Converting output for file write (the writer function wants a list of list of 5 int, ordered by the target_users list)
             List<List<int>> output_dictionary_as_target_users_list = output_dictionary.ToList().OrderBy(x => x.Key).Select(x => x.Value).ToList();

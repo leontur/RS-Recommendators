@@ -14,20 +14,20 @@ namespace RS_Engine
         //ALGORITHM PARAMETERS
 
         //number of similarities to select (user-user similarity)
-        private const int SIM_USER_RANGE = 6;
-        private const int SIM_USER_RANGE_TAKE_ITEMS = 10;
+        private const int SIM_USER_RANGE = 10;
+        private const int SIM_USER_RANGE_TAKE_ITEMS = 8;
 
         //number of similarities to select (rating based similarity)
-        private const int SIM_RATING_USER_RANGE = 15;
-        private const int SIM_RATING_USER_RANGE_TAKE_ITEMS = 3;
+        private const int SIM_RATING_USER_RANGE = 20;
+        private const int SIM_RATING_USER_RANGE_TAKE_ITEMS = 2;
 
         //number of similarities to select (title based similarity)
-        private const int SIM_TITLE_USER_RANGE = 20;
-        private const int SIM_TITLE_USER_RANGE_TAKE_ITEMS = 3;
+        private const int SIM_TITLE_USER_RANGE = 25;
+        private const int SIM_TITLE_USER_RANGE_TAKE_ITEMS = 4;
 
         //number of similarities to select (tag based similarity)
-        private const int SIM_TAG_USER_RANGE = 10;
-        private const int SIM_TAG_USER_RANGE_TAKE_ITEMS = 5;
+        private const int SIM_TAG_USER_RANGE = 20;
+        private const int SIM_TAG_USER_RANGE_TAKE_ITEMS = 7;
 
         //weights for average similarity (weight are 1-11)
         private static int[] SIM_WEIGHTS = new int[11];
