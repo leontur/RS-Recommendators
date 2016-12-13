@@ -396,6 +396,11 @@ namespace RS_Engine
 
                 outLog("  + conversion OK | submission user count= " + output_users.Count() + " | submission useritems count= " + output_useritems.Count());
             }
+
+            ////////////////////////////////////
+            //MS_AZURE_CS FORMAT PRINT
+            //convertAndPrintDatasetsToMSCS();
+           
         }
 
         //MENU SELECTOR
@@ -587,5 +592,115 @@ namespace RS_Engine
             lastWasInline = carriageret;
         }
 
+
+        private static void convertAndPrintDatasetsToMSCS()
+        {
+            ////////////////////////////////////
+            //MS_AZURE_CS FORMAT PRINT
+            Console.WriteLine("MS_AZURE_CS CONVERSION..");
+            //Items
+            string item_MSCS = "";
+            int addcount = 0;
+            foreach (var it in item_profile)
+            {
+                //only if enabled 
+                if ((int)it[12] == 1)
+                {
+                    //add to MS_CS output
+                    //<Item Id>,<Item Name>,<Item Category>,[<Description>],<Features list>
+                    item_MSCS +=
+                          (int)it[0] + ","
+                        + string.Join(" ", ((List<int>)it[1]).Select(n => n.ToString()).ToArray()) + ","
+                        + (int)it[3] + ","
+                        + string.Join(" ", ((List<int>)it[10]).Select(n => n.ToString()).ToArray()) + ","
+                        + " " + "careerlevel=" + (int)it[2] + ","
+                        + " " + "industryid=" + (int)it[4] + ","
+                        + " " + "country=" + (int)it[5] + ","
+                        + " " + "region=" + (int)it[6] + ","
+                        + " " + "employment=" + (int)it[9] + ","
+                        + " " + "createdat=" + REngineCBF.UnixTimeStampToDateTime((int)it[11]).ToString("yyyy/MM/dd'T'HH:mm:ss", CultureInfo.InvariantCulture)
+                        ;
+                    item_MSCS += Environment.NewLine;
+                    addcount++;
+                    if (addcount % 3000 == 0)
+                    {
+                        //counter
+                        Console.WriteLine(".." + addcount);
+
+                        //save
+                        File.AppendAllText(BACKPATH + "Output/MS_CS_ITEMS.csv", item_MSCS);
+                        item_MSCS = "";
+                    }
+                }
+            }
+            //save last
+            File.AppendAllText(BACKPATH + "Output/MS_CS_ITEMS.csv", item_MSCS);
+            //repeat with disabled to fill 100.000 (MS_CS LIMIT)
+            item_MSCS = "";
+            foreach (var it in item_profile)
+            {
+                //only if NOTenabled 
+                if ((int)it[12] == 0 && addcount < 100000)
+                {
+                    //add to MS_CS output
+                    //<Item Id>,<Item Name>,<Item Category>,[<Description>],<Features list>
+                    item_MSCS +=
+                          (int)it[0] + ","
+                        + string.Join(" ", ((List<int>)it[1]).Select(n => n.ToString()).ToArray()) + ","
+                        + (int)it[3] + ","
+                        + string.Join(" ", ((List<int>)it[10]).Select(n => n.ToString()).ToArray()) + ","
+                        + " " + "careerlevel=" + (int)it[2] + ","
+                        + " " + "industryid=" + (int)it[4] + ","
+                        + " " + "country=" + (int)it[5] + ","
+                        + " " + "region=" + (int)it[6] + ","
+                        + " " + "employment=" + (int)it[9] + ","
+                        + " " + "createdat=" + REngineCBF.UnixTimeStampToDateTime((int)it[11]).ToString("yyyy/MM/dd'T'HH:mm:ss", CultureInfo.InvariantCulture)
+                        ;
+                    item_MSCS += Environment.NewLine;
+                    addcount++;
+                    if (addcount % 3000 == 0)
+                    {
+                        //counter
+                        Console.WriteLine(".." + addcount);
+
+                        //save
+                        File.AppendAllText(BACKPATH + "Output/MS_CS_ITEMS.csv", item_MSCS);
+                        item_MSCS = "";
+                    }
+                }
+            }
+            //save last
+            File.AppendAllText(BACKPATH + "Output/MS_CS_ITEMS.csv", item_MSCS);
+
+            //Interactions
+            string interactions_MSCS = "";
+            int addcount2 = 0;
+            foreach (var it in interactions)
+            {
+                //add to MS_CS output
+                //<User Id>,<Item Id>,<Time>,[<Event>]
+                interactions_MSCS +=
+                    it[0] + "," +
+                    it[1] + "," +
+                    REngineCBF.UnixTimeStampToDateTime(it[3]).ToString("yyyy/MM/dd'T'HH:mm:ss", CultureInfo.InvariantCulture) + "," +
+                    (it[2] == 1 ? "Click" : it[2] == 2 ? "AddShopCart" : it[2] == 3 ? "Purchase" : "")
+                    ;
+                interactions_MSCS += Environment.NewLine;
+                addcount2++;
+                if (addcount2 % 8000 == 0)
+                {
+                    //counter
+                    Console.WriteLine(".." + addcount2);
+
+                    //save
+                    File.AppendAllText(BACKPATH + "Output/MS_CS_INTERACTIONS.csv", interactions_MSCS);
+                    interactions_MSCS = "";
+                }
+            }
+            //save last
+            File.AppendAllText(BACKPATH + "Output/MS_CS_INTERACTIONS.csv", interactions_MSCS);
+            //MS_AZURE_CS END
+            /////////////////////////////
+        }
     }
 }

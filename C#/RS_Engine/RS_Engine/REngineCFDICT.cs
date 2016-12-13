@@ -18,17 +18,25 @@ namespace RS_Engine
     {
         /////////////////////////////////////////////
         //ALGORITHM PARAMETERS
+
         //UB
         private const int SIM_SHRINK_UB = 10;
         private const int PRED_SHRINK_UB = 10;
+
         //IB
         private const int SIM_SHRINK_IB = 20;
         private const int PRED_SHRINK_IB = 10;
+
+        //CF KNN (0=disabled)
+        private const int CF_UB_KNN = 110;
+        private const int CF_IB_KNN = 0;
+
         //HW
-        private const double HYBRID_W_WEIGHT = 0.6;
+        private const double HYBRID_W_WEIGHT = 0.4;
+
         //HR
-        private const int HYBRID_R_WEIGHT_I = 1;
-        private const double HYBRID_R_WEIGHT_U = 0.99;
+        private const int HYBRID_R_WEIGHT_I = 4;
+        private const double HYBRID_R_WEIGHT_U = 0.5;
         private const int HYBRID_R_KNN = 30;
 
         /////////////////////////////////////////////
@@ -42,6 +50,8 @@ namespace RS_Engine
         public static IDictionary<int, IDictionary<int, double>> CF_HW_user_prediction_dictionary = new Dictionary<int, IDictionary<int, double>>();
         public static IDictionary<int, IDictionary<int, double>> CF_HR_user_prediction_dictionary = new Dictionary<int, IDictionary<int, double>>();
 
+        public static IDictionary<int, double> CF_IB_IDF_dictionary = new Dictionary<int, double>();
+
         //SUPER-HYBRID
         public static IDictionary<int, List<int>> SUPER_HYBRID_read = new Dictionary<int, List<int>>();
 
@@ -53,7 +63,7 @@ namespace RS_Engine
             RManager.outLog("  + processing..");
             RManager.outLog("  + CF Algorithm..");
 
-            /*
+            
             //SUPER-HYBRID
             //only temporary: read from another output (done with another algorithm) and add the lines in this is not good
             //READ FROM CSV
@@ -68,7 +78,6 @@ namespace RS_Engine
                     SUPER_HYBRID_read.Add(Int32.Parse(row_IN[0]), row_IN[1].Split('\t').Select(Int32.Parse).ToList());
                 }
             }
-            */
 
             ///////////////////////////////////////////////
             //CF
@@ -84,13 +93,13 @@ namespace RS_Engine
             predictCFItemBasedRecommendations();
 
             //Execute HYBRID
-            //computeCFHybridWeightedRecommendations();
+            computeCFHybridWeightedRecommendations();
             computeCFHybridRankRecommendations();
 
             ///////////////////////////////////////////////
             //CB
             //Execute
-            REngineCBCF2.getRecommendations();
+            //REngineCBCF2.getRecommendations();
 
             ///////////////////////////////////////////////
             //Execute OUTPUT
@@ -197,7 +206,7 @@ namespace RS_Engine
                         int count = Interlocked.CompareExchange(ref par_counter, 0, 0);
                         if (count % 200 == 0) RManager.outLog("  - remaining: " + count, true, true, true);
                         
-                        //getting user id
+                        //getting item id
                         int item = (int)i[0];
 
                         //retrieving the ranked interactions dict of the user
@@ -250,6 +259,95 @@ namespace RS_Engine
                 }
             }
 
+            //counter
+            par_counter = RManager.interactions.Count();
+            RManager.outLog("  + CF_IB_IDF_dictionary");
+
+            //check if already serialized (for fast fetching)
+            if (!File.Exists(Path.Combine(RManager.SERIALTPATH, "CFDICT_CF_IB_IDF_dictionary.bin")))
+            {
+
+                //temp dictionary for total interactions count
+                IDictionary<int, int> item_inter_count = new Dictionary<int, int>();
+
+                //for every item
+                object sync = new object();
+                Parallel.ForEach(
+                    RManager.interactions,
+                    new ParallelOptions { MaxDegreeOfParallelism = 8 },
+                    i =>
+                    {
+                        //counter
+                        Interlocked.Decrement(ref par_counter);
+                        int count = Interlocked.CompareExchange(ref par_counter, 0, 0);
+                        if (count % 2000 == 0) RManager.outLog("  - remaining: " + count, true, true, true);
+
+                        //getting item id
+                        int item = (int)i[1];
+
+                        //create an entry in the dictionary
+                        //counting times of interactions per items (with no duplicates)
+                        lock (sync)
+                        {
+                            if (!item_inter_count.ContainsKey(item))
+                            {
+                                item_inter_count.Add(item, 1);
+                            }
+                            else
+                            {
+                                item_inter_count[item] += 1;
+                            }
+                        }
+
+                    }
+                );
+
+                //for every item
+                par_counter = item_inter_count.Count();
+                int interactions_size = RManager.interactions.Count();
+                Parallel.ForEach(
+                    item_inter_count,
+                    new ParallelOptions { MaxDegreeOfParallelism = 8 },
+                    i =>
+                    {
+                        //counter
+                        Interlocked.Decrement(ref par_counter);
+                        int count = Interlocked.CompareExchange(ref par_counter, 0, 0);
+                        if (count % 2000 == 0) RManager.outLog("  - remaining: " + count, true, true, true);
+
+                        //create an entry in the dictionary
+                        //counting times of interactions per items (with no duplicates)
+                        lock (sync)
+                        {
+                            CF_IB_IDF_dictionary.Add(
+                                i.Key, //item id (unique)
+                                Math.Log10(interactions_size / i.Value) // IDF log10 coefficient
+                                );
+                        }
+
+                    }
+                );
+
+                //serialize
+                using (Stream stream = File.Open(Path.Combine(RManager.SERIALTPATH, "CFDICT_CF_IB_IDF_dictionary.bin"), FileMode.Create))
+                {
+                    RManager.outLog("  + writing serialized file " + "CFDICT_CF_IB_IDF_dictionary.bin");
+                    var bformatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+                    bformatter.Serialize(stream, CF_IB_IDF_dictionary);
+                }
+            }
+            else
+            {
+                //deserialize
+                using (Stream stream = File.Open(Path.Combine(RManager.SERIALTPATH, "CFDICT_CF_IB_IDF_dictionary.bin"), FileMode.Open))
+                {
+                    RManager.outLog("  + reading serialized file " + "CFDICT_CF_IB_IDF_dictionary.bin");
+                    var bformatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+                    CF_IB_IDF_dictionary = (IDictionary<int, double>)bformatter.Deserialize(stream);
+                }
+            }
+
+
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -263,8 +361,6 @@ namespace RS_Engine
             //runtime dictionaries
             IDictionary<int, IDictionary<int, double>> user_user_similarity_dictionary = new Dictionary<int, IDictionary<int, double>>();
             IDictionary<int, IDictionary<int, double>> user_user_similarity_dictionary_num = new Dictionary<int, IDictionary<int, double>>();
-            //IDictionary<int, IDictionary<int, double>> user_user_similarity_dictionary_den1 = new Dictionary<int, IDictionary<int, double>>();
-            //IDictionary<int, IDictionary<int, double>> user_user_similarity_dictionary_den2 = new Dictionary<int, IDictionary<int, double>>();
             IDictionary<int, double> user_similarity_dictionary_norm = new Dictionary<int, double>();
 
             //counter
@@ -283,8 +379,6 @@ namespace RS_Engine
 
                 //creating user key in the coefficients dictionaries
                 user_user_similarity_dictionary_num.Add(user, new Dictionary<int, double>());
-                //user_user_similarity_dictionary_den1.Add(user, new Dictionary<int, double>());
-                //user_user_similarity_dictionary_den2.Add(user, new Dictionary<int, double>());
 
                 //get the interacted items and the related best interaction type for each clicked item
                 IDictionary<int, int> interacted_items = u.Value;
@@ -310,52 +404,33 @@ namespace RS_Engine
                         int interaction_type_of_sim_user = 0;
 
                         //creating coefficients
-                        double num, den1, den2;
+                        double num;
 
                         //if the sim_user has interacted with same item
                         if (RManager.user_items_dictionary[sim_user].TryGetValue(item, out interaction_type_of_sim_user))
-                        {
                             num = interaction_type * interaction_type_of_sim_user;
-                            den1 = Math.Pow(interaction_type, 2);
-                            den2 = Math.Pow(interaction_type_of_sim_user, 2);
-                        }
                         else
-                        {
-                            num = den1 = den2 = 0;
-                        }
+                            num = 0;
 
                         //storing coefficients
-                        if (user_user_similarity_dictionary_num[user].ContainsKey(sim_user)) {
+                        if (user_user_similarity_dictionary_num[user].ContainsKey(sim_user)) 
                             user_user_similarity_dictionary_num[user][sim_user] += num;
-                            //user_user_similarity_dictionary_den1[user][sim_user] += den1;
-                            //user_user_similarity_dictionary_den2[user][sim_user] += den2;
-                        }
                         else
-                        {
                             //add to similarity dictionary
                             user_user_similarity_dictionary_num[user].Add(sim_user, num);
-                            //user_user_similarity_dictionary_den1[user].Add(sim_user, den1);
-                            //user_user_similarity_dictionary_den2[user].Add(sim_user, den2);
-                        }
 
                     }
                 }
 
                 //removing from the similarity coefficients the user itself
                 if (user_user_similarity_dictionary_num[user].ContainsKey(user))
-                {
                     user_user_similarity_dictionary_num[user].Remove(user);
-                    //user_user_similarity_dictionary_den1[user].Remove(user);
-                    //user_user_similarity_dictionary_den2[user].Remove(user);
-                }
             }
 
-            //for each item in the dictionary
+            //for each user in the dictionary
             foreach (var u in RManager.user_items_dictionary)
-            {
                 //increase norm
                 user_similarity_dictionary_norm[u.Key] = Math.Sqrt(u.Value.Count());
-            }
 
             //counter
             c_tot = user_user_similarity_dictionary_num.Count();
@@ -392,6 +467,18 @@ namespace RS_Engine
                 user_user_similarity_dictionary.Add(user, sim_users_predictions);
             }
 
+            if (CF_UB_KNN > 0)
+            {
+                //ordering and taking only top similar KNN
+                RManager.outLog("  + KNN is active, ordering and taking.. ");
+
+                //for each user
+                foreach (var u in user_user_similarity_dictionary.Select(x => x.Key).ToList())
+                    //sort the predictions and take knn
+                    user_user_similarity_dictionary[u] = user_user_similarity_dictionary[u].OrderByDescending(x => x.Value).Take(CF_UB_KNN).ToDictionary(kp => kp.Key, kp => kp.Value);
+
+            }
+
             //exposing
             CF_user_user_sim_dictionary = user_user_similarity_dictionary;
         }
@@ -406,7 +493,6 @@ namespace RS_Engine
             //runtime dictionaries
             IDictionary<int, IDictionary<int, double>> users_prediction_dictionary = new Dictionary<int, IDictionary<int, double>>();
             IDictionary<int, IDictionary<int, double>> users_prediction_dictionary_num = new Dictionary<int, IDictionary<int, double>>();
-            //IDictionary<int, IDictionary<int, double>> users_prediction_dictionary_den = new Dictionary<int, IDictionary<int, double>>();
             IDictionary<int, double> users_prediction_dictionary_norm = new Dictionary<int, double>();
 
             //counter
@@ -425,7 +511,6 @@ namespace RS_Engine
                 {
                     //creating user key in the coefficients dictionaries
                     users_prediction_dictionary_num.Add(user, new Dictionary<int, double>());
-                    //users_prediction_dictionary_den.Add(user, new Dictionary<int, double>());
 
                     //get dictionary of similar users and value of similarity
                     var uus_list = CF_user_user_sim_dictionary[user];
@@ -439,27 +524,24 @@ namespace RS_Engine
                         //get items (dictionary) with which this user interacted
                         var sim_user_item_list = RManager.user_items_dictionary[user2];
 
-                        //for every item in this dictionary
-                        foreach (var item in sim_user_item_list)
+                        //if similar user has the current user in its similarities
+                        if (CF_user_user_sim_dictionary[user2].ContainsKey(user))
                         {
-                            //get item id
-                            int i = item.Key;
-
-                            //coefficients
-                            double num = uus_list[user2] * sim_user_item_list[i];
-                            double den = uus_list[user2];
-
-                            //if the current item is not predicted yet for the user, add it
-                            if (!users_prediction_dictionary_num[user].ContainsKey(i))
+                            //for every item in this dictionary
+                            foreach (var item in sim_user_item_list)
                             {
-                                users_prediction_dictionary_num[user].Add(i, num);
-                                //users_prediction_dictionary_den[user].Add(i, den);
-                            }
-                            //else adding its contribution
-                            else
-                            {
-                                users_prediction_dictionary_num[user][i] += num;
-                                //users_prediction_dictionary_den[user][i] += den;
+                                //get item id
+                                int i = item.Key;
+
+                                //coefficients
+                                double num = uus_list[user2] * sim_user_item_list[i];
+
+                                //if the current item is not predicted yet for the user, add it
+                                if (!users_prediction_dictionary_num[user].ContainsKey(i))
+                                    users_prediction_dictionary_num[user].Add(i, num);
+                                //else adding its contribution
+                                else
+                                    users_prediction_dictionary_num[user][i] += num;
                             }
                         }
                     }
@@ -500,15 +582,18 @@ namespace RS_Engine
                     //get current item id
                     int sim_item = item_pred.Key;
 
-                    //only if this item is recommendable
-                    if (RManager.item_profile_enabled_hashset.Contains(sim_item)) {
+                    //only if this item is not clicked before by the user
+                    if (!RManager.user_items_dictionary[user].ContainsKey(sim_item))
+                    {
+                        //only if this item is recommendable
+                        if (RManager.item_profile_enabled_hashset.Contains(sim_item))
+                        {
+                            //evaluate prediction of that item for that user
+                            double pred = users_prediction_dictionary_num[user][sim_item] / (users_prediction_dictionary_norm[user] + PRED_SHRINK_UB);
 
-                        //evaluate prediction of that item for that user
-                        double pred = users_prediction_dictionary_num[user][sim_item] / (users_prediction_dictionary_norm[user] + PRED_SHRINK_UB);
-                                                                                   // / (users_prediction_dictionary_den[user][sim_item] + PRED_SHRINK_UB);
-
-                        //storing
-                        sim_items_predictions.Add(sim_item, pred);
+                            //storing
+                            sim_items_predictions.Add(sim_item, pred);
+                        }
                     }
                 }
 
@@ -531,8 +616,6 @@ namespace RS_Engine
             //runtime dictionaries
             IDictionary<int, IDictionary<int, double>> item_item_similarity_dictionary = new Dictionary<int, IDictionary<int, double>>();
             IDictionary<int, IDictionary<int, double>> item_item_similarity_dictionary_num = new Dictionary<int, IDictionary<int, double>>();
-            //IDictionary<int, IDictionary<int, double>> item_item_similarity_dictionary_den1 = new Dictionary<int, IDictionary<int, double>>();
-            //IDictionary<int, IDictionary<int, double>> item_item_similarity_dictionary_den2 = new Dictionary<int, IDictionary<int, double>>();
             IDictionary<int, double> item_similarity_dictionary_norm = new Dictionary<int, double>();
 
             //counter
@@ -551,8 +634,6 @@ namespace RS_Engine
 
                 //creating user key in the coefficients dictionaries
                 item_item_similarity_dictionary_num.Add(item, new Dictionary<int, double>());
-                //item_item_similarity_dictionary_den1.Add(item, new Dictionary<int, double>());
-                //item_item_similarity_dictionary_den2.Add(item, new Dictionary<int, double>());
 
                 //get the users that interacted with the current item and the related best interaction type for each clicked item
                 IDictionary<int, int> interacting_users = i.Value;
@@ -573,7 +654,7 @@ namespace RS_Engine
                     //for each item in the list of (similar) items
                     foreach (var sim_item in item_list)
                     {
-                        if (sim_item == user)
+                        if (sim_item == item)
                             continue;
 
                         //retrieving interaction coefficients
@@ -582,44 +663,21 @@ namespace RS_Engine
 
                         //creating coefficients
                         double num = interaction_type * interaction_type_of_sim_item;
-                        //double den1 = Math.Pow(interaction_type, 2);
-                        //double den2 = Math.Pow(interaction_type_of_sim_item, 2);
 
                         //storing coefficients
                         if (item_item_similarity_dictionary_num[item].ContainsKey(sim_item))
-                        {
                             item_item_similarity_dictionary_num[item][sim_item] += num;
-                            //item_item_similarity_dictionary_den1[item][sim_item] += den1;
-                            //item_item_similarity_dictionary_den2[item][sim_item] += den2;
-                        }
                         else
-                        {
                             //add to similarity dictionary
                             item_item_similarity_dictionary_num[item].Add(sim_item, num);
-                            //item_item_similarity_dictionary_den1[item].Add(sim_item, den1);
-                            //item_item_similarity_dictionary_den2[item].Add(sim_item, den2);
-                        }
-
                     }
                 }
-
-                /*
-                //removing from the similarity coefficients the item itself
-                if (item_item_similarity_dictionary_num[item].ContainsKey(item))
-                {
-                    item_item_similarity_dictionary_num[item].Remove(item);
-                    item_item_similarity_dictionary_den1[item].Remove(item);
-                    item_item_similarity_dictionary_den2[item].Remove(item);
-                }
-                */
             }
 
             //for each item in the dictionary
             foreach (var i in RManager.item_users_dictionary)
-            {
                 //increase norm
                 item_similarity_dictionary_norm[i.Key] = Math.Sqrt(i.Value.Count());
-            }
 
             //counter
             c_tot = item_item_similarity_dictionary_num.Count();
@@ -656,6 +714,17 @@ namespace RS_Engine
                 item_item_similarity_dictionary.Add(item, sim_items_predictions);
             }
 
+            if (CF_IB_KNN > 0)
+            {
+                //ordering and taking only top similar KNN
+                RManager.outLog("  + KNN is active, ordering and taking.. ");
+
+                //for each item
+                foreach (var i in item_item_similarity_dictionary.Select(x => x.Key).ToList())
+                    //sort the predictions and take knn
+                    item_item_similarity_dictionary[i] = item_item_similarity_dictionary[i].OrderByDescending(x => x.Value).Take(CF_IB_KNN).ToDictionary(kp => kp.Key, kp => kp.Value);
+            }
+
             //exposing
             CF_item_item_sim_dictionary = item_item_similarity_dictionary;
         }
@@ -671,7 +740,6 @@ namespace RS_Engine
             IDictionary<int, IDictionary<int, double>> users_prediction_dictionary = new Dictionary<int, IDictionary<int, double>>();
             IDictionary<int, IDictionary<int, double>> users_prediction_dictionary_num = new Dictionary<int, IDictionary<int, double>>();
             IDictionary<int, IDictionary<int, double>> users_prediction_dictionary_den = new Dictionary<int, IDictionary<int, double>>();
-            //IDictionary<int, double> users_prediction_dictionary_norm = new Dictionary<int, double>();
 
             //counter
             int c_tot = RManager.target_users.Count();
@@ -688,7 +756,7 @@ namespace RS_Engine
                 if (RManager.user_items_dictionary.ContainsKey(uu)) //only for security reason
                 {
                     //creating user key in the coefficients dictionaries
-                    users_prediction_dictionary_num.Add(uu, new Dictionary<int, double>());
+                    users_prediction_dictionary_num.Add(uu, new Dictionary<int, double>()); //TODO in caso non vada, spostare sopra (e anche nelle altre funzioni uguale)
                     users_prediction_dictionary_den.Add(uu, new Dictionary<int, double>());
 
                     //get list of items with which the user interacted
@@ -713,7 +781,7 @@ namespace RS_Engine
                                 continue;
 
                             //coefficients
-                            double num = i_r_dict[item] * sim_item.Value;
+                            double num = CF_IB_IDF_dictionary[item] * sim_item.Value; //i_r_dict[item] * sim_item.Value;
                             double den = sim_item.Value;
 
                             //if the current item is not predicted yet for the user, add it
@@ -732,20 +800,6 @@ namespace RS_Engine
                     }
                 }
             }
-
-            /*
-            //for each item in the dictionary
-            foreach (var item in CF_item_item_sim_dictionary)
-            {
-                //get the dictionary pointed by the user, containing the similar users
-                var sim_items = item.Value;
-
-                //increase norm
-                users_prediction_dictionary_norm.Add(item.Key, 0);
-                foreach (var other_items in sim_items)
-                    users_prediction_dictionary_norm[item.Key] += other_items.Value;
-            }
-            */
 
             //counter
             c_tot = users_prediction_dictionary_num.Count();
@@ -772,10 +826,8 @@ namespace RS_Engine
                     //only if this item is recommendable
                     if (RManager.item_profile_enabled_hashset.Contains(sim_item))
                     {
-
                         //evaluate prediction of that item for that user
-                        double pred =
-                            users_prediction_dictionary_num[user][sim_item] /  (users_prediction_dictionary_den[user][sim_item] + PRED_SHRINK_IB);
+                        double pred = users_prediction_dictionary_num[user][sim_item] / (users_prediction_dictionary_den[user][sim_item] + PRED_SHRINK_IB);
 
                         //storing
                         sim_items_predictions.Add(sim_item, pred);
@@ -868,10 +920,10 @@ namespace RS_Engine
 
             //IB
             //for each user in Item Based prediction
-            foreach (var u in CF_IB_user_prediction_dictionary)
-                //if (u.Value.Count() > 0)
+            foreach (var i in CF_IB_user_prediction_dictionary)
+                //if (i.Value.Count() > 0)
                     //sort the predictions
-                    CF_IB_user_prediction_dictionary_ordered[u.Key] = CF_IB_user_prediction_dictionary[u.Key].OrderByDescending(x => x.Value);
+                    CF_IB_user_prediction_dictionary_ordered[i.Key] = CF_IB_user_prediction_dictionary[i.Key].OrderByDescending(x => x.Value);
 
             //counter
             int par_counter = CF_UB_user_prediction_dictionary_ordered.Count();
@@ -920,7 +972,7 @@ namespace RS_Engine
                 });
 
             //counter
-            par_counter = CF_UB_user_prediction_dictionary_ordered.Count();
+            par_counter = CF_IB_user_prediction_dictionary_ordered.Count();
             RManager.outLog("  + computing points for IB ");
 
             //IB
@@ -978,7 +1030,7 @@ namespace RS_Engine
         private static void generateOutput(IDictionary<int, IDictionary<int, double>> users_prediction_dictionary)
         {
             //ENABLED ALGORITHMS
-            bool A_CF_DICT  = true; //CF from dictionaries DICT
+            bool A_CF_DICT  = true;    //CF from dictionaries DICT
             bool A_CF_TIT   = false;   //CF over TITLES
             bool A_CF_TAG   = false;   //CF over TAGS
             bool A_CF_RAT   = false;   //CF over RATING
@@ -995,6 +1047,7 @@ namespace RS_Engine
             //counter
             int c_tot = users_prediction_dictionary.Count();
             int top5_counter = 0;
+            int superhybrid_counter = 0;
             RManager.outLog("  + generating output structured data ");
             RManager.outLog("  + the input dictionary count is: " + c_tot);
 
@@ -1075,6 +1128,7 @@ namespace RS_Engine
 
                 //////////////////////////////
 
+                /* disabled, for DICT already done in the code, apply only to others algorithms
                 //ADVANCED FILTER (ALREADY CLICKED)
                 if (!RManager.ISTESTMODE)
                 {
@@ -1105,7 +1159,9 @@ namespace RS_Engine
                         }
                     }
                 }
+                */
 
+                /*
                 //grouping to order the list by the most recurring items
                 //(if an item is present many times is because is predicted by many algorithms simultaneously!)
                 var rec_items_group = rec_items.GroupBy(i => i).OrderByDescending(grp => grp.Count());//.Select(x => x.Key).ToList();
@@ -1121,21 +1177,22 @@ namespace RS_Engine
                         rec_items.Insert(0, gr.Key); //jump in the head if found a multiple entry
                     }
 
-                /*
-                //FINAL CHECK
-                //if recommendations are still not enough
+                */
+
+                //FINAL CHECK (SUPER-HYBRID)
+                //if recommendations are not enough
                 if (rec_items.Count < 5)
                 {
-                    RManager.outLog(" Target USER_ID " + user + " has LESS than 5 predictions (" + rec_items.Count + ") -> super-hybrid system (TO DEVELOP)");
+                    RManager.outLog(" Target USER_ID " + user + " has LESS than 5 predictions (" + rec_items.Count + ") -> super-hybrid system");
 
                     //SUPER-HYBRID
                     //get the similar
+                    superhybrid_counter++;
 
                     //ATTUALMENTE SOLO IN PROVA (MA CREDO NON SERVA PIU..)
                     if (!RManager.ISTESTMODE) //non usabile in test per via della casualita dei db
                         rec_items.AddRange(SUPER_HYBRID_read[user]);
                 }
-                */
 
                 //FINAL CHECK (..last way..)
                 if (rec_items.Count < 5)
@@ -1155,7 +1212,8 @@ namespace RS_Engine
             if(output_dictionary.Count != RManager.target_users.Count)
                 RManager.outLog(" ERROR: the output dictionary count is not equal to the target user list!");
 
-            RManager.outLog(" INFO: added top5 for in " + top5_counter + " cases!");
+            RManager.outLog(" INFO: added super hybrid in " + superhybrid_counter + " cases!");
+            RManager.outLog(" INFO: added top5 in " + top5_counter + " cases!");
 
             //Converting output for file write (the writer function wants a list of list of 5 int, ordered by the target_users list)
             List<List<int>> output_dictionary_as_target_users_list = output_dictionary.ToList().OrderBy(x => x.Key).Select(x => x.Value).ToList();

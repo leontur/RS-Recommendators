@@ -32,7 +32,7 @@ namespace RS_Engine
             RManager.outLog("  + SHAKE N PROPOSE");
 
             //generate n rndms (items to 'substitute')
-            int subst = 180; //<<<<<<<<<<<<<<<<<<<<<<<<<<<
+            int subst = 400; //<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
             RManager.outLog("  + creating random list SUB of " + subst);
             int[] randomList = new int[subst];
@@ -49,7 +49,7 @@ namespace RS_Engine
             RManager.outLog("  + random list size: " + randomList.Count());
 
             //generate n rndms (items to 'shake')
-            int shake = 2000; //<<<<<<<<<<<<<<<<<<<<
+            int shake = 3000; //<<<<<<<<<<<<<<<<<<<<
 
             RManager.outLog("  + creating random list SHK of " + shake);
             int[] randomList2 = new int[shake];

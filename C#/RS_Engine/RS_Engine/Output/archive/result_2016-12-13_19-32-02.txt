@@ -1,0 +1,2354 @@
+RS:> 
+RS:> -----------------------------------------------------------------
+RS:>  ** RECOMMENDATORS ENGINE **
+RS:> -----------------------------------------------------------------
+RS:>     ____________________________
+RS:>     Algorithms
+RS:>     1) TOP
+RS:>     2) CB-F (ok)
+RS:>     3) U-CF
+RS:>     4) I-CF
+RS:> 
+RS:>     5) CF DICT UB/IB/HYBRID (chiama anche 6)
+RS:>     6) HYBRID CB+CF 2.0
+RS:>     ____________________________
+RS:>     TEST Mode
+RS:>     7) test mode: enable here to initialize the dataset as train/test and do EVAL (not use for kaggle scope)
+RS:>     ____________________________
+RS:>     8) EVAL mode: execute EVAL with input a specific csv (not use for kaggle scope)
+RS:>     9) .bin size calculator
+RS:>     ____________________________
+RS:>     0) exit
+RS:> -----------------------------------------------------------------
+RS:> 
+RS:>     > RS:>     ==> selected program (5)
+RS:> -----------------------------------------------------------------
+RS:>   + initializing RS 
+RS:>   + initializing dataset retrievement 
+RS:>   + reading dataset: interactions
+RS:>   + dataset read OK | interactions_f count= 546865 | conversion..
+RS:>   + reading serialized file target_users.bin
+RS:>   + reading serialized file user_profile.bin
+RS:>   + reading serialized file item_profile.bin
+RS:>   + reading serialized file item_profile_enabled.bin
+RS:>   + populating auxiliary data structures 
+RS:> 
+RS:>   + all datasets conversion: OK
+RS:>   -total lines | interactions      >>> 546864
+RS:>   -total lines | item_profile      >>> 167956
+RS:>   -total lines | item_profile_enab >>> 63446
+RS:>   -total lines | target_users      >>> 10000
+RS:>   -total lines | user_profile      >>> 40000
+RS:> 
+RS:> -----------------------------------------------------------------
+RS:>   # running program 5
+RS:> 
+RS:>   + processing..
+RS:>   + CF Algorithm..
+RS:>   + reading from super_hybrid_read csv
+RS:>   + read OK | s_hyb_f count= 10001 | conversion..
+RS:>   + creating DICTIONARIES.. 
+RS:>   + user_items_dictionary
+RS:>   + reading serialized file CFDICT_user_items_dictionary.bin
+RS:>   + item_users_dictionary
+RS:>   + reading serialized file CFDICT_item_users_dictionary.bin
+RS:>   + CF_IB_IDF_dictionary
+RS:>   + reading serialized file CFDICT_CF_IB_IDF_dictionary.bin
+RS:>   + computeCFUserUserSimilarity(): 
+RS:>   + calculating all coefficients 
+
+RS:>   + calculating user_user similarity 
+
+RS:>   + KNN is active, ordering and taking.. 
+RS:>   + predictCFUserBasedRecommendations(): 
+RS:>   + aggregation of predictions 
+
+RS:>   + estimating ratings of similar items 
+
+RS:>   + computeCFItemItemSimilarity(): 
+RS:>   + calculating all coefficients 
+
+RS:>   + calculating item_item similarity 
+
+RS:>   + predictCFItemBasedRecommendations(): 
+RS:>   + aggregation of predictions 
+
+RS:>   + estimating ratings of similar items 
+
+RS:>   + computeCFHybridWeightedRecommendations(): 
+RS:>   + computeCFHybridRankRecommendations(): 
+RS:>   + computing points for UB 
+
+RS:>   + computing points for IB 
+
+RS:>  + Output CF DICT :> True
+RS:>  + Output CF TIT  :> False
+RS:>  + Output CF TAG  :> False
+RS:>  + Output CF RAT  :> False
+RS:>  + Output CF UU   :> False
+RS:>  + Output CF II   :> False
+RS:>   + generating output structured data 
+RS:>   + the input dictionary count is: 10000
+RS:>  Target USER_ID 1982 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1286 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2742 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 3547 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 4607 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 5112 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 7693 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 10870 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 11423 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 12233 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 16228 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 21578 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 24419 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 22728 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 23229 has LESS than 5 predictions (1) -> super-hybrid system
+RS:>  Target USER_ID 13715 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 33119 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 30368 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 30774 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 36396 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 39189 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 41309 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 32111 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 43444 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 48463 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 46074 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 42321 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 58784 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 58798 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 60496 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 55534 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 67752 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 62914 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 69088 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 82848 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 78298 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 87127 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 89595 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 84814 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 80113 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 93312 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 95619 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 81375 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 94548 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 96756 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 99598 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 77942 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 102002 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 85958 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 98174 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 92182 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 108961 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 74032 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 106202 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 110221 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 122086 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 122260 has LESS than 5 predictions (3) -> super-hybrid system
+RS:>  Target USER_ID 122394 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 122653 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 122688 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 107952 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 118326 has LESS than 5 predictions (3) -> super-hybrid system
+
+RS:>  Target USER_ID 124833 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 115389 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 134993 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 127238 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 146193 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 146286 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 136346 has LESS than 5 predictions (2) -> super-hybrid system
+
+RS:>  Target USER_ID 119526 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 141431 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 151666 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 149198 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 149616 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 158275 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 158445 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 142537 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 161662 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 158919 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 158944 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 143178 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 101857 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 144636 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 171078 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 162564 has LESS than 5 predictions (2) -> super-hybrid system
+RS:>  Target USER_ID 164126 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 155734 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 168880 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 168971 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 183704 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 203686 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 184048 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 190315 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 196851 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 196956 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 197066 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 186960 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 207662 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 209090 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 209980 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 206671 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 206739 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 222499 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 222972 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 226190 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 226470 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 227943 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 173245 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 189335 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 236260 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 174882 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 202447 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 202687 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 175162 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 175369 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 217522 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 218517 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 225564 has LESS than 5 predictions (3) -> super-hybrid system
+RS:>  Target USER_ID 225578 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 177089 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 221815 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 258124 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 248988 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 249590 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 180411 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 260521 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 260675 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 261298 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 269361 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 229370 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 255343 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 231154 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 269655 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 270764 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 277457 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 277553 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 277781 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 278882 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 283592 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 263279 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 234180 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 234368 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 284525 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 287531 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 287772 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 297705 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 297802 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 273878 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 298291 has LESS than 5 predictions (2) -> super-hybrid system
+
+RS:>  Target USER_ID 265311 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 304815 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 291162 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 291686 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 313463 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 292369 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 282529 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 283126 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 300630 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 300841 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 338903 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 339730 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 326640 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 315123 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 357815 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 340788 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 343351 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 360374 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 318666 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 318686 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 318896 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 308721 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 308918 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 308928 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 294038 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 344738 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 347923 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 351608 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 351781 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 309237 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 329334 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 331268 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 334151 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 319758 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 336646 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 362196 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 321693 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 365011 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 365212 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 311157 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 311454 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 322871 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 396312 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 398117 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 323430 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 367455 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 324447 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 437610 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 420319 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 403467 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 403616 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 412599 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 375029 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 439758 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 441371 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 406606 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 407702 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 420917 has LESS than 5 predictions (4) -> super-hybrid system
+
+RS:>  Target USER_ID 413967 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 452358 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 442882 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 414946 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 415108 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 443645 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 378224 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 452813 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 399940 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 409801 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 416709 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 468793 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 488681 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 455713 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 420103 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 456605 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 462184 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 540840 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 384102 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 541706 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 424441 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 385900 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 386121 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 425103 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 387468 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 512205 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 425765 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 425847 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 464598 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 513192 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 513296 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 470096 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 470303 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 471037 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 549378 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 549893 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 523597 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 514959 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 471676 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 515776 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 524938 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 431458 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 491211 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 547115 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 549196 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 517951 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 494012 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 551553 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 495244 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 527891 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 467204 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 552117 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 495732 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 554066 has LESS than 5 predictions (2) -> super-hybrid system
+
+RS:>  Target USER_ID 477065 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 477151 has LESS than 5 predictions (3) -> super-hybrid system
+RS:>  Target USER_ID 477342 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 569844 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 588618 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 435873 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 436059 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 620852 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 556768 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 531422 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 531675 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 531842 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 532310 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 590311 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 590606 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 534910 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 558995 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 572248 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 593503 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 594300 has LESS than 5 predictions (3) -> super-hybrid system
+
+RS:>  Target USER_ID 535325 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 594752 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 535958 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 536379 has LESS than 5 predictions (1) -> super-hybrid system
+RS:>  Target USER_ID 572568 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 606644 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 595057 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 595781 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 607467 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 502953 has LESS than 5 predictions (1) -> super-hybrid system
+RS:>  Target USER_ID 504243 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 540178 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 505297 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 597121 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 597200 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 639992 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 641142 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 562963 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 563169 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 573757 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 600882 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 565609 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 610609 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 643094 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 574693 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 643546 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 612282 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 508901 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 658000 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 659676 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 690305 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 691314 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 691824 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 576221 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 671027 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 612890 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 692383 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 615354 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 662444 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 635116 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 644948 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 645387 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 616027 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 616445 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 672782 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 617673 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 694432 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 696480 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 676804 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 696578 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 637388 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 664831 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 678887 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 665929 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 649820 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 729903 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 698151 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 712850 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 713598 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 768509 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 650327 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 714167 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 651222 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 652018 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 652085 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 714654 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 653189 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 667651 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 668320 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 752196 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 752913 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 681179 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 775070 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 788724 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 753620 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 753975 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 754239 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 808832 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 683743 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 734412 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 809513 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 685712 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 734744 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 812004 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 737292 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 739358 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 816908 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 818512 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 818594 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 758393 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 740989 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 743736 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 758945 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 744223 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 793650 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 719081 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 704773 has LESS than 5 predictions (4) -> super-hybrid system
+RS:>  Target USER_ID 760055 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 761669 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 690161 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 705448 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 778923 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 849424 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 779374 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 779604 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 764648 has LESS than 5 predictions (2) -> super-hybrid system
+
+RS:>  Target USER_ID 821887 has LESS than 5 predictions (3) -> super-hybrid system
+RS:>  Target USER_ID 764746 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 749042 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 796000 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 796616 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 781310 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 797599 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 798845 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 825306 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 723699 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 908352 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 825920 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 894605 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 912069 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 856096 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 856104 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 895929 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 807422 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 727120 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 929858 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 831840 has LESS than 5 predictions (4) -> super-hybrid system
+
+RS:>  Target USER_ID 915310 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 832033 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 858561 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 833520 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 833563 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 834932 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 859377 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 860157 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 990635 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 861382 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 835119 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1032241 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1033754 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 931971 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 836562 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 896595 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 865300 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 932934 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1035011 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 865333 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 923097 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 993373 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 898350 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 869092 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1039602 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 843361 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 999567 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 934801 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 937407 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 938054 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 872285 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 844645 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 846751 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1043848 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1045445 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 975423 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 976058 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 872645 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 979075 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 942348 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 874814 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 980167 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 980297 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1004442 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 982219 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 982774 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 983217 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 946058 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1046590 has LESS than 5 predictions (1) -> super-hybrid system
+RS:>  Target USER_ID 928744 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 928875 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1110972 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1069739 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 907179 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1046969 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 880830 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 881512 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 986401 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 987637 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1145423 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 949844 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 949968 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1147066 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1070346 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 881613 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 882301 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1071445 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1148430 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1149765 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1073269 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1114761 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1184878 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 890183 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 890594 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1184908 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1116791 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1010150 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1118090 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 891058 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1220501 has LESS than 5 predictions (3) -> super-hybrid system
+RS:>  Target USER_ID 1152519 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1152874 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1077457 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1078191 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1119298 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1080467 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1081897 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1154050 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1056123 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1154681 has LESS than 5 predictions (2) -> super-hybrid system
+RS:>  Target USER_ID 1155333 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1155523 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 952979 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1057138 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1227485 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1227631 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1087636 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1122434 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1163494 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1163758 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1059036 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1015833 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1016093 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1164595 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1190072 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1124070 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1191943 has LESS than 5 predictions (1) -> super-hybrid system
+RS:>  Target USER_ID 1060929 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1090888 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1230623 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1230871 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1230897 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1193662 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1062354 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1232212 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1194830 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 957446 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 958899 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1065315 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1169469 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1195437 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1065441 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1172461 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1095792 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1096562 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 961234 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 961727 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1232582 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 962497 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1022315 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1197035 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1237037 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1238738 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1099956 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1128183 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1129342 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 965376 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1066571 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1101406 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1176382 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1200532 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1025666 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1027225 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1241589 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 967271 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1242687 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1177082 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1177391 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1178279 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1028766 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1261134 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1261269 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1131423 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1202137 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1202549 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1299082 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1244610 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1102444 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1103234 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1262220 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1336661 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1265090 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1265471 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1372498 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1266958 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1267201 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1267368 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1269173 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1248717 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1373416 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1132726 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1270943 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1250032 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1250510 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1272317 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1273062 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1273210 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1273851 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1303119 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1377323 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1274790 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1341885 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1343269 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1343451 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1250944 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1207168 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1378982 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1380328 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1381276 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1207985 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1307022 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1307331 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1209566 has LESS than 5 predictions (2) -> super-hybrid system
+
+RS:>  Target USER_ID 1383543 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1385049 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1279754 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1279885 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1386956 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1255526 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1256009 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1413435 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1141062 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1417752 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1259474 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1309147 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1282882 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1453976 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1346511 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1311084 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1391522 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1392022 has LESS than 5 predictions (3) -> super-hybrid system
+
+RS:>  Target USER_ID 1313020 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1393766 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1421017 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1421575 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1491733 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1492311 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1422395 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1347279 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1347596 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1424433 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1395869 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1424650 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1349225 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1495611 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1398565 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1398836 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1284953 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1286917 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1459128 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1316944 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1429336 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1430314 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1402025 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1498797 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1499185 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1499477 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1218430 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1319528 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1350249 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1403688 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1219677 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1291539 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1435660 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1436086 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1460601 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1405904 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1406926 has LESS than 5 predictions (4) -> super-hybrid system
+RS:>  Target USER_ID 1408231 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1351941 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1293331 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1500784 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1500820 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1464347 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1409116 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1464958 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1464995 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1322233 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1503042 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1503549 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1436956 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1436964 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1356794 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1322940 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1438080 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1295718 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1439482 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1563437 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1298204 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1506340 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1507675 has LESS than 5 predictions (3) -> super-hybrid system
+
+RS:>  Target USER_ID 1607536 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1363090 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1363250 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1508340 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1608100 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1366182 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1367125 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1471051 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1441769 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1368124 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1471396 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1369852 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1369902 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1370360 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1608851 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1472097 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1444816 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1445856 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1531600 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1511079 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1573513 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1575137 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1446377 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1330211 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1331535 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1372424 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1446562 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1446619 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1332094 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1611696 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1513896 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1514767 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1649430 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1333905 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1334445 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1452008 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1651686 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1535830 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1691676 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1655827 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1537404 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1692661 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1693877 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1538198 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1693899 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1694478 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1694919 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1478404 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1725974 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1539221 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1479198 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1726504 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1726545 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1727008 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1696423 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1697686 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1582653 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1582791 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1540093 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1584336 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1518856 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1541143 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1541513 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1542567 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1542692 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1658917 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1618990 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1585840 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1586126 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1586850 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1587284 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1619891 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1544987 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1545305 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1545933 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1546316 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1700735 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1481089 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1547028 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1520320 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1481616 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1736990 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1549112 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1549583 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1483405 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1522312 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1588581 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1666548 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1666663 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1666982 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1589633 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1738871 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1592608 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1626356 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1552501 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1553713 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1704346 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1486577 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1669270 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1525212 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1554165 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1595198 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1627645 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1627827 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1488738 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1525489 has LESS than 5 predictions (4) -> super-hybrid system
+RS:>  Target USER_ID 1526727 has LESS than 5 predictions (4) -> super-hybrid system
+RS:>  Target USER_ID 1526785 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1628860 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1770827 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1555346 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1805238 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1630123 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1632525 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1633407 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1743751 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1773937 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1774900 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1745175 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1708120 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1557697 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1558028 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1558045 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1633974 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1634216 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1675190 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1636145 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1636373 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1636839 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1559558 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1809389 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1559927 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1601822 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1637709 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1640532 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1677554 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1641101 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1680361 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1602257 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1748016 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1749200 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1778841 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1779893 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1779930 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1780087 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1780121 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1780207 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1715094 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1812086 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1754017 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1781915 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1755136 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1644394 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1755799 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1717379 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1782098 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1757649 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1720965 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1758570 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1838678 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1784693 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1604720 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1604834 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1760158 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1761170 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1841519 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1786709 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1787012 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1880677 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1915264 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1787498 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1723286 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1884797 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1689445 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1951754 has LESS than 5 predictions (3) -> super-hybrid system
+RS:>  Target USER_ID 1918761 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1952159 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1887337 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1952658 has LESS than 5 predictions (3) -> super-hybrid system
+RS:>  Target USER_ID 1953427 has LESS than 5 predictions (3) -> super-hybrid system
+
+RS:>  Target USER_ID 1954729 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1955016 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1956085 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1889363 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1845660 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1814503 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1846463 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1957946 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1789661 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1958546 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1791168 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1959623 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1792735 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1793160 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1793466 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1793887 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1794619 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1849563 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1995377 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1795060 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1795361 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1925854 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1795894 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1964075 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1996691 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1796639 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1817974 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1799949 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1800223 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1802591 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1999799 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1818296 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1818350 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1818733 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1819692 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1821712 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2039933 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1851730 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1967089 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1927728 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1927819 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1928092 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1928224 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1929147 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2000157 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1969115 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2042570 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2043215 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2043526 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1896434 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1824747 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2001276 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2081185 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1930106 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1897332 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1932717 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1932861 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1827079 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1827234 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1827748 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1973403 has LESS than 5 predictions (1) -> super-hybrid system
+RS:>  Target USER_ID 2004348 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2004729 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1975743 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1829340 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1829517 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1936123 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2084815 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1858175 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2006536 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2009117 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2047390 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2047401 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1830658 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1831260 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2087770 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2013622 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2013883 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2016318 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1982107 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2091629 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1866992 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1833682 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1834321 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1834702 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2022658 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1835576 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1835873 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1835913 has LESS than 5 predictions (2) -> super-hybrid system
+RS:>  Target USER_ID 1837000 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1983574 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2095203 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1868700 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1902730 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1903896 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2114864 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2115938 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1904813 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2117330 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1905860 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2024920 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2025606 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2025652 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1943230 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1943781 has LESS than 5 predictions (2) -> super-hybrid system
+
+RS:>  Target USER_ID 2026461 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1986774 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2099848 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2028042 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1874772 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2118372 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1989490 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1908370 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1945492 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2028626 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1945802 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1946166 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1946232 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1947300 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2119378 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1990332 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1877736 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2149092 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2030505 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2030724 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1992106 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2058517 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1992695 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2034641 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2185578 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2060213 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2187049 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2060839 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2253498 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2121598 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2062689 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 1912736 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2108480 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2151343 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2220142 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2220651 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2063633 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2108651 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2188318 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 1913581 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2109787 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2189294 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2189408 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2151916 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2152458 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2190085 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2223255 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2192647 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2192793 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2123995 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2112914 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2193904 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2154020 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2154418 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2154720 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2124622 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2126742 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2194813 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2227269 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2127754 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2155407 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2293001 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2155898 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2293529 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2129104 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2263292 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2156819 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2265642 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2157041 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2157531 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2071494 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2294647 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2296077 has LESS than 5 predictions (1) -> super-hybrid system
+
+RS:>  Target USER_ID 2131391 has LESS than 5 predictions (1) -> super-hybrid system
+RS:>  Target USER_ID 2231061 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2131832 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2197878 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2160563 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2073709 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2266780 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2161553 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2296564 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2296967 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2296978 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2163234 has LESS than 5 predictions (2) -> super-hybrid system
+RS:>  Target USER_ID 2199012 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2268636 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2339672 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2302378 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2302549 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2076064 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2201511 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2201518 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2202513 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2076830 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2305336 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2305350 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2234512 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2202761 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2203932 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2236186 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2078161 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2375707 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2376979 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2377116 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2272422 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2169038 has LESS than 5 predictions (1) -> super-hybrid system
+
+RS:>  Target USER_ID 2169556 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2381850 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2237513 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2170345 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2274596 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2346150 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2205901 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2308045 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2135691 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2136176 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2136483 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2137030 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2137591 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2347594 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2348600 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2384139 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2171902 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2350484 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2172950 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2173097 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2350940 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2278049 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2173982 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2351256 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2315480 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2239715 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2240799 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2144222 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2208134 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2208774 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2148122 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2178242 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2246657 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2179307 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2417687 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2359079 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2390854 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2280242 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2182502 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2281966 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2184055 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2321110 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2249210 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2322058 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2283807 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2285985 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2391505 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2323094 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2286758 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2287738 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2359612 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2214720 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2184375 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2393606 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2250364 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2361142 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2218080 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2251007 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2325797 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2394828 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2362352 has LESS than 5 predictions (4) -> super-hybrid system
+
+RS:>  Target USER_ID 2326675 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2326763 has LESS than 5 predictions (3) -> super-hybrid system
+RS:>  Target USER_ID 2327087 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2364891 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2461091 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2491857 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2367618 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2329577 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2395128 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2330338 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2331279 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2396788 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2291171 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2492254 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2492809 has LESS than 5 predictions (4) -> super-hybrid system
+RS:>  Target USER_ID 2493019 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2465190 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2397405 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2371324 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2371616 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2398839 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2398934 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2399615 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2467479 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2467514 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2494372 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2399962 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2427477 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2372905 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2494699 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2495811 has LESS than 5 predictions (3) -> super-hybrid system
+RS:>  Target USER_ID 2495884 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2403536 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2428247 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2373320 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2373642 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2429252 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2429319 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2373788 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2335168 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2568008 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2469817 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2469857 has LESS than 5 predictions (3) -> super-hybrid system
+
+RS:>  Target USER_ID 2374787 has LESS than 5 predictions (4) -> super-hybrid system
+
+RS:>  Target USER_ID 2496918 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2496942 has LESS than 5 predictions (3) -> super-hybrid system
+RS:>  Target USER_ID 2337182 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2375289 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2430644 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2431054 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2602227 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2640928 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2530312 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2503465 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2409321 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2409352 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2604912 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2605291 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2642067 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2570540 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2533598 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2534239 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2412054 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2412638 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2571652 has LESS than 5 predictions (2) -> super-hybrid system
+RS:>  Target USER_ID 2433134 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2433457 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2572023 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2505822 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2474483 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2509186 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2606667 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2645315 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2607839 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2439758 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2415524 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2442043 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2443437 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2510688 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2510703 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2476909 has LESS than 5 predictions (2) -> super-hybrid system
+RS:>  Target USER_ID 2477025 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2477438 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2538117 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2512016 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2674692 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2611435 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2648977 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2576219 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2446228 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2446687 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2577937 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2578024 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2449167 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2480685 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2480753 has LESS than 5 predictions (3) -> super-hybrid system
+
+RS:>  Target USER_ID 2578642 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2676238 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2481885 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2482185 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2482256 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2614123 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2516084 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2519124 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2615769 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2678356 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2541760 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2454085 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2542134 has LESS than 5 predictions (1) -> super-hybrid system
+
+RS:>  Target USER_ID 2485265 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2617904 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2581519 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2519402 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2652250 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2652562 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2682044 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2682446 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2682460 has LESS than 5 predictions (3) -> super-hybrid system
+
+RS:>  Target USER_ID 2683307 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2582094 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2653652 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2620663 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2654369 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2655583 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2656157 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2685133 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2659827 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2457461 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2623177 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2623274 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2550077 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2551353 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2661304 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2662060 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2625751 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2489362 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2489975 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2711808 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2587774 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2552638 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2665051 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2457956 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2458100 has LESS than 5 predictions (1) -> super-hybrid system
+RS:>  Target USER_ID 2627478 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2665640 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2665844 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2666019 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2713932 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2715482 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2459617 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2459971 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2555970 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2556276 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2589086 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2524817 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2632072 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2715708 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2715827 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2557721 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2558207 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2717542 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2667629 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2558922 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2750733 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2751748 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2691987 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2560412 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2635829 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2560914 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2693617 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2693938 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2719022 has LESS than 5 predictions (1) -> super-hybrid system
+RS:>  Target USER_ID 2719156 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2719386 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2593537 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2786583 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2787540 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2637877 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2789178 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2789385 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2638634 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2695173 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2720020 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2697728 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2595550 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2791362 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2640583 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2723367 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2723409 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2862045 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2862354 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2862604 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2864482 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2826112 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2702144 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2796234 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2725449 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2726423 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2703675 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2797664 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2704716 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2705137 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2799816 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2760434 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2761193 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2708389 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2869210 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2869818 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2802155 has LESS than 5 predictions (2) -> super-hybrid system
+RS:>  Target USER_ID 2870646 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2831087 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2711506 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2711568 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2973606 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2802822 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2803055 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2730731 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2832985 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2833703 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2902777 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2975321 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2975620 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2805361 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2978246 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2735150 has LESS than 5 predictions (1) -> super-hybrid system
+
+RS:>  Target USER_ID 2938020 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2939374 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2736736 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2737617 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2737644 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2978714 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2978737 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2766381 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2766678 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2978764 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2941029 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2740152 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2908068 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2837317 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2838783 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2838914 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2770556 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2912859 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2912977 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2771250 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2839076 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2943449 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2914004 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2813781 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2984468 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2744890 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2745184 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2745436 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2916741 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2773297 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2841418 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2945331 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2917833 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2816351 has LESS than 5 predictions (1) -> super-hybrid system
+RS:>  Target USER_ID 2816438 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2817386 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2918641 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2818573 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2775749 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2776244 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2776298 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2845272 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2882969 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2845731 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2846809 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2884400 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2920348 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2885359 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2948894 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2949080 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2777308 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2777610 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2778514 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2950759 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2921522 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2850567 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2781952 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2855601 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2857124 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2783821 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2857272 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2924866 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2924987 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2925842 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2925845 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2928690 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2888569 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2859567 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2929575 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2889939 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2930471 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2956082 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2890891 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2934156 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2891974 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2935217 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2893504 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2895193 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2958125 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2958879 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2959512 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2961420 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2962213 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2964707 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2966810 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  Target USER_ID 2971176 has LESS than 5 predictions (0) -> super-hybrid system
+RS:>  Target USER_ID 2971974 has LESS than 5 predictions (0) -> super-hybrid system
+
+RS:>  INFO: added super hybrid in 1444 cases!
+RS:>  INFO: added top5 in 0 cases!
+RS:>  >>>>>> generating output file, wait a minute..
+RS:>  >>>>>> output submission file created: ../../../Output/submission_2016-12-13_19-32-02_1.csv
+RS:> 
+RS:> -----------------------------------------------------------------
+RS:>  ** RECOMMENDATORS ENGINE **
+RS:> -----------------------------------------------------------------
+RS:>     ____________________________
+RS:>     Algorithms
+RS:>     1) TOP
+RS:>     2) CB-F (ok)
+RS:>     3) U-CF
+RS:>     4) I-CF
+RS:> 
+RS:>     5) CF DICT UB/IB/HYBRID (chiama anche 6)
+RS:>     6) HYBRID CB+CF 2.0
+RS:>     ____________________________
+RS:>     TEST Mode
+RS:>     7) test mode: enable here to initialize the dataset as train/test and do EVAL (not use for kaggle scope)
+RS:>     ____________________________
+RS:>     8) EVAL mode: execute EVAL with input a specific csv (not use for kaggle scope)
+RS:>     9) .bin size calculator
+RS:>     ____________________________
+RS:>     0) exit
+RS:> -----------------------------------------------------------------
+RS:> 
+RS:>     > 
