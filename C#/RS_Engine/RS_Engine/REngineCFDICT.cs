@@ -99,7 +99,8 @@ namespace RS_Engine
             ///////////////////////////////////////////////
             //CB
             //Execute
-            //REngineCBCF2.getRecommendations();
+            RManager.outLog("  + executing ALSO CBCF2! .. ");
+            REngineCBCF2.getRecommendations();
 
             ///////////////////////////////////////////////
             //Execute OUTPUT
@@ -582,8 +583,8 @@ namespace RS_Engine
                     //get current item id
                     int sim_item = item_pred.Key;
 
-                    //only if this item is not clicked before by the user
-                    if (!RManager.user_items_dictionary[user].ContainsKey(sim_item))
+                    //only if this item is not clicked before by the user (always insert if test mode)
+                    if (RManager.ISTESTMODE || !RManager.user_items_dictionary[user].ContainsKey(sim_item))
                     {
                         //only if this item is recommendable
                         if (RManager.item_profile_enabled_hashset.Contains(sim_item))
@@ -1030,12 +1031,12 @@ namespace RS_Engine
         private static void generateOutput(IDictionary<int, IDictionary<int, double>> users_prediction_dictionary)
         {
             //ENABLED ALGORITHMS
-            bool A_CF_DICT  = true;    //CF from dictionaries DICT
+            bool A_CF_DICT  = true;   //CF from dictionaries DICT
             bool A_CF_TIT   = false;   //CF over TITLES
-            bool A_CF_TAG   = false;   //CF over TAGS
+            bool A_CF_TAG   = true;   //CF over TAGS
             bool A_CF_RAT   = false;   //CF over RATING
-            bool A_CB_UU    = false;   //CB over user-user similarity
-            bool A_CB_II    = false;   //CB over item-item similarity (<<<<<<< to be implemented FROM CBF)
+            bool A_CB_UU    = true;   //CB over user-user similarity
+            bool A_CB_II    = false;   //CB over item-item similarity (<<<<<<< yet to be implemented in CBCF2 (FROM CBF)!!)
 
             RManager.outLog(" + Output CF DICT :> " + A_CF_DICT);
             RManager.outLog(" + Output CF TIT  :> " + A_CF_TIT);
@@ -1071,7 +1072,9 @@ namespace RS_Engine
                 /////////////////////////////////////////////////
                 
                 //instantiate the list of (final) most similar items
-                List<int> rec_items = new List<int>();
+                List<int> rec_items = new List<int>(); //DICT
+
+                List<int> CB_U_rec_items = new List<int>(); //UU
 
                 //ALGORITHMS EXECUTION
                 //MERGE LISTS OF PREDICTIONS
@@ -1110,13 +1113,6 @@ namespace RS_Engine
                     //adding predictions 
                     rec_items.AddRange(CF_RAT_rec_items);
                 }
-                if (A_CB_UU)
-                {
-                    //get list of predictions
-                    List<int> CB_U_rec_items = REngineCBCF2.getListOfPlausibleItems(user);
-                    //adding predictions 
-                    rec_items.AddRange(CB_U_rec_items);
-                }
                 if (A_CB_II)
                 {
                     //get list of predictions
@@ -1128,12 +1124,12 @@ namespace RS_Engine
 
                 //////////////////////////////
 
-                /* disabled, for DICT already done in the code, apply only to others algorithms
+                /* disabled, for DICT already done in the code, apply only to others algorithms*/
                 //ADVANCED FILTER (ALREADY CLICKED)
                 if (!RManager.ISTESTMODE)
                 {
                     //retrieving interactions already used by the current user (not recommending a job already applied)
-                    List<int> already_clicked = RManager.interactions.Where(i => i[0] == user && i[2] > 1).OrderBy(i => i[3]).Select(i => i[1]).ToList(); //TODO check with MAP
+                    List<int> already_clicked = RManager.interactions.Where(i => i[0] == user && i[2] > 0).OrderBy(i => i[3]).Select(i => i[1]).ToList(); //TODO check with MAP
 
                     //find commons
                     List<int> clicked_and_predicted = already_clicked.Intersect(rec_items).ToList();
@@ -1153,15 +1149,19 @@ namespace RS_Engine
                         RManager.outLog(" Target USER_ID " + user + " has LESS than 5 predictions (" + rec_items.Count + ") -> considering even already clicked..");
                         if (rec_items.Count > 5)
                         {
-                            //try to leave the minimum number of already clicked and remove all the rest of these ones
-                            for (int r = 0; r < rec_items.Count() - 5; r++)
-                                rec_items.Remove(clicked_and_predicted[r]);
+                            try
+                            {
+                                //try to leave the minimum number of already clicked and remove all the rest of these ones
+                                for (int r = 0; r < rec_items.Count() - 5; r++)
+                                    rec_items.Remove(clicked_and_predicted[r]);
+                            }
+                            catch { ; }
                         }
                     }
                 }
-                */
+                
 
-                /*
+                /**/
                 //grouping to order the list by the most recurring items
                 //(if an item is present many times is because is predicted by many algorithms simultaneously!)
                 var rec_items_group = rec_items.GroupBy(i => i).OrderByDescending(grp => grp.Count());//.Select(x => x.Key).ToList();
@@ -1177,9 +1177,22 @@ namespace RS_Engine
                         rec_items.Insert(0, gr.Key); //jump in the head if found a multiple entry
                     }
 
-                */
 
-                //FINAL CHECK (SUPER-HYBRID)
+                //(UU FILL)
+                //if recommendations are not enough
+                if (rec_items.Count < 5)
+                {
+                    RManager.outLog(" Target USER_ID " + user + " has LESS than 5 predictions (" + rec_items.Count + ") -> uu fill");
+
+                    if (A_CB_UU)
+                    {
+                        //get list of predictions
+                        CB_U_rec_items = REngineCBCF2.getListOfPlausibleItems(user);
+                        rec_items.AddRange(CB_U_rec_items);
+                    }
+                }
+                
+                //(SUPER-HYBRID)
                 //if recommendations are not enough
                 if (rec_items.Count < 5)
                 {

@@ -32,7 +32,7 @@ namespace RS_Engine
             RManager.outLog("  + SHAKE N PROPOSE");
 
             //generate n rndms (items to 'substitute')
-            int subst = 400; //<<<<<<<<<<<<<<<<<<<<<<<<<<<
+            int subst = 800; //<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
             RManager.outLog("  + creating random list SUB of " + subst);
             int[] randomList = new int[subst];
@@ -49,7 +49,7 @@ namespace RS_Engine
             RManager.outLog("  + random list size: " + randomList.Count());
 
             //generate n rndms (items to 'shake')
-            int shake = 3000; //<<<<<<<<<<<<<<<<<<<<
+            int shake = 8000; //<<<<<<<<<<<<<<<<<<<<
 
             RManager.outLog("  + creating random list SHK of " + shake);
             int[] randomList2 = new int[shake];
@@ -65,13 +65,33 @@ namespace RS_Engine
             }
             RManager.outLog("  + random list size: " + randomList2.Count());
 
+            ///////////////
             //temp arrays
             //int[][] input1 = new int[10000][];
             Dictionary<int, List<int>> input1D = new Dictionary<int, List<int>>();
             int[][] input2 = new int[10000][];
             int[][] output = new int[10000][];
 
+            HashSet<int> emptyToFill = new HashSet<int>();
             List<int> userlist = new List<int>();
+
+            ///////AUXILIARY FILE TO GET THE LIST OF TOPPOP TO REPLACE 
+            RManager.outLog("  + reading submission FORTOP from csv");
+            var toppop_f = File.ReadAllLines(RManager.BACKPATH + "Output/eval/submissionFORTOP" + ".csv");
+            for (int i = 1; i < toppop_f.Length; i++)
+            {
+                List<string> row_IN = toppop_f[i].Split(',').Select(x => x).ToList();
+                try
+                {
+                    var tryy = row_IN[1].Split(' ').Select(Int32.Parse).ToList(); //space delimited
+                }
+                catch
+                {
+                    //nothing to recommend, save id
+                    emptyToFill.Add(Int32.Parse(row_IN[0]));
+                }
+            }
+            RManager.outLog("  + FORTOP list count = " + emptyToFill.Count());
 
             ///////GOOD FILE
             //source file
@@ -132,6 +152,14 @@ namespace RS_Engine
                     output[i] = input2[i];
                     emptycount++;
                 }
+                /*
+                //replace the toppop with the bad
+                if (emptyToFill.Contains(id))
+                {
+                    output[i] = input2[i];
+                    RManager.outLog("  - TOP hit at row " + i);
+                }
+                */
             }
             //SHK
             for (int i = 0; i < output.Count(); i++)

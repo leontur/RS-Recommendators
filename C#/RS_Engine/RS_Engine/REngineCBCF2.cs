@@ -51,17 +51,17 @@ namespace RS_Engine
             RManager.outLog("  + CB+CF 2.0 Algorithm..");
 
             //Assigning weights
-            SIM_WEIGHTS[0] = 5;   //jobroles	
-            SIM_WEIGHTS[1] = 10;  //career_level	
+            SIM_WEIGHTS[0] = 8;   //jobroles	
+            SIM_WEIGHTS[1] = 8;  //career_level	
             SIM_WEIGHTS[2] = 3;   //discipline_id	
             SIM_WEIGHTS[3] = 3;   //industry_id	
             SIM_WEIGHTS[4] = 5;   //country	
-            SIM_WEIGHTS[5] = 2;   //region	
+            SIM_WEIGHTS[5] = 1;   //region	
             SIM_WEIGHTS[6] = 3;   //experience_n_entries_class	
-            SIM_WEIGHTS[7] = 4;   //experience_years_experience	
+            SIM_WEIGHTS[7] = 5;   //experience_years_experience	
             SIM_WEIGHTS[8] = 1;   //experience_years_in_current
             SIM_WEIGHTS[9] = 8;   //edu_degree	
-            SIM_WEIGHTS[10] = 10; //edu_fieldofstudies
+            SIM_WEIGHTS[10] = 12; //edu_fieldofstudies
             den = SIM_WEIGHTS.Sum();
 
             //printing weights for log
@@ -494,11 +494,18 @@ namespace RS_Engine
             //ordering by timestamp
             var ordered_temporary_timestamps = temporary_timestamps.OrderByDescending(x => x.Value);
             int total = ordered_temporary_timestamps.Count();
+            int iteractioncount = 0;
             foreach (var i in ordered_temporary_timestamps)
             {
-                //increasing rank
-                output_dictionary[i.Key] += total;
+                //increasing rank (in case of first and second most fresh, increase more)
+                if(iteractioncount == 0)
+                    output_dictionary[i.Key] += total * 4;
+                else if(iteractioncount == 1)
+                    output_dictionary[i.Key] += total * 2;
+                else
+                    output_dictionary[i.Key] += total;
                 total--;
+                iteractioncount++;
             }
 
             //note that this function assigns only ranks, the output is NOT ordered
@@ -559,11 +566,18 @@ namespace RS_Engine
             //ordering by timestamp
             var ordered_temporary_timestamps = temporary_timestamps.OrderByDescending(x => x.Value);
             int total = ordered_temporary_timestamps.Count();
+            int iteractioncount = 0;
             foreach (var u in ordered_temporary_timestamps)
             {
-                //increasing rank
-                output_dictionary[u.Key] += total;
+                //increasing rank (in case of first and second most fresh, increase more)
+                if (iteractioncount == 0)
+                    output_dictionary[u.Key] += total * 4;
+                else if (iteractioncount == 1)
+                    output_dictionary[u.Key] += total * 2;
+                else
+                    output_dictionary[u.Key] += total;
                 total--;
+                iteractioncount++;
             }
 
             //note that this function assigns only ranks, the output is NOT ordered
