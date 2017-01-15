@@ -1033,9 +1033,9 @@ namespace RS_Engine
             //ENABLED ALGORITHMS
             bool A_CF_DICT  = true;   //CF from dictionaries DICT
             bool A_CF_TIT   = false;   //CF over TITLES
-            bool A_CF_TAG   = true;   //CF over TAGS
+            bool A_CF_TAG   = false;   //CF over TAGS
             bool A_CF_RAT   = false;   //CF over RATING
-            bool A_CB_UU    = true;   //CB over user-user similarity
+            bool A_CB_UU    = false;   //CB over user-user similarity
             bool A_CB_II    = false;   //CB over item-item similarity (<<<<<<< yet to be implemented in CBCF2 (FROM CBF)!!)
 
             RManager.outLog(" + Output CF DICT :> " + A_CF_DICT);
@@ -1092,106 +1092,114 @@ namespace RS_Engine
                     //adding predictions 
                     rec_items.AddRange(CF_rec_items);
                 }
-                if (A_CF_TIT)
-                {
-                    //get list of predictions
-                    List<int> CF_TIT_rec_items = REngineCBCF2.getListOfPlausibleTitleBasedItems(user);
-                    //adding predictions 
-                    rec_items.AddRange(CF_TIT_rec_items);
-                }
-                if (A_CF_TAG)
-                {
-                    //get list of predictions
-                    List<int> CF_TAG_rec_items = REngineCBCF2.getListOfPlausibleTagBasedItems(user);
-                    //adding predictions 
-                    rec_items.AddRange(CF_TAG_rec_items);
-                }
-                if (A_CF_RAT)
-                {
-                    //get list of predictions
-                    List<int> CF_RAT_rec_items = REngineCBCF2.getListOfPlausibleRatingBasedItems(user);
-                    //adding predictions 
-                    rec_items.AddRange(CF_RAT_rec_items);
-                }
-                if (A_CB_II)
-                {
-                    //get list of predictions
-                    //List<int> CB_I_rec_items = ...;
-                    //adding predictions 
-                    //rec_items.AddRange(CB_I_rec_items);
-                }
 
 
                 //////////////////////////////
 
-                /* disabled, for DICT already done in the code, apply only to others algorithms*/
-                //ADVANCED FILTER (ALREADY CLICKED)
-                if (!RManager.ISTESTMODE)
+                //(OTHER ALGORITHMS FILL)
+                //if recommendations are not enough
+                if (rec_items.Count < 5)
                 {
-                    //retrieving interactions already used by the current user (not recommending a job already applied)
-                    List<int> already_clicked = RManager.interactions.Where(i => i[0] == user && i[2] > 0).OrderBy(i => i[3]).Select(i => i[1]).ToList(); //TODO check with MAP
 
-                    //find commons
-                    List<int> clicked_and_predicted = already_clicked.Intersect(rec_items).ToList();
-
-                    //try removing already clicked
-                    var rec_items_try = rec_items.Except(clicked_and_predicted).ToList();
-
-                    //CHECK
-                    //if recommendations are enough
-                    if (rec_items_try.Count >= 5)
+                    if (A_CF_TIT)
                     {
-                        //try success
-                        rec_items = rec_items_try.ToList();
+                        //get list of predictions
+                        List<int> CF_TIT_rec_items = REngineCBCF2.getListOfPlausibleTitleBasedItems(user);
+                        //adding predictions 
+                        rec_items.AddRange(CF_TIT_rec_items);
                     }
-                    else
+                    if (A_CF_TAG)
                     {
-                        RManager.outLog(" Target USER_ID " + user + " has LESS than 5 predictions (" + rec_items.Count + ") -> considering even already clicked..");
-                        if (rec_items.Count > 5)
+                        //get list of predictions
+                        List<int> CF_TAG_rec_items = REngineCBCF2.getListOfPlausibleTagBasedItems(user);
+                        //adding predictions 
+                        rec_items.AddRange(CF_TAG_rec_items);
+                    }
+                    if (A_CF_RAT)
+                    {
+                        //get list of predictions
+                        List<int> CF_RAT_rec_items = REngineCBCF2.getListOfPlausibleRatingBasedItems(user);
+                        //adding predictions 
+                        rec_items.AddRange(CF_RAT_rec_items);
+                    }
+                    if (A_CB_II)
+                    {
+                        //get list of predictions
+                        //List<int> CB_I_rec_items = ...;
+                        //adding predictions 
+                        //rec_items.AddRange(CB_I_rec_items);
+                    }
+
+
+                    /* disabled, for DICT already done in the code, apply only to the others algorithms*/
+                    //ADVANCED FILTER (ALREADY CLICKED)
+                    if (!RManager.ISTESTMODE)
+                    {
+                        //retrieving interactions already used by the current user (not recommending a job already applied)
+                        List<int> already_clicked = RManager.interactions.Where(i => i[0] == user && i[2] > 0).OrderBy(i => i[3]).Select(i => i[1]).ToList(); //TODO check with MAP
+
+                        //find commons
+                        List<int> clicked_and_predicted = already_clicked.Intersect(rec_items).ToList();
+
+                        //try removing already clicked
+                        var rec_items_try = rec_items.Except(clicked_and_predicted).ToList();
+
+                        //CHECK
+                        //if recommendations are enough
+                        if (rec_items_try.Count >= 5)
                         {
-                            try
-                            {
-                                //try to leave the minimum number of already clicked and remove all the rest of these ones
-                                for (int r = 0; r < rec_items.Count() - 5; r++)
-                                    rec_items.Remove(clicked_and_predicted[r]);
-                            }
-                            catch { ; }
+                            //try success
+                            rec_items = rec_items_try.ToList();
                         }
-                    }
+                        else
+                        {
+                            RManager.outLog(" Target USER_ID " + user + " has LESS than 5 predictions (" + rec_items.Count + ") -> considering even already clicked..");
+                            if (rec_items.Count > 5)
+                            {
+                                try
+                                {
+                                    //try to leave the minimum number of already clicked and remove all the rest of these ones
+                                    for (int r = 0; r < rec_items.Count() - 5; r++)
+                                        rec_items.Remove(clicked_and_predicted[r]);
+                                }
+                                catch { ; }
+                            }
+                        }
+                    }    
+
+                    /**/
+                    //grouping to order the list by the most recurring items
+                    //(if an item is present many times is because is predicted by many algorithms simultaneously!)
+                    var rec_items_group = rec_items.GroupBy(i => i).OrderByDescending(grp => grp.Count());//.Select(x => x.Key).ToList();
+
+                    //removing duplicates (no more necessaries because of the groupby)
+                    rec_items = rec_items.Distinct().ToList();
+
+                    //check to know if there is only a single entry for each item, in this case the group by is futile
+                    foreach (var gr in rec_items_group)
+                        if (gr.Count() > 1)
+                        {
+                            rec_items.Remove(gr.Key);
+                            rec_items.Insert(0, gr.Key); //jump in the head if found a multiple entry
+                        }
+
                 }
-                
-
-                /**/
-                //grouping to order the list by the most recurring items
-                //(if an item is present many times is because is predicted by many algorithms simultaneously!)
-                var rec_items_group = rec_items.GroupBy(i => i).OrderByDescending(grp => grp.Count());//.Select(x => x.Key).ToList();
-
-                //removing duplicates (no more necessaries because of the groupby)
-                rec_items = rec_items.Distinct().ToList();
-
-                //check to know if there is only a single entry for each item, in this case the group by is futile
-                foreach (var gr in rec_items_group)
-                    if (gr.Count() > 1)
-                    {
-                        rec_items.Remove(gr.Key);
-                        rec_items.Insert(0, gr.Key); //jump in the head if found a multiple entry
-                    }
-
 
                 //(UU FILL)
                 //if recommendations are not enough
                 if (rec_items.Count < 5)
                 {
-                    RManager.outLog(" Target USER_ID " + user + " has LESS than 5 predictions (" + rec_items.Count + ") -> uu fill");
-
                     if (A_CB_UU)
                     {
+                        RManager.outLog(" Target USER_ID " + user + " has LESS than 5 predictions (" + rec_items.Count + ") -> uu fill");
+
                         //get list of predictions
                         CB_U_rec_items = REngineCBCF2.getListOfPlausibleItems(user);
                         rec_items.AddRange(CB_U_rec_items);
                     }
                 }
                 
+                /*
                 //(SUPER-HYBRID)
                 //if recommendations are not enough
                 if (rec_items.Count < 5)
@@ -1206,6 +1214,7 @@ namespace RS_Engine
                     if (!RManager.ISTESTMODE) //non usabile in test per via della casualita dei db
                         rec_items.AddRange(SUPER_HYBRID_read[user]);
                 }
+                */
 
                 //FINAL CHECK (..last way..)
                 if (rec_items.Count < 5)

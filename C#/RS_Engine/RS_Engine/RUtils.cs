@@ -32,7 +32,7 @@ namespace RS_Engine
             RManager.outLog("  + SHAKE N PROPOSE");
 
             //generate n rndms (items to 'substitute')
-            int subst = 1000; //<<<<<<<<<<<<<<<<<<<<<<<<<<<
+            int subst = 825; //<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
             RManager.outLog("  + creating random list SUB of " + subst);
             int[] randomList = new int[subst];
@@ -49,7 +49,7 @@ namespace RS_Engine
             RManager.outLog("  + random list size: " + randomList.Count());
 
             //generate n rndms (items to 'shake')
-            int shake = 7000; //<<<<<<<<<<<<<<<<<<<<
+            int shake = 6450; //<<<<<<<<<<<<<<<<<<<<
 
             RManager.outLog("  + creating random list SHK of " + shake);
             int[] randomList2 = new int[shake];
@@ -171,16 +171,43 @@ namespace RS_Engine
                     if (new Random(Guid.NewGuid().GetHashCode()).Next(0, 10000) % 2 == 0)
                     {
                         if (tmp.Count()==5) {
-                            if (i % 2 == 0)
+                            if (i % 50 == 0)
+                            {
+                                output[i][3] = tmp[1];
+                                output[i][1] = tmp[3];
+                            }
+                            else if (i % 10 == 0)
+                            {
+                                output[i][2] = tmp[4];
+                                output[i][4] = tmp[2];
+                            }
+                            else if (i % 2 == 0)
                             {
                                 output[i][0] = tmp[1];
                                 output[i][1] = tmp[0];
                             }
                             else
                             {
-                                output[i][1] = tmp[3];
-                                output[i][2] = tmp[1];
-                                output[i][3] = tmp[2];
+                                if (i < 1800)
+                                {
+
+                                    output[i][1] = tmp[3];
+                                    output[i][2] = tmp[1];
+                                    output[i][3] = tmp[2];
+                                }
+                                else if (i < 4000)
+                                {
+
+                                    output[i][0] = tmp[2];
+                                    output[i][1] = tmp[0];
+                                    output[i][2] = tmp[1];
+                                }
+                                else
+                                {
+                                    output[i][1] = tmp[2];
+                                    output[i][2] = tmp[3];
+                                    output[i][3] = tmp[1];
+                                }
                             }
                         }
                     }

@@ -1,4 +1,3 @@
-F:\Repository\GitHub\RS-Recommendators\C#\RS_Engine\RS_Engine\obj\x64\Debug\RS_Engine.csprojResolveAssemblyReference.cache
 F:\Repository\GitHub\RS-Recommendators\C#\RS_Engine\RS_Engine\bin\x64\Debug\RS_Engine.exe.config
 F:\Repository\GitHub\RS-Recommendators\C#\RS_Engine\RS_Engine\bin\x64\Debug\RS_Engine.exe
 F:\Repository\GitHub\RS-Recommendators\C#\RS_Engine\RS_Engine\bin\x64\Debug\RS_Engine.pdb
