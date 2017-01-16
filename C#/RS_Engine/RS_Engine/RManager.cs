@@ -23,6 +23,7 @@ namespace RS_Engine
         public static List<List<object>> item_profile_enabled = new List<List<object>>();
         //public static List<List<object>> item_profile_disabled = new List<List<object>>();
         public static List<int> item_profile_and_interaction_merge_nodup = new List<int>();
+        public static HashSet<int> target_users_hashset = new HashSet<int>();
 
         //TEST DATA STRUCTURES
         public static List<List<object>> user_profile_test = new List<List<object>>();
@@ -32,6 +33,7 @@ namespace RS_Engine
         //DICTIONARIES DATA STRUCTURES
         public static IDictionary<int, IDictionary<int, int>> user_items_dictionary = new Dictionary<int, IDictionary<int, int>>();
         public static IDictionary<int, IDictionary<int, int>> item_users_dictionary = new Dictionary<int, IDictionary<int, int>>();
+        public static HashSet<int> item_with_onemore_interaction_by_target = new HashSet<int>();
 
         //Global vars
         public static int EXEMODE = 0;
@@ -90,7 +92,11 @@ namespace RS_Engine
 
                 //scroll file
                 for (i = 1; i < target_users_f.Length; i++)
-                    target_users.Add(Int32.Parse(target_users_f[i]));
+                {
+                    int tgt = Int32.Parse(target_users_f[i]);
+                    target_users.Add(tgt);
+                    target_users_hashset.Add(tgt);
+                }
 
                 //serialize
                 using (Stream stream = File.Open(Path.Combine(SERIALTPATH, "target_users.bin"), FileMode.Create))
@@ -341,6 +347,11 @@ namespace RS_Engine
             item_profile_and_interaction_merge_nodup.AddRange(interactions.Select(x => x[1]).ToList());
             item_profile_and_interaction_merge_nodup.Union(item_profile.Select(x => (int)x[0]).ToList());
             item_profile_and_interaction_merge_nodup = item_profile_and_interaction_merge_nodup.Distinct().ToList();
+
+            //Populate item_with_onemore_interaction_by_target
+            var tmp_item_onemore = interactions.Where(x => target_users_hashset.Contains(x[0])).Select(x => x[1]).ToList().Distinct().ToList();
+            foreach (var itInt in tmp_item_onemore)
+                item_with_onemore_interaction_by_target.Add(itInt);
 
             //INFO
             outLog("");
