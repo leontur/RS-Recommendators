@@ -14,9 +14,11 @@ namespace RS_Engine
 
         //UB
         private const int SIM_SHRINK_UB = 10;
+        private const int PRED_SHRINK_UB = 10;
 
         //IB
         private const int SIM_SHRINK_IB = 5;
+        private const int PRED_SHRINK_IB = 10;
 
         //CB KNN (0=disabled)
         private const int CB_UB_KNN = 400;
@@ -57,8 +59,14 @@ namespace RS_Engine
             compute_TF_IDF();
 
             computeCBUserUserSimilarity();
+            predictCBUserBasedRecommendations();
+            predictCBUserBasedNormalizedRecommendations();
+            computeCBItemItemSimilarity();
+            predictCBItemBasedRecommendations();
+            predictCBItemBasedNormalizedRecommendations();
         }
 
+        //////////////////////////////////////////////////////////////////////////////////////////
         //CREATE CB DICTIONARIES (for IDF use)
         public static void InitUserCBDict()
         {
@@ -177,6 +185,7 @@ namespace RS_Engine
 
         }
 
+        //////////////////////////////////////////////////////////////////////////////////////////
         //COMPUTE TF AND IDF
         public static void compute_TF_IDF()
         {
@@ -211,6 +220,7 @@ namespace RS_Engine
                 attributes_users[at] = attributes_users[at].OrderByDescending(x => x.Value).ToDictionary(kp => kp.Key, kp => kp.Value);
         }
 
+        //////////////////////////////////////////////////////////////////////////////////////////
         //COMPUTE USER USER SIMILARITY
         public static void computeCBUserUserSimilarity()
         {
@@ -307,6 +317,238 @@ namespace RS_Engine
             }
         }
 
+        //CREATE USER BASED RECOMMENDATIONS
+        public static void predictCBUserBasedRecommendations()
+        {
+
+            //info
+            RManager.outLog("  + predictCBUserBasedRecommendations(): ");
+
+            //runtime dictionaries
+            IDictionary<int, IDictionary<int, double>> users_prediction_dictionary = new Dictionary<int, IDictionary<int, double>>();
+            IDictionary<int, IDictionary<int, double>> users_prediction_dictionary_num = new Dictionary<int, IDictionary<int, double>>();
+            IDictionary<int, double> users_prediction_dictionary_norm = new Dictionary<int, double>();
+
+            //counter
+            int c_tot = RManager.target_users.Count();
+            RManager.outLog("  + aggregation of predictions ");
+
+            //for each target user
+            foreach (var user in RManager.target_users)
+            {
+                //counter
+                if (--c_tot % 500 == 0)
+                    RManager.outLog(" - remaining " + c_tot, true, true, true);
+
+                //if current target has similar users
+                //if (CB_user_user_sim_dictionary.ContainsKey(user))
+                //{
+                    //creating user key in the coefficients dictionaries
+                    users_prediction_dictionary_num.Add(user, new Dictionary<int, double>());
+
+                    //get dictionary of similar users and value of similarity
+                    var uus_list = CB_user_user_sim_dictionary[user];
+
+                    //for every similar user in the dictionary
+                    foreach (var sim_user in uus_list)
+                    {
+                        //get sim_user id
+                        int user2 = sim_user.Key;
+
+                        //get items (dictionary) with which this user interacted
+                        var sim_user_item_list = RManager.user_items_dictionary[user2];
+
+                        //for every item in this dictionary
+                        foreach (var item in sim_user_item_list)
+                        {
+                            //get item id
+                            int i = item.Key;
+
+                            //coefficients
+                            double num = uus_list[user2] * sim_user_item_list[i];
+
+                            //if the current item is not predicted yet for the user, add it
+                            if (!users_prediction_dictionary_num[user].ContainsKey(i))
+                                users_prediction_dictionary_num[user].Add(i, num);
+                            //else adding its contribution
+                            else
+                                users_prediction_dictionary_num[user][i] += num;
+                        }
+                    }
+                //}
+            }
+
+            //for each user in the dictionary
+            foreach (var user in CB_user_user_sim_dictionary)
+            {
+                //get the dictionary pointed by the user, containing the similar users
+                var sim_users = user.Value;
+
+                //increase norm
+                users_prediction_dictionary_norm.Add(user.Key, 0);
+                foreach (var other_user in sim_users)
+                    users_prediction_dictionary_norm[user.Key] += other_user.Value;
+            }
+
+            //counter
+            c_tot = users_prediction_dictionary_num.Count();
+            RManager.outLog("  + estimating ratings of similar items ");
+
+            //calculating similarity
+            //for every target user (users_prediction_dictionary_num contains all target users)
+            foreach (var u in users_prediction_dictionary_num)
+            {
+                //counter
+                if (--c_tot % 100 == 0)
+                    RManager.outLog(" - remaining " + c_tot, true, true, true);
+
+                //get current user id
+                int user = u.Key;
+
+                //for each item predicted for the user
+                IDictionary<int, double> sim_items_predictions = new Dictionary<int, double>();
+                foreach (var item_pred in users_prediction_dictionary_num[user])
+                {
+                    //get current item id
+                    int sim_item = item_pred.Key;
+
+                    //only if this item is not clicked before by the user (always insert if test mode)
+                    if (RManager.ISTESTMODE || !RManager.user_items_dictionary[user].ContainsKey(sim_item))
+                    {
+                        //only if this item is recommendable
+                        if (RManager.item_profile_enabled_hashset.Contains(sim_item))
+                        {
+                            //evaluate prediction of that item for that user
+                            double pred = users_prediction_dictionary_num[user][sim_item] / (users_prediction_dictionary_norm[user] + PRED_SHRINK_UB);
+
+                            //storing
+                            sim_items_predictions.Add(sim_item, pred);
+                        }
+                    }
+                    //else
+                }
+
+                //storing
+                users_prediction_dictionary.Add(user, sim_items_predictions);
+            }
+
+            //expose
+            CB_UB_user_prediction_dictionary = users_prediction_dictionary;
+        }
+
+        //PREDICT USER BASED NORMALIZED RECOMMENDATIONS
+        public static void predictCBUserBasedNormalizedRecommendations()
+        {
+            //info
+            RManager.outLog("  + computeCFUserUserSimilarity(): ");
+
+            //runtime dictionaries
+            IDictionary<int, IDictionary<int, double>> user_prediction_dictionary = new Dictionary<int, IDictionary<int, double>>();
+            IDictionary<int, IDictionary<int, double>> user_prediction_dictionary_num = new Dictionary<int, IDictionary<int, double>>();
+            IDictionary<int, double> user_prediction_dictionary_norm = new Dictionary<int, double>();
+
+            //counter
+            int c_tot = RManager.target_users.Count();
+            RManager.outLog("  + calculating all coefficients ");
+
+            //for every target user
+            foreach (var user in RManager.target_users)
+            {
+                //counter
+                if (--c_tot % 500 == 0)
+                    RManager.outLog(" - remaining " + c_tot, true, true, true);
+
+                //creating user key in the coefficients dictionaries
+                user_prediction_dictionary_num.Add(user, new Dictionary<int, double>());
+
+                //for each attribute of the user
+                foreach (var user2 in CB_user_user_sim_dictionary[user])
+                {
+                    //if current target has similar users
+                    if (RManager.user_items_dictionary.ContainsKey(user2.Key))
+                    {
+                        //for each item interacted by user
+                        foreach (var item in RManager.user_items_dictionary[user2.Key])
+                        {
+                            //add this item if was not predicted for the current user
+                            double num = user2.Value * item.Value;
+
+                            //storing coefficients
+                            if (user_prediction_dictionary_num[user].ContainsKey(item.Key))
+                                user_prediction_dictionary_num[user][item.Key] += num;
+                            else
+                                user_prediction_dictionary_num[user].Add(item.Key, num);
+                        }
+                    }
+                }
+            }
+
+            //for each user in the dictionary
+            foreach (var user in CB_user_user_sim_dictionary)
+            {
+                //get the dictionary pointed by the user, containing the similar users
+                var sim_users = user.Value;
+
+                //increase norm
+                user_prediction_dictionary_norm.Add(user.Key, 0);
+                foreach (var other_user in sim_users)
+                    user_prediction_dictionary_norm[user.Key] += other_user.Value;
+            }
+
+            //counter
+            c_tot = user_prediction_dictionary_num.Count();
+            RManager.outLog("  + normalizing similar items ");
+
+            //calculating similarity
+            //for every target user (user_prediction_dictionary_num contains all target users)
+            foreach (var u in user_prediction_dictionary_num)
+            {
+                //counter
+                if (--c_tot % 100 == 0)
+                    RManager.outLog(" - remaining " + c_tot, true, true, true);
+
+                //get current user id
+                int user = u.Key;
+                user_prediction_dictionary.Add(user, new Dictionary<int, double>());
+                double max = 0;
+
+                //foreach prediction for the user
+                foreach (var i in user_prediction_dictionary_num[user])
+                {
+                    //item id
+                    int item = i.Key;
+
+                    if (RManager.user_items_dictionary.ContainsKey(user))
+                    {
+                        if (!RManager.user_items_dictionary[user].ContainsKey(item))
+                        {
+                            if (RManager.item_profile_enabled_hashset.Contains(item))
+                            {
+                                user_prediction_dictionary[user][item] = user_prediction_dictionary_num[user][item] / (user_prediction_dictionary_norm[user] + PRED_SHRINK_UB);
+                                max = Math.Max(max, user_prediction_dictionary_num[user][item]);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (RManager.item_profile_enabled_hashset.Contains(item))
+                        {
+                            user_prediction_dictionary[user][item] = user_prediction_dictionary_num[user][item] / (user_prediction_dictionary_norm[user] + PRED_SHRINK_UB);
+                            max = Math.Max(max, user_prediction_dictionary_num[user][item]);
+                        }
+                    }
+                }
+
+                //normalization
+                foreach (var item in user_prediction_dictionary[user])
+                    user_prediction_dictionary[user][item.Key] = user_prediction_dictionary[user][item.Key] / max;
+            }
+
+            //expose
+            CB_UB_user_prediction_dictionary = user_prediction_dictionary;
+        }
+
+        //////////////////////////////////////////////////////////////////////////////////////////
         //COMPUTE ITEM ITEM SIMILARITY
         public static void computeCBItemItemSimilarity()
         {
@@ -409,21 +651,229 @@ namespace RS_Engine
 
         }
 
-
-
-
-
-
-
-
-
-        //COMPUTE ITEM ITEM SIMILARITY ESTIMATE
-        public static void computeCBItemItemSimilarityEstimate()
+        //CREATE ITEM BASED RECOMMENDATIONS
+        public static void predictCBItemBasedRecommendations()
         {
+            //info
+            RManager.outLog("  + predictCBItemBasedRecommendations(): ");
 
+            //runtime dictionaries
+            IDictionary<int, IDictionary<int, double>> users_prediction_dictionary = new Dictionary<int, IDictionary<int, double>>();
+            IDictionary<int, IDictionary<int, double>> users_prediction_dictionary_num = new Dictionary<int, IDictionary<int, double>>();
+            IDictionary<int, IDictionary<int, double>> users_prediction_dictionary_den = new Dictionary<int, IDictionary<int, double>>();
 
+            //counter
+            int c_tot = RManager.target_users.Count();
+            RManager.outLog("  + aggregation of predictions ");
+
+            //for each target user
+            foreach (var uu in RManager.target_users)
+            {
+                //counter
+                if (--c_tot % 500 == 0)
+                    RManager.outLog(" - remaining " + c_tot, true, true, true);
+
+                //if current target has similar users
+                if (RManager.user_items_dictionary.ContainsKey(uu)) //only for security reason
+                {
+                    //creating user key in the coefficients dictionaries
+                    users_prediction_dictionary_num.Add(uu, new Dictionary<int, double>()); //TODO in caso non vada, spostare sopra (e anche nelle altre funzioni uguale)
+                    users_prediction_dictionary_den.Add(uu, new Dictionary<int, double>());
+
+                    //get list of items with which the user interacted
+                    IDictionary<int, int> i_r_dict = RManager.user_items_dictionary[uu];
+
+                    //for every item in this dictionary
+                    foreach (var ij in i_r_dict)
+                    {
+                        //get item id
+                        int item = ij.Key;
+
+                        //get the dictionary of similar items and the similarity value
+                        var ij_s_dict = CB_item_item_sim_dictionary[item];
+
+                        //for every similar item of the current item
+                        foreach (var sim_item in ij_s_dict)
+                        {
+                            //get sim_item id
+                            int ii = sim_item.Key;
+
+                            if (i_r_dict.ContainsKey(ii))
+                                continue;
+
+                            //coefficients
+                            double num = REngineCFDICT.CF_IB_IDF_dictionary[item] * sim_item.Value; //i_r_dict[item] * sim_item.Value;
+                            double den = sim_item.Value;
+
+                            //if the current item is not predicted yet for the user, add it
+                            if (!users_prediction_dictionary_num[uu].ContainsKey(ii))
+                            {
+                                users_prediction_dictionary_num[uu].Add(ii, num);
+                                users_prediction_dictionary_den[uu].Add(ii, den);
+                            }
+                            //else adding its contribution
+                            else
+                            {
+                                users_prediction_dictionary_num[uu][ii] += num;
+                                users_prediction_dictionary_den[uu][ii] += den;
+                            }
+                        }
+                    }
+                }
+            }
+
+            //counter
+            c_tot = users_prediction_dictionary_num.Count();
+            RManager.outLog("  + estimating ratings of similar items ");
+
+            //calculating similarity
+            //for every target user (users_prediction_dictionary_num contains all target users)
+            foreach (var u in users_prediction_dictionary_num)
+            {
+                //counter
+                if (--c_tot % 100 == 0)
+                    RManager.outLog(" - remaining " + c_tot, true, true, true);
+
+                //get current user id
+                int user = u.Key;
+
+                //for each item predicted for the user
+                IDictionary<int, double> sim_items_predictions = new Dictionary<int, double>();
+                foreach (var item_pred in users_prediction_dictionary_num[user])
+                {
+                    //get current item id
+                    int sim_item = item_pred.Key;
+
+                    //only if this item is recommendable
+                    if (RManager.item_profile_enabled_hashset.Contains(sim_item))
+                    {
+                        //evaluate prediction of that item for that user
+                        double pred = users_prediction_dictionary_num[user][sim_item] / (users_prediction_dictionary_den[user][sim_item] + PRED_SHRINK_IB);
+
+                        //storing
+                        sim_items_predictions.Add(sim_item, pred);
+                    }
+                }
+
+                //storing
+                users_prediction_dictionary.Add(user, sim_items_predictions);
+            }
+
+            //expose
+            CB_IB_user_prediction_dictionary = users_prediction_dictionary;
         }
 
+        //PREDICT ITEM BASED NORMALIZED RECOMMENDATIONS
+        public static void predictCBItemBasedNormalizedRecommendations()
+        {
+            //info
+            RManager.outLog("  + predictCBItemBasedNormalizedRecommendations(): ");
+
+            //runtime dictionaries
+            IDictionary<int, IDictionary<int, double>> users_prediction_dictionary_num = new Dictionary<int, IDictionary<int, double>>();
+            IDictionary<int, IDictionary<int, double>> users_prediction_dictionary_den = new Dictionary<int, IDictionary<int, double>>();
+
+            //counter
+            int c_tot = RManager.target_users.Count();
+            RManager.outLog("  + aggregation of predictions ");
+
+            //for each target user
+            foreach (var uu in RManager.target_users)
+            {
+                //counter
+                if (--c_tot % 500 == 0)
+                    RManager.outLog(" - remaining " + c_tot, true, true, true);
+
+                //if current target has similar users
+                if (RManager.user_items_dictionary.ContainsKey(uu)) //only for security reason
+                {
+                    //creating user key in the coefficients dictionaries
+                    users_prediction_dictionary_num.Add(uu, new Dictionary<int, double>()); //TODO in caso non vada, spostare sopra (e anche nelle altre funzioni uguale)
+                    users_prediction_dictionary_den.Add(uu, new Dictionary<int, double>());
+
+                    //get list of items with which the user interacted
+                    IDictionary<int, int> i_r_dict = RManager.user_items_dictionary[uu];
+
+                    //for every item in this dictionary
+                    foreach (var ij in i_r_dict)
+                    {
+                        //get item id
+                        int item = ij.Key;
+
+                        //get the dictionary of similar items and the similarity value
+                        var ij_s_dict = CB_item_item_sim_dictionary[item];
+
+                        //for every similar item of the current item
+                        foreach (var sim_item in ij_s_dict)
+                        {
+                            //get sim_item id
+                            int ii = sim_item.Key;
+
+                            if (i_r_dict.ContainsKey(ii))
+                                continue;
+
+                            //coefficients
+                            double num = REngineCFDICT.CF_IB_IDF_dictionary[item] * sim_item.Value; //i_r_dict[item] * sim_item.Value;
+                            double den = sim_item.Value;
+
+                            //if the current item is not predicted yet for the user, add it
+                            if (!users_prediction_dictionary_num[uu].ContainsKey(ii))
+                            {
+                                users_prediction_dictionary_num[uu].Add(ii, num);
+                                users_prediction_dictionary_den[uu].Add(ii, den);
+                            }
+                            //else adding its contribution
+                            else
+                            {
+                                users_prediction_dictionary_num[uu][ii] += num;
+                                users_prediction_dictionary_den[uu][ii] += den;
+                            }
+                        }
+                    }
+                }
+            }
+
+            //counter
+            c_tot = users_prediction_dictionary_num.Count();
+            RManager.outLog("  + estimating ratings of similar items ");
+
+            //calculating similarity
+            //for every target user (users_prediction_dictionary_num contains all target users)
+            foreach (var u in users_prediction_dictionary_num)
+            {
+                //counter
+                if (--c_tot % 100 == 0)
+                    RManager.outLog(" - remaining " + c_tot, true, true, true);
+
+                //get current user id
+                int user = u.Key;
+                double max = 0;
+
+                //for each item predicted for the user
+                foreach (var item_pred in users_prediction_dictionary_num[user])
+                {
+                    //get current item id
+                    int sim_item = item_pred.Key;
+
+                    //only if this item is recommendable
+                    if (RManager.item_profile_enabled_hashset.Contains(sim_item))
+                    {
+                        //evaluate prediction of that item for that user
+                        double pred = users_prediction_dictionary_num[user][sim_item] / (users_prediction_dictionary_den[user][sim_item] + PRED_SHRINK_IB);
+                        max = Math.Max(max, pred);
+
+                        //storing
+                        users_prediction_dictionary_num[user][sim_item] = pred;
+                    }
+                }
+
+                foreach (var item in users_prediction_dictionary_num[user])
+                    users_prediction_dictionary_num[user][item.Key] = users_prediction_dictionary_num[user][item.Key] / max;
+            }
+
+            //expose
+            CB_IB_user_prediction_dictionary = users_prediction_dictionary_num;
+        }
 
     }
 }
