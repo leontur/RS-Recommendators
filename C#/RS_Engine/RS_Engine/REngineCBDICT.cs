@@ -13,17 +13,16 @@ namespace RS_Engine
         //ALGORITHM PARAMETERS
 
         //UB
-        private const int SIM_SHRINK_UB = 10;
-        private const int PRED_SHRINK_UB = 10;
+        public const int SIM_SHRINK_UB = 10;
+        public const int PRED_SHRINK_UB = 10;
 
         //IB
-        private const int SIM_SHRINK_IB = 5;
-        private const int PRED_SHRINK_IB = 10;
+        public const int SIM_SHRINK_IB = 5;
+        public const int PRED_SHRINK_IB = 10;
 
         //CB KNN (0=disabled)
-        private const int CB_UB_KNN = 400;
-        private const int CB_IB_KNN = 0;
-
+        public const int CB_UB_KNN = 400;
+        public const int CB_IB_KNN = 0;
 
         /////////////////////////////////////////////
         //EXECUTION VARS

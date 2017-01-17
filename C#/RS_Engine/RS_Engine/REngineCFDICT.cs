@@ -31,6 +31,10 @@ namespace RS_Engine
         private const int CF_UB_KNN = 110;
         private const int CF_IB_KNN = 0;
 
+        //CF+CB HYBRID
+        private const double CFCB_HYBRID_UB = 1.1;
+        private const double CFCB_HYBRID_IB = 1.5;
+
         //HW
         private const double HYBRID_W_WEIGHT = 0.4;
 
@@ -483,8 +487,229 @@ namespace RS_Engine
             CF_user_user_sim_dictionary = user_user_similarity_dictionary;
         }
 
-        //////////////////////////////////////////////////////////////////////////////////////////
-        //CREATE RECOMMENDATIONS 
+        //CREATE AN USER_USER HYBRID SIMILARITY (DICTIONARY) (CF+CB)
+        private static void computeCFCBHybridUserUserSimilarity()
+        {
+            //info
+            RManager.outLog("  + computeCFCBHybridUserUserSimilarity(): ");
+
+            //runtime dictionaries
+            IDictionary<int, IDictionary<int, double>> user_user_similarity_dictionary = new Dictionary<int, IDictionary<int, double>>();
+            IDictionary<int, IDictionary<int, double>> user_user_similarity_dictionary_num = new Dictionary<int, IDictionary<int, double>>();
+            IDictionary<int, double> user_similarity_dictionary_norm = new Dictionary<int, double>();
+
+            //counter
+            int c_tot = RManager.user_items_dictionary.Count();
+            RManager.outLog("  + calculating all coefficients ");
+
+            //for every user
+            foreach (var u in RManager.user_items_dictionary)
+            {
+                //counter
+                if (--c_tot % 500 == 0)
+                    RManager.outLog(" - remaining " + c_tot, true, true, true);
+
+                //getting current user id
+                int user = u.Key;
+
+                //creating user key in the coefficients dictionaries
+                user_user_similarity_dictionary_num.Add(user, new Dictionary<int, double>());
+
+                //get the interacted items and the related best interaction type for each clicked item
+                IDictionary<int, int> interacted_items = u.Value;
+
+                //for every interacted items (by this user)
+                foreach (var i in interacted_items)
+                {
+                    //getting current item id
+                    int item = i.Key;
+
+                    //get the dictionary of that item (that contains the users which have interacted with)
+                    //and from that, get list of users that interacted with 
+                    IDictionary<int, int> interacted_users = RManager.item_users_dictionary[item];
+
+                    //get the list of users which have interacted with the same item of the current user
+                    List<int> user_list = interacted_users.Keys.ToList();
+
+                    //for each user in the list of (similar) users
+                    foreach (var sim_user in user_list)
+                    {
+                        //retrieving interaction coefficients
+                        int interaction_type = i.Value;
+                        int interaction_type_of_sim_user = 0;
+
+                        //creating coefficients
+                        double num;
+
+                        //if the sim_user has interacted with same item
+                        if (RManager.user_items_dictionary[sim_user].TryGetValue(item, out interaction_type_of_sim_user))
+                            num = interaction_type * interaction_type_of_sim_user;
+                        else
+                            num = 0;
+
+                        //storing coefficients
+                        if (user_user_similarity_dictionary_num[user].ContainsKey(sim_user))
+                            user_user_similarity_dictionary_num[user][sim_user] += num;
+                        else
+                            //add to similarity dictionary
+                            user_user_similarity_dictionary_num[user].Add(sim_user, num);
+
+                    }
+                }
+
+                //removing from the similarity coefficients the user itself
+                if (user_user_similarity_dictionary_num[user].ContainsKey(user))
+                    user_user_similarity_dictionary_num[user].Remove(user);
+            }
+
+            //for each user in the dictionary
+            foreach (var u in RManager.user_items_dictionary)
+                //increase norm
+                user_similarity_dictionary_norm[u.Key] = Math.Sqrt(u.Value.Count());
+
+            //counter
+            c_tot = user_user_similarity_dictionary_num.Count();
+            RManager.outLog("  + calculating user_user similarity ");
+
+            //calculating similarity
+            //for every user
+            foreach (var u in user_user_similarity_dictionary_num)
+            {
+                //counter
+                if (--c_tot % 500 == 0)
+                    RManager.outLog(" - remaining " + c_tot, true, true, true);
+
+                //get current user id
+                int user = u.Key;
+
+                //for every sim_user to this user
+                IDictionary<int, double> sim_users_predictions = new Dictionary<int, double>();
+                foreach (var sim_u in user_user_similarity_dictionary_num[user])
+                {
+                    //get current sim_user id
+                    int sim_user = sim_u.Key;
+
+                    //evaluate prediction of that sim_user for that user
+                    double pred =
+                        user_user_similarity_dictionary_num[user][sim_user] /
+                        ((user_similarity_dictionary_norm[user] * user_similarity_dictionary_norm[sim_user]) + SIM_SHRINK_UB);
+
+                    //storing
+                    sim_users_predictions.Add(sim_user, pred);
+                }
+
+                //storing
+                user_user_similarity_dictionary.Add(user, sim_users_predictions);
+            }
+
+            ////////////////////////////////////////////
+            //HYBRID (CF+CB)
+
+            //info
+            RManager.outLog("  + user user HYBRID (CF+CB): ");
+
+            //runtime dictionaries
+            IDictionary<int, IDictionary<int, double>> CB_similarity_dictionary = new Dictionary<int, IDictionary<int, double>>();
+            IDictionary<int, IDictionary<int, double>> CB_similarity_dictionary_num = new Dictionary<int, IDictionary<int, double>>();
+            IDictionary<int, double> CB_similarity_dictionary_norm = new Dictionary<int, double>();
+
+            //counter
+            c_tot = user_user_similarity_dictionary.Count();
+            RManager.outLog("  + calculating all coefficients ");
+
+            //for each user
+            foreach (var u in user_user_similarity_dictionary)
+            {
+                //counter
+                if (--c_tot % 2000 == 0)
+                    RManager.outLog(" - remaining " + c_tot, true, true, true);
+
+                //user
+                int user = u.Key;
+                CB_similarity_dictionary_num.Add(user, new Dictionary<int, double>());
+                var user_attributes = REngineCBDICT.users_attributes[user];
+
+                //foreach similar user
+                foreach(var u2 in u.Value)
+                {
+                    //user2
+                    int user2 = u2.Key;
+                    var user2_attributes = REngineCBDICT.users_attributes[user2];
+
+                    foreach(var att in user_attributes)
+                    {
+                        if (user2_attributes.ContainsKey(att.Key))
+                        {
+                            //creating coefficients
+                            double num = att.Value * user2_attributes[att.Key];
+
+                            //storing coefficients
+                            if (CB_similarity_dictionary_num[user].ContainsKey(user2))
+                                CB_similarity_dictionary_num[user][user2] += num;
+                            else
+                                CB_similarity_dictionary_num[user].Add(user2, num);
+                        }
+                    }
+                }
+            }
+
+            //foreach user and its attributes, compute the vector norm
+            foreach(var user in CB_similarity_dictionary_num)
+            {
+                foreach (var attr in REngineCBDICT.users_attributes[user.Key])
+                {
+                    if (CB_similarity_dictionary_norm.ContainsKey(user.Key))
+                        CB_similarity_dictionary_norm[user.Key] += Math.Pow(attr.Value, 2);
+                    else
+                        CB_similarity_dictionary_norm.Add(user.Key, Math.Pow(attr.Value, 2));
+                }
+                CB_similarity_dictionary_norm[user.Key] = Math.Sqrt(CB_similarity_dictionary_norm[user.Key]);
+            }
+
+            //counter
+            c_tot = user_user_similarity_dictionary.Count();
+            RManager.outLog("  + similarity estimate ");
+
+            //for each user
+            foreach (var u in CB_similarity_dictionary_num)
+            {
+                //counter
+                if (--c_tot % 2000 == 0)
+                    RManager.outLog(" - remaining " + c_tot, true, true, true);
+
+                //compute uu simil
+                CB_similarity_dictionary.Add(u.Key, new Dictionary<int, double>());
+                foreach (var user2 in CB_similarity_dictionary_num[u.Key])
+                    CB_similarity_dictionary[u.Key].Add(
+                        user2.Key,
+                        (user2.Value / (CB_similarity_dictionary_norm[u.Key] * CB_similarity_dictionary_norm[user2.Key] + REngineCBDICT.SIM_SHRINK_UB))
+                        );
+            }
+
+            //similarity combination
+            foreach(var user in user_user_similarity_dictionary)
+                foreach(var user2 in user.Value)
+                    if(CB_similarity_dictionary[user.Key].ContainsKey(user2.Key))
+                        user_user_similarity_dictionary[user.Key][user2.Key] += (CB_similarity_dictionary[user.Key][user2.Key] * CFCB_HYBRID_UB);
+
+            //KNN
+            if (CF_UB_KNN > 0)
+            {
+                //ordering and taking only top similar KNN
+                RManager.outLog("  + KNN is active, ordering and taking.. ");
+
+                //for each user
+                foreach (var u in user_user_similarity_dictionary.Select(x => x.Key).ToList())
+                    //sort the predictions and take knn
+                    user_user_similarity_dictionary[u] = user_user_similarity_dictionary[u].OrderByDescending(x => x.Value).Take(CF_UB_KNN).ToDictionary(kp => kp.Key, kp => kp.Value);
+
+            }
+
+            //exposing
+            CF_user_user_sim_dictionary = user_user_similarity_dictionary;
+        }
+
+        //CREATE USER_USER RECOMMENDATIONS 
         private static void predictCFUserBasedRecommendations()
         {
             //info
@@ -605,9 +830,8 @@ namespace RS_Engine
             CF_UB_user_prediction_dictionary = users_prediction_dictionary;
         }
 
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        //CREATE AN USER_USER SIMILARITY (DICTIONARY)
+        //////////////////////////////////////////////////////////////////////////////////////////
+        //CREATE AN ITEM_ITEM SIMILARITY (DICTIONARY)
         private static void computeCFItemItemSimilarity()
         {
             //info
@@ -729,8 +953,220 @@ namespace RS_Engine
             CF_item_item_sim_dictionary = item_item_similarity_dictionary;
         }
 
-        //////////////////////////////////////////////////////////////////////////////////////////
-        //CREATE RECOMMENDATIONS 
+        //CREATE AN ITEM_ITEM HYBRID SIMILARITY (DICTIONARY) (CF+CB)
+        private static void computeCFCBHybridItemItemSimilarity()
+        {
+            //info
+            RManager.outLog("  + computeCFCBHybridItemItemSimilarity(): ");
+
+            //runtime dictionaries
+            IDictionary<int, IDictionary<int, double>> item_item_similarity_dictionary = new Dictionary<int, IDictionary<int, double>>();
+            IDictionary<int, IDictionary<int, double>> item_item_similarity_dictionary_num = new Dictionary<int, IDictionary<int, double>>();
+            IDictionary<int, double> item_similarity_dictionary_norm = new Dictionary<int, double>();
+
+            //counter
+            int c_tot = RManager.item_users_dictionary.Count();
+            RManager.outLog("  + calculating all coefficients ");
+
+            //for every item
+            foreach (var i in RManager.item_users_dictionary)
+            {
+                //counter
+                if (--c_tot % 2000 == 0)
+                    RManager.outLog(" - remaining " + c_tot, true, true, true);
+
+                //getting current item id
+                int item = i.Key;
+
+                //creating user key in the coefficients dictionaries
+                item_item_similarity_dictionary_num.Add(item, new Dictionary<int, double>());
+
+                //get the users that interacted with the current item and the related best interaction type for each clicked item
+                IDictionary<int, int> interacting_users = i.Value;
+
+                //for every user that interacted with this item
+                foreach (var u in interacting_users)
+                {
+                    //getting current user id
+                    int user = u.Key;
+
+                    //get the dictionary of that user (that contains the items which have interacted with)
+                    //and from that, get list of items that interacted with 
+                    IDictionary<int, int> interacted_items = RManager.user_items_dictionary[user];
+
+                    //get the list of items which have been interacted by the current user
+                    List<int> item_list = interacted_items.Keys.ToList();
+
+                    //for each item in the list of (similar) items
+                    foreach (var sim_item in item_list)
+                    {
+                        if (sim_item == item)
+                            continue;
+
+                        //retrieving interaction coefficients
+                        int interaction_type = interacted_items[item];//u.Value;
+                        int interaction_type_of_sim_item = interacted_items[sim_item];
+
+                        //creating coefficients
+                        double num = interaction_type * interaction_type_of_sim_item;
+
+                        //storing coefficients
+                        if (item_item_similarity_dictionary_num[item].ContainsKey(sim_item))
+                            item_item_similarity_dictionary_num[item][sim_item] += num;
+                        else
+                            //add to similarity dictionary
+                            item_item_similarity_dictionary_num[item].Add(sim_item, num);
+                    }
+                }
+            }
+
+            //for each item in the dictionary
+            foreach (var i in RManager.item_users_dictionary)
+                //increase norm
+                item_similarity_dictionary_norm[i.Key] = Math.Sqrt(i.Value.Count());
+
+            //counter
+            c_tot = item_item_similarity_dictionary_num.Count();
+            RManager.outLog("  + calculating item_item similarity ");
+
+            //calculating similarity
+            //for every item
+            foreach (var i in item_item_similarity_dictionary_num)
+            {
+                //counter
+                if (--c_tot % 2000 == 0)
+                    RManager.outLog(" - remaining " + c_tot, true, true, true);
+
+                //get current item id
+                int item = i.Key;
+
+                //for every sim_item to this item
+                IDictionary<int, double> sim_items_predictions = new Dictionary<int, double>();
+                foreach (var sim_i in item_item_similarity_dictionary_num[item])
+                {
+                    //get current sim_item id
+                    int sim_item = sim_i.Key;
+
+                    //evaluate prediction of that sim_item for that item
+                    double pred =
+                        item_item_similarity_dictionary_num[item][sim_item] /
+                        ((item_similarity_dictionary_norm[item] * item_similarity_dictionary_norm[sim_item]) + SIM_SHRINK_IB);
+
+                    //storing
+                    sim_items_predictions.Add(sim_item, pred);
+                }
+
+                //storing
+                item_item_similarity_dictionary.Add(item, sim_items_predictions);
+            }
+
+            ////////////////////////////////////////////
+            //HYBRID (CF+CB)
+
+            //info
+            RManager.outLog("  + user user HYBRID (CF+CB): ");
+
+            //runtime dictionaries
+            IDictionary<int, IDictionary<int, double>> CB_similarity_dictionary = new Dictionary<int, IDictionary<int, double>>();
+            IDictionary<int, IDictionary<int, double>> CB_similarity_dictionary_num = new Dictionary<int, IDictionary<int, double>>();
+            IDictionary<int, double> CB_similarity_dictionary_norm = new Dictionary<int, double>();
+
+            //counter
+            c_tot = item_item_similarity_dictionary.Count();
+            RManager.outLog("  + calculating all coefficients ");
+
+            //for each item
+            foreach (var i in item_item_similarity_dictionary)
+            {
+                //counter
+                if (--c_tot % 2000 == 0)
+                    RManager.outLog(" - remaining " + c_tot, true, true, true);
+
+                //item
+                int item = i.Key;
+                CB_similarity_dictionary_num.Add(item, new Dictionary<int, double>());
+                var item_attributes = REngineCBDICT.items_attributes[item];
+
+                //foreach similar item
+                foreach (var i2 in i.Value)
+                {
+                    //item2
+                    int item2 = i2.Key;
+                    var item2_attributes = REngineCBDICT.items_attributes[item2];
+
+                    foreach (var att in item_attributes)
+                    {
+                        if (item2_attributes.ContainsKey(att.Key))
+                        {
+                            //creating coefficients
+                            double num = att.Value * item2_attributes[att.Key];
+
+                            //storing coefficients
+                            if (CB_similarity_dictionary_num[item].ContainsKey(item2))
+                                CB_similarity_dictionary_num[item][item2] += num;
+                            else
+                                CB_similarity_dictionary_num[item].Add(item2, num);
+                        }
+                    }
+                }
+            }
+
+            //foreach item and its attributes, compute the vector norm
+            foreach (var item in CB_similarity_dictionary_num)
+            {
+                foreach (var attr in REngineCBDICT.items_attributes[item.Key])
+                {
+                    if (CB_similarity_dictionary_norm.ContainsKey(item.Key))
+                        CB_similarity_dictionary_norm[item.Key] += Math.Pow(attr.Value, 2);
+                    else
+                        CB_similarity_dictionary_norm.Add(item.Key, Math.Pow(attr.Value, 2));
+                }
+                CB_similarity_dictionary_norm[item.Key] = Math.Sqrt(CB_similarity_dictionary_norm[item.Key]);
+            }
+
+            //counter
+            c_tot = item_item_similarity_dictionary.Count();
+            RManager.outLog("  + similarity estimate ");
+
+            //for each item
+            foreach (var i in CB_similarity_dictionary_num)
+            {
+                //counter
+                if (--c_tot % 2000 == 0)
+                    RManager.outLog(" - remaining " + c_tot, true, true, true);
+
+                //compute ii simil
+                CB_similarity_dictionary.Add(i.Key, new Dictionary<int, double>());
+                foreach (var item2 in CB_similarity_dictionary_num[i.Key])
+                    CB_similarity_dictionary[i.Key].Add(
+                        item2.Key,
+                        (item2.Value / (CB_similarity_dictionary_norm[i.Key] * CB_similarity_dictionary_norm[item2.Key] + REngineCBDICT.SIM_SHRINK_IB))
+                        );
+            }
+
+            //similarity combination
+            foreach (var item in item_item_similarity_dictionary)
+                foreach (var item2 in item.Value)
+                    if (CB_similarity_dictionary[item.Key].ContainsKey(item2.Key))
+                        item_item_similarity_dictionary[item.Key][item.Key] += (CB_similarity_dictionary[item.Key][item.Key] * CFCB_HYBRID_IB);
+
+            //KNN
+            if (CF_IB_KNN > 0)
+            {
+                //ordering and taking only top similar KNN
+                RManager.outLog("  + KNN is active, ordering and taking.. ");
+
+                //for each item
+                foreach (var i in item_item_similarity_dictionary.Select(x => x.Key).ToList())
+                    //sort the predictions and take knn
+                    item_item_similarity_dictionary[i] = item_item_similarity_dictionary[i].OrderByDescending(x => x.Value).Take(CF_IB_KNN).ToDictionary(kp => kp.Key, kp => kp.Value);
+            }
+
+            //exposing
+            CF_item_item_sim_dictionary = item_item_similarity_dictionary;
+        }
+
+        //CREATE ITEM_ITEM RECOMMENDATIONS 
         private static void predictCFItemBasedRecommendations()
         {
             //info
@@ -842,10 +1278,7 @@ namespace RS_Engine
             CF_IB_user_prediction_dictionary = users_prediction_dictionary;
         }
 
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        //HYBRID
-
+        //////////////////////////////////////////////////////////////////////////////////////////
         //Hybrid weighted
         private static void computeCFHybridWeightedRecommendations()
         {
@@ -1024,7 +1457,6 @@ namespace RS_Engine
             CF_HR_user_prediction_dictionary = users_prediction_dictionary;
         }
 
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         //GENERATE OUTPUT STRUCTURED DATA
         private static void generateOutput(IDictionary<int, IDictionary<int, double>> users_prediction_dictionary)
