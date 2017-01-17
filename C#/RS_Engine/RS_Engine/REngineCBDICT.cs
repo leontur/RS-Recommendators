@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace RS_Engine
@@ -48,20 +50,18 @@ namespace RS_Engine
             RManager.outLog("  + processing..");
             RManager.outLog("  + CB Algorithm..");
 
-
-            //info
-            RManager.outLog("  + InitUserCBDict(): ");
+            //EXECUTION
             InitUserCBDict();
-            RManager.outLog("  + InitItemCBDict(): ");
             InitItemCBDict();
-
-            compute_TF_IDF();
+            compute_TF_IDF_UB();
+            compute_TF_IDF_IB();
 
             computeCBUserUserSimilarity();
-            predictCBUserBasedRecommendations();
+            //predictCBUserBasedRecommendations();
             predictCBUserBasedNormalizedRecommendations();
-            computeCBItemItemSimilarity();
-            predictCBItemBasedRecommendations();
+
+            computeCBItemItemSimilarity(); //(include 'estimate')
+            //predictCBItemBasedRecommendations();
             predictCBItemBasedNormalizedRecommendations();
         }
 
@@ -72,121 +72,250 @@ namespace RS_Engine
             //attributes array
             string[] attr = new string[] { "jr_", "cl_", "di_", "ii_", "c_", "r_", "ex1_", "ex2_", "ex3_", "ed_", "ef_" };
 
-            //IDF
-            //initialize user attribute (global) dictionary
-            //for each user, list all attributes
-            foreach (var i in RManager.user_profile)
+            //counter
+            int par_counter = RManager.user_profile.Count();
+            RManager.outLog("  + InitUserCBDict():");
+
+            //check if already serialized (for fast fetching)
+            if (!File.Exists(Path.Combine(RManager.SERIALTPATH, "CBDICT_users_attributes.bin")))
             {
-                int userid = (int)i[0];
-                users_attributes.Add(userid, new Dictionary<string, double>());
 
-                //(add attribute only if > 0)
-
-                //job roles
-                foreach (var jr in (List<int>)i[1])
-                {
-                    if (jr != 0)
+                //IDF
+                //initialize user attribute (global) dictionary
+                //for each user, list all attributes
+                object sync = new object();
+                Parallel.ForEach(
+                    RManager.user_profile,
+                    new ParallelOptions { MaxDegreeOfParallelism = 32 },
+                    i =>
                     {
-                        string curr = attr[0] + jr;
-                        users_attributes[userid].Add(curr, 1);
-                        try { attributes_users.Add(curr, new Dictionary<int, double>()); } catch {; }
-                    }
+                        //counter
+                        Interlocked.Decrement(ref par_counter);
+                        int count = Interlocked.CompareExchange(ref par_counter, 0, 0);
+                        if (count % 200 == 0) RManager.outLog("  - remaining: " + count, true, true, true);
+
+                        lock (sync)
+                        {
+
+                            //getting user id
+                            int userid = (int)i[0];
+                            users_attributes.Add(userid, new Dictionary<string, double>());
+
+                            //(add attribute only if > 0)
+
+                            //job roles
+                            foreach (var jr in (List<int>)i[1])
+                            {
+                                if (jr != 0)
+                                {
+                                    string curr = attr[0] + jr;
+                                    users_attributes[userid].Add(curr, 1);
+                                }
+                            }
+                            //career level TO edu_degree
+                            for (int tit = 2; tit <= 10; tit++)
+                            {
+                                //if ((int)i[tit] != 0)
+                                //{
+                                    string curr = attr[tit - 1] + (int)i[tit];
+                                    users_attributes[userid].Add(curr, 1);
+                                //}
+
+                            }
+                            //edu_fieldofstudies
+                            foreach (var ef in (List<int>)i[11])
+                            {
+                                if (ef != 0)
+                                {
+                                    string curr = attr[10] + ef;
+                                    users_attributes[userid].Add(curr, 1);
+                                }
+                            }
+                        }
+                    });
+                
+                //serialize
+                using (Stream stream = File.Open(Path.Combine(RManager.SERIALTPATH, "CBDICT_users_attributes.bin"), FileMode.Create))
+                {
+                    RManager.outLog("  + writing serialized file " + "CBDICT_users_attributes.bin");
+                    var bformatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+                    bformatter.Serialize(stream, users_attributes);
                 }
-                //career level TO edu_degree
-                for (int tit = 2; tit <= 10; tit++)
+            }
+            else
+            {
+                //deserialize
+                using (Stream stream = File.Open(Path.Combine(RManager.SERIALTPATH, "CBDICT_users_attributes.bin"), FileMode.Open))
                 {
-                    if ((int)i[tit] != 0)
-                    {
-                        string curr = attr[tit - 1] + (int)i[tit];
-                        users_attributes[userid].Add(curr, 1);
-                        try { attributes_users.Add(curr, new Dictionary<int, double>()); } catch {; }
-                    }
-
-                }
-                //edu_fieldofstudies
-                foreach (var ef in (List<int>)i[11])
-                {
-                    if (ef != 0)
-                    {
-                        string curr = attr[10] + ef;
-                        users_attributes[userid].Add(curr, 1);
-                        try { attributes_users.Add(curr, new Dictionary<int, double>()); } catch {; }
-                    }
+                    RManager.outLog("  + reading serialized file " + "CBDICT_users_attributes.bin");
+                    var bformatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+                    users_attributes = (IDictionary<int, IDictionary<string, double>>)bformatter.Deserialize(stream);
                 }
             }
 
-            //IDF
-            //initialize attributes (global) dictionary
-            //for each attribute, list all users (that have it)
-            foreach (var att in attributes_users)
+            //check if already serialized (for fast fetching)
+            if (!File.Exists(Path.Combine(RManager.SERIALTPATH, "CBDICT_attributes_users.bin")))
+            {
+                //IDF
+                //initialize attributes (global) dictionary
+                //for each attribute, list all users (that have it)
                 foreach (var usr in users_attributes)
-                    if (usr.Value.ContainsKey(att.Key))
-                        att.Value.Add(usr.Key, 1);
+                    foreach (var atr in usr.Value)
+                        if (!attributes_users.ContainsKey(atr.Key)) 
+                            attributes_users.Add(atr.Key, new Dictionary<int, double> { { usr.Key, 1 } });
+                        else
+                            if(!attributes_users[atr.Key].ContainsKey(usr.Key))
+                                attributes_users[atr.Key].Add(usr.Key, 1);
 
+                //serialize
+                using (Stream stream = File.Open(Path.Combine(RManager.SERIALTPATH, "CBDICT_attributes_users.bin"), FileMode.Create))
+                {
+                    RManager.outLog("  + writing serialized file " + "CBDICT_attributes_users.bin");
+                    var bformatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+                    bformatter.Serialize(stream, attributes_users);
+                }
+            }
+            else
+            {
+                //deserialize
+                using (Stream stream = File.Open(Path.Combine(RManager.SERIALTPATH, "CBDICT_attributes_users.bin"), FileMode.Open))
+                {
+                    RManager.outLog("  + reading serialized file " + "CBDICT_attributes_users.bin");
+                    var bformatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+                    attributes_users = (IDictionary<string, IDictionary<int, double>>)bformatter.Deserialize(stream);
+                }
+            }
         }
         public static void InitItemCBDict()
         {
             //attributes array
             string[] attr = new string[] { "tit_", "cl_", "di_", "ii_", "c_", "r_", "la_", "lo_", "em_", "tag_", "cr_", "act_" };
 
-            //IDF
-            //initialize items attribute (global) dictionary
-            //for each item, list all attributes
-            foreach (var i in RManager.item_profile)
+            //counter
+            int par_counter = RManager.item_profile.Count();
+            RManager.outLog("  + InitItemCBDict():");
+
+            //check if already serialized (for fast fetching)
+            if (!File.Exists(Path.Combine(RManager.SERIALTPATH, "CBDICT_items_attributes.bin")))
             {
-                int itemid = (int)i[0];
-                users_attributes.Add(itemid, new Dictionary<string, double>());
 
-                //(add attribute only if > 0)
-
-                //title
-                foreach (var tit in (List<int>)i[1])
-                {
-                    if (tit != 0)
+                //IDF
+                //initialize items attribute (global) dictionary
+                //for each item, list all attributes
+                object sync = new object();
+                Parallel.ForEach(
+                    RManager.item_profile,
+                    new ParallelOptions { MaxDegreeOfParallelism = 32 },
+                    i =>
                     {
-                        string curr = attr[0] + tit;
-                        items_attributes[itemid].Add(curr, 1);
-                        try { attributes_items.Add(curr, new Dictionary<int, double>()); } catch {; }
-                    }
+                        //counter
+                        Interlocked.Decrement(ref par_counter);
+                        int count = Interlocked.CompareExchange(ref par_counter, 0, 0);
+                        if (count % 200 == 0) RManager.outLog("  - remaining: " + count, true, true, true);
+
+                        lock(sync){
+
+                            //getting user id
+                            int itemid = (int)i[0];
+                            items_attributes.Add(itemid, new Dictionary<string, double>());
+
+                            //(add attribute only if > 0)
+
+                            //title
+                            foreach (var tit in (List<int>)i[1])
+                            {
+                                if (tit != 0)
+                                {
+                                    string curr = attr[0] + tit;
+                                    items_attributes[itemid].Add(curr, 1);
+                                }
+                            }
+                            //career level TO employment, and created_at and active_during_test
+                            for (int tit = 2; tit <= 12; tit++)
+                            {
+                                if (tit == 10) continue; //is a list, see tags
+
+                                int val = 0;
+                                if (tit == 7 || tit == 8) //is a double
+                                    val = Convert.ToInt32((float)i[tit]);
+                                else
+                                    val = (int)i[tit];
+
+                                if (val != 0)
+                                {
+                                    string curr = attr[tit - 1] + val;
+                                    items_attributes[itemid].Add(curr, 1);
+                                }
+                            }
+                            //tags
+                            foreach (var tag in (List<int>)i[10])
+                            {
+                                if (tag != 0)
+                                {
+                                    string curr = attr[9] + tag;
+                                    items_attributes[itemid].Add(curr, 1);
+                                }
+                            }
+
+                        }
+                    });
+
+                //serialize
+                using (Stream stream = File.Open(Path.Combine(RManager.SERIALTPATH, "CBDICT_items_attributes.bin"), FileMode.Create))
+                {
+                    RManager.outLog("  + writing serialized file " + "CBDICT_items_attributes.bin");
+                    var bformatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+                    bformatter.Serialize(stream, items_attributes);
                 }
-                //career level TO employment, and created_at and active_during_test
-                for (int tit = 2; tit <= 12; tit++)
+            }
+            else
+            {
+                //deserialize
+                using (Stream stream = File.Open(Path.Combine(RManager.SERIALTPATH, "CBDICT_items_attributes.bin"), FileMode.Open))
                 {
-                    if (tit == 10) continue; //is a list, see tags
-
-                    if ((int)i[tit] != 0)
-                    {
-                        string curr = attr[tit - 1] + (int)i[tit];
-                        items_attributes[itemid].Add(curr, 1);
-                        try { attributes_items.Add(curr, new Dictionary<int, double>()); } catch {; }
-                    }
-
-                }
-                //tags
-                foreach (var tag in (List<int>)i[10])
-                {
-                    if (tag != 0)
-                    {
-                        string curr = attr[9] + tag;
-                        items_attributes[itemid].Add(curr, 1);
-                        try { attributes_items.Add(curr, new Dictionary<int, double>()); } catch {; }
-                    }
+                    RManager.outLog("  + reading serialized file " + "CBDICT_items_attributes.bin");
+                    var bformatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+                    items_attributes = (IDictionary<int, IDictionary<string, double>>)bformatter.Deserialize(stream);
                 }
             }
 
-            //IDF
-            //initialize attributes (global) dictionary
-            //for each attribute, list all items (that have it)
-            foreach (var att in attributes_items)
+            //check if already serialized (for fast fetching)
+            if (!File.Exists(Path.Combine(RManager.SERIALTPATH, "CBDICT_attributes_items.bin")))
+            {
+                //IDF
+                //initialize attributes (global) dictionary
+                //for each attribute, list all items (that have it)
                 foreach (var itm in items_attributes)
-                    if (itm.Value.ContainsKey(att.Key))
-                        att.Value.Add(itm.Key, 1);
+                    foreach (var atr in itm.Value)
+                        if (!attributes_items.ContainsKey(atr.Key))
+                            attributes_items.Add(atr.Key, new Dictionary<int, double> { { itm.Key, 1 } });
+                        else
+                            if (!attributes_items[atr.Key].ContainsKey(itm.Key))
+                            attributes_items[atr.Key].Add(itm.Key, 1);
 
+                //serialize
+                using (Stream stream = File.Open(Path.Combine(RManager.SERIALTPATH, "CBDICT_attributes_items.bin"), FileMode.Create))
+                {
+                    RManager.outLog("  + writing serialized file " + "CBDICT_attributes_items.bin");
+                    var bformatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+                    bformatter.Serialize(stream, attributes_items);
+                }
+            }
+            else
+            {
+                //deserialize
+                using (Stream stream = File.Open(Path.Combine(RManager.SERIALTPATH, "CBDICT_attributes_items.bin"), FileMode.Open))
+                {
+                    RManager.outLog("  + reading serialized file " + "CBDICT_attributes_items.bin");
+                    var bformatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+                    attributes_items = (IDictionary<string, IDictionary<int, double>>)bformatter.Deserialize(stream);
+                }
+            }
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////
-        //COMPUTE TF AND IDF
-        public static void compute_TF_IDF()
+        //COMPUTE TF AND IDF (UB)
+        public static void compute_TF_IDF_UB()
         {
             //info
             RManager.outLog("  + compute_TF_IDF(): ");
@@ -205,18 +334,55 @@ namespace RS_Engine
                 attr_tf[at.Key] = Math.Log10(users_count / at.Value.Count());
 
             //UPDATE values in global dictionaries
-            foreach (var us in users_attributes)
-                foreach (var at in us.Value)
-                    users_attributes[us.Key][at.Key] *= (user_tf[us.Key] * attr_tf[at.Key]);
-            foreach (var at in attributes_users)
-                foreach (var us in at.Value)
-                    attributes_users[at.Key][us.Key] *= (user_tf[us.Key] * attr_tf[at.Key]);
+            foreach (var us in users_attributes.Keys.ToList())
+                foreach (var at in users_attributes[us].Keys.ToList())
+                    users_attributes[us][at] *= (user_tf[us] * attr_tf[at]);
+
+            foreach (var at in attributes_users.Keys.ToList())
+                foreach (var us in attributes_users[at].Keys.ToList())
+                    attributes_users[at][us] *= (user_tf[us] * attr_tf[at]);
 
             //SORTING by attribute
-            foreach (var us in users_attributes.Select(x => x.Key).ToList())
+            foreach (var us in users_attributes.Keys.ToList())
                 users_attributes[us] = users_attributes[us].OrderByDescending(x => x.Value).ToDictionary(kp => kp.Key, kp => kp.Value);
-            foreach (var at in attributes_users.Select(x => x.Key).ToList())
+
+            foreach (var at in attributes_users.Keys.ToList())
                 attributes_users[at] = attributes_users[at].OrderByDescending(x => x.Value).ToDictionary(kp => kp.Key, kp => kp.Value);
+        }
+        //COMPUTE TF AND IDF (IB)
+        public static void compute_TF_IDF_IB()
+        {
+            //info
+            RManager.outLog("  + compute_TF_IDF(): ");
+
+            //temp dictionaries
+            IDictionary<int, double> item_tf = new Dictionary<int, double>();
+            IDictionary<string, double> attr_tf = new Dictionary<string, double>();
+            int users_count = items_attributes.Count();
+
+            //for each user, create the time frequency TF dictionary
+            foreach (var us in items_attributes)
+                item_tf[us.Key] = 1 / us.Value.Count();
+
+            //for each attribute, create the time frequency TF dictionary
+            foreach (var at in attributes_items)
+                attr_tf[at.Key] = Math.Log10(users_count / at.Value.Count());
+
+            //UPDATE values in global dictionaries
+            foreach (var us in items_attributes.Keys.ToList())
+                foreach (var at in items_attributes[us].Keys.ToList())
+                    items_attributes[us][at] *= (item_tf[us] * attr_tf[at]);
+
+            foreach (var at in attributes_items.Keys.ToList())
+                foreach (var us in attributes_items[at].Keys.ToList())
+                    attributes_items[at][us] *= (item_tf[us] * attr_tf[at]);
+
+            //SORTING by attribute
+            foreach (var us in items_attributes.Keys.ToList())
+                items_attributes[us] = items_attributes[us].OrderByDescending(x => x.Value).ToDictionary(kp => kp.Key, kp => kp.Value);
+
+            foreach (var at in attributes_items.Keys.ToList())
+                attributes_items[at] = attributes_items[at].OrderByDescending(x => x.Value).ToDictionary(kp => kp.Key, kp => kp.Value);
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////

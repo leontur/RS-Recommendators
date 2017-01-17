@@ -84,16 +84,24 @@ namespace RS_Engine
             }
 
             ///////////////////////////////////////////////
-            //CF
+            //CB + CF
             //Execute DICTIONARIES
             createDictionaries();
 
+            ///////////////////////////////////////////////
+            //CB
+            REngineCBDICT.getRecommendations();
+
+            ///////////////////////////////////////////////
+            //CF
             //Execute USER BASED
-            computeCFUserUserSimilarity();
+            //computeCFUserUserSimilarity();
+            computeCFCBHybridUserUserSimilarity();
             predictCFUserBasedRecommendations();
 
             //Execute ITEM BASED
-            computeCFItemItemSimilarity();
+            //computeCFItemItemSimilarity();
+            computeCFCBHybridItemItemSimilarity();
             predictCFItemBasedRecommendations();
 
             //Execute HYBRID
@@ -101,10 +109,10 @@ namespace RS_Engine
             computeCFHybridRankRecommendations();
 
             ///////////////////////////////////////////////
-            //CB
+            //CBCF2
             //Execute
-            RManager.outLog("  + executing ALSO CBCF2! .. ");
-            REngineCBCF2.getRecommendations();
+            //RManager.outLog("  + executing ALSO CBCF2! .. ");
+            //REngineCBCF2.getRecommendations();
 
             ///////////////////////////////////////////////
             //Execute OUTPUT
@@ -1462,14 +1470,16 @@ namespace RS_Engine
         private static void generateOutput(IDictionary<int, IDictionary<int, double>> users_prediction_dictionary)
         {
             //ENABLED ALGORITHMS
-            bool A_CF_DICT  = true;   //CF from dictionaries DICT
+            bool A_CBCF_DICT  = true;   //CF from dictionaries DICT
+
+            //OTHER ALGORITHMS
             bool A_CF_TIT   = false;   //CF over TITLES
             bool A_CF_TAG   = false;   //CF over TAGS
             bool A_CF_RAT   = false;   //CF over RATING
             bool A_CB_UU    = false;   //CB over user-user similarity
             bool A_CB_II    = false;   //CB over item-item similarity (<<<<<<< yet to be implemented in CBCF2 (FROM CBF)!!)
 
-            RManager.outLog(" + Output CF DICT :> " + A_CF_DICT);
+            RManager.outLog(" + Output CB+CF DICT :> " + A_CBCF_DICT);
             RManager.outLog(" + Output CF TIT  :> " + A_CF_TIT);
             RManager.outLog(" + Output CF TAG  :> " + A_CF_TAG);
             RManager.outLog(" + Output CF RAT  :> " + A_CF_RAT);
@@ -1511,7 +1521,7 @@ namespace RS_Engine
                 //MERGE LISTS OF PREDICTIONS
                 //adding all predictions 
                 //NOTE: the way I add the lists makes the CF with more 'priority' that the others
-                if (A_CF_DICT)
+                if (A_CF_TIT)
                 {
                     //get list of predictions
                         //if (u.Value.Count > 0) //if the list of recommendable items is not empty
@@ -1523,7 +1533,6 @@ namespace RS_Engine
                     //adding predictions 
                     rec_items.AddRange(CF_rec_items);
                 }
-
 
                 //////////////////////////////
 

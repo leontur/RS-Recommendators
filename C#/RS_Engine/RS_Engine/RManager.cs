@@ -83,36 +83,17 @@ namespace RS_Engine
 
             //////////////
             //target_users
-            if (!File.Exists(Path.Combine(SERIALTPATH, "target_users.bin")))
-            {
-                //Data init
-                outLog("  + reading dataset: " + "target_users");
-                var target_users_f = File.ReadAllLines(DATASETPATH + "target_users" + ".csv");
-                outLog("  + dataset read OK | target_users_f count= " + target_users_f.Count() + " | conversion..");
+            //Data init
+            outLog("  + reading dataset: " + "target_users");
+            var target_users_f = File.ReadAllLines(DATASETPATH + "target_users" + ".csv");
+            outLog("  + dataset read OK | target_users_f count= " + target_users_f.Count() + " | conversion..");
 
-                //scroll file
-                for (i = 1; i < target_users_f.Length; i++)
-                {
-                    int tgt = Int32.Parse(target_users_f[i]);
-                    target_users.Add(tgt);
-                    target_users_hashset.Add(tgt);
-                }
-
-                //serialize
-                using (Stream stream = File.Open(Path.Combine(SERIALTPATH, "target_users.bin"), FileMode.Create))
-                {
-                    RManager.outLog("  + writing serialized file " + "target_users.bin");
-                    bformatter.Serialize(stream, target_users);
-                }
-            }
-            else
+            //scroll file
+            for (i = 1; i < target_users_f.Length; i++)
             {
-                //deserialize
-                using (Stream stream = File.Open(Path.Combine(SERIALTPATH, "target_users.bin"), FileMode.Open))
-                {
-                    RManager.outLog("  + reading serialized file " + "target_users.bin");
-                    target_users = (List<int>)bformatter.Deserialize(stream);
-                }
+                int tgt = Int32.Parse(target_users_f[i]);
+                target_users.Add(tgt);
+                target_users_hashset.Add(tgt);
             }
 
             //////////////
@@ -442,6 +423,7 @@ namespace RS_Engine
             outLog("");
             outLog("    5) CF DICT UB/IB/HYBRID (chiama anche 6)");
             outLog("    6) HYBRID CB+CF 2.0");
+            outLog("    55) CB DICT");
 
             if (!ISTESTMODE)
             {

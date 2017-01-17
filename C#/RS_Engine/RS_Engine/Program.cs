@@ -93,10 +93,10 @@ namespace RS_Engine
                 //PROCESSING - HYBRID CB+CF 2.0
                 REngineCBCF2.getRecommendations();
             }
-            else if (RManager.EXEMODE == 7)
+            else if (RManager.EXEMODE == 55)
             {
-                //PROCESSING - XXX
-                ;
+                //PROCESSING - CBDICT
+                REngineCBDICT.getRecommendations();
             }
             else if (RManager.EXEMODE == 8)
             {

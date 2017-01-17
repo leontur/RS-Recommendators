@@ -1,0 +1,90 @@
+RS:> 
+RS:> -----------------------------------------------------------------
+RS:>  ** RECOMMENDATORS ENGINE **
+RS:> -----------------------------------------------------------------
+RS:>     ____________________________
+RS:>     Algorithms
+RS:>     1) TOP
+RS:>     2) CB-F (ok)
+RS:>     3) U-CF
+RS:>     4) I-CF
+RS:> 
+RS:>     5) CF DICT UB/IB/HYBRID (chiama anche 6)
+RS:>     6) HYBRID CB+CF 2.0
+RS:>     55) CB DICT
+RS:>     ____________________________
+RS:>     TEST Mode
+RS:>     7) test mode: enable here to initialize the dataset as train/test and do EVAL (not use for kaggle scope)
+RS:>     ____________________________
+RS:>     8) EVAL mode: execute EVAL with input a specific csv (not use for kaggle scope)
+RS:>     9) .bin size calculator
+RS:>     ____________________________
+RS:>     0) exit
+RS:> -----------------------------------------------------------------
+RS:> 
+RS:>     > RS:>     ==> selected program (7)
+RS:> -----------------------------------------------------------------
+RS:> 
+RS:> -----------------------------------------------------------------
+RS:>  ** RECOMMENDATORS ENGINE **
+RS:> -----------------------------------------------------------------
+RS:>     ____________________________
+RS:>     +++ TEST MODE ENABLED +++
+RS:>     >> datasets are initialized as train/test (not use for kaggle scope)
+RS:>     >> after the algorithm is invoked EVAL
+RS:>     ____________________________
+RS:>     Algorithms
+RS:>     1) TOP
+RS:>     2) CB-F (ok)
+RS:>     3) U-CF
+RS:>     4) I-CF
+RS:> 
+RS:>     5) CF DICT UB/IB/HYBRID (chiama anche 6)
+RS:>     6) HYBRID CB+CF 2.0
+RS:>     55) CB DICT
+RS:>     ____________________________
+RS:>     8) EVAL mode: execute EVAL with input a specific csv (not use for kaggle scope)
+RS:>     9) .bin size calculator
+RS:>     ____________________________
+RS:>     0) exit
+RS:> -----------------------------------------------------------------
+RS:> 
+RS:>     > RS:>     ==> selected program (55)
+RS:> -----------------------------------------------------------------
+RS:>   + initializing RS 
+RS:>   + initializing dataset retrievement 
+RS:>   + reading dataset: interactions
+RS:>   + dataset read OK | interactions_f count= 546865 | conversion..
+RS:>   + reading dataset: target_users
+RS:>   + dataset read OK | target_users_f count= 10001 | conversion..
+RS:>   + reading serialized file user_profile.bin
+RS:>   + reading serialized file item_profile.bin
+RS:>   + reading serialized file item_profile_enabled.bin
+RS:>   + populating auxiliary data structures 
+RS:> 
+RS:>   + all datasets conversion: OK
+RS:>   -total lines | interactions      >>> 546864
+RS:>   -total lines | item_profile      >>> 167956
+RS:>   -total lines | item_profile_enab >>> 63446
+RS:>   -total lines | target_users      >>> 10000
+RS:>   -total lines | user_profile      >>> 40000
+RS:> 
+RS:>   + TEST MODE - INSERT LIMIT=RS:>   + TINY TEST MODE ENABLED - LIMIT=600
+RS:>   + tiny random list size: 600
+RS:>   + thining out datasets (1m)
+RS:>   -total lines | user_profile (tiny) >>> 600
+RS:>   -total lines | interactions (tiny) >>> 7311
+RS:>   + creating random list..  percentage is set to 20%
+RS:>   + random list size: 120
+RS:>   + splitting data into train and test..
+RS:>   -total lines | user_profile (train)    >>> 600
+RS:>   -total lines | user_profile_test       >>> 120
+RS:>   -total lines | target_users (replaced) >>> 120
+RS:> -----------------------------------------------------------------
+RS:>   # running program 55
+RS:> 
+RS:>   + processing..
+RS:>   + CB Algorithm..
+RS:>   + InitUserCBDict():
+RS:>   + reading serialized file CBDICT_users_attributes.bin
+RS:>   + InitItemCBDict():
