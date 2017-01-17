@@ -10,7 +10,6 @@ namespace RS_Engine
 {
     class REngineCBDICT
     {
-
         /////////////////////////////////////////////
         //ALGORITHM PARAMETERS
 
@@ -234,6 +233,9 @@ namespace RS_Engine
                             for (int tit = 2; tit <= 12; tit++)
                             {
                                 if (tit == 10) continue; //is a list, see tags
+
+                                //to avoid memory fill
+                                if (tit == 7 || tit == 8 || tit == 11 || tit == 12) continue;
 
                                 int val = 0;
                                 if (tit == 7 || tit == 8) //is a double
@@ -464,16 +466,13 @@ namespace RS_Engine
                 //ordering and taking only top similar KNN
                 RManager.outLog("  + KNN is active, ordering and taking.. ");
 
-                //temp population
-                IDictionary<int, IDictionary<int, double>> user_user_sim_dictionary = new Dictionary<int, IDictionary<int, double>>();
-
                 //for each user
                 foreach (var u in user_user_similarity_dictionary_num.Select(x => x.Key).ToList())
                     //sort the predictions and take knn
                     user_user_similarity_dictionary_num[u] = user_user_similarity_dictionary_num[u].OrderByDescending(x => x.Value).Take(CB_UB_KNN).ToDictionary(kp => kp.Key, kp => kp.Value);
 
                 //Exposing
-                CB_user_user_sim_dictionary = user_user_sim_dictionary;
+                CB_user_user_sim_dictionary = user_user_similarity_dictionary_num;
             }
             else
             {
@@ -605,7 +604,7 @@ namespace RS_Engine
         public static void predictCBUserBasedNormalizedRecommendations()
         {
             //info
-            RManager.outLog("  + computeCFUserUserSimilarity(): ");
+            RManager.outLog("  + predictCBUserBasedNormalizedRecommendations(): ");
 
             //runtime dictionaries
             IDictionary<int, IDictionary<int, double>> user_prediction_dictionary = new Dictionary<int, IDictionary<int, double>>();
