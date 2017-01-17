@@ -421,9 +421,10 @@ namespace RS_Engine
             outLog("    3) U-CF");
             outLog("    4) I-CF");
             outLog("");
-            outLog("    5) CF DICT UB/IB/HYBRID (chiama anche 6)");
+            outLog("    5)  CF DICT + CB DICT (chiama anche 6:UB/IB/HYBRID)");
+            outLog("    55) CB DICT (cannot call alone)");
+            outLog("");
             outLog("    6) HYBRID CB+CF 2.0");
-            outLog("    55) CB DICT");
 
             if (!ISTESTMODE)
             {

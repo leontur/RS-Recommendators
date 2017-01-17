@@ -235,7 +235,7 @@ namespace RS_Engine
                                 if (tit == 10) continue; //is a list, see tags
 
                                 //to avoid memory fill
-                                if (tit == 7 || tit == 8 || tit == 11 || tit == 12) continue;
+                                if (tit == 5 || tit == 7 || tit == 8 || tit == 11 || tit == 12) continue;
 
                                 int val = 0;
                                 if (tit == 7 || tit == 8) //is a double
@@ -320,7 +320,7 @@ namespace RS_Engine
         public static void compute_TF_IDF_UB()
         {
             //info
-            RManager.outLog("  + compute_TF_IDF(): ");
+            RManager.outLog("  + compute_TF_IDF_UB(): ");
 
             //temp dictionaries
             IDictionary<int, double> user_tf = new Dictionary<int, double>();
@@ -355,7 +355,7 @@ namespace RS_Engine
         public static void compute_TF_IDF_IB()
         {
             //info
-            RManager.outLog("  + compute_TF_IDF(): ");
+            RManager.outLog("  + compute_TF_IDF_IB(): ");
 
             //temp dictionaries
             IDictionary<int, double> item_tf = new Dictionary<int, double>();
@@ -392,7 +392,7 @@ namespace RS_Engine
         public static void computeCBUserUserSimilarity()
         {
             //info
-            RManager.outLog("  + computeCFUserUserSimilarity(): ");
+            RManager.outLog("  + computeCBUserUserSimilarity(): ");
 
             //runtime dictionaries
             IDictionary<int, IDictionary<int, double>> user_user_similarity_dictionary_num = new Dictionary<int, IDictionary<int, double>>();
@@ -420,7 +420,7 @@ namespace RS_Engine
                     {
                         if (u == user)
                             continue;
-                        
+
                         if (RManager.user_items_dictionary.ContainsKey(u))
                         {
                             //creating coefficients
@@ -433,7 +433,7 @@ namespace RS_Engine
                                 //add to similarity dictionary
                                 user_user_similarity_dictionary_num[user].Add(u, num);
                         }
-                        
+
                     }
                 }
             }
@@ -455,11 +455,11 @@ namespace RS_Engine
             RManager.outLog("  + calculating user_user similarity ");
 
             //for each user, compute the uu simil
-            foreach (var user in user_user_similarity_dictionary_num)
-                foreach (var u in user.Value)
-                    user_user_similarity_dictionary_num[user.Key][u.Key] =
-                        user_user_similarity_dictionary_num[user.Key][u.Key] /
-                        (user_similarity_dictionary_norm[user.Key] * user_similarity_dictionary_norm[u.Key] + SIM_SHRINK_UB);
+            foreach (var user in user_user_similarity_dictionary_num.Keys.ToList())
+                foreach (var u in user_user_similarity_dictionary_num[user].Keys.ToList())
+                    user_user_similarity_dictionary_num[user][u] =
+                        user_user_similarity_dictionary_num[user][u] /
+                        (user_similarity_dictionary_norm[user] * user_similarity_dictionary_norm[u] + SIM_SHRINK_UB);
 
             if (CB_UB_KNN > 0)
             {
@@ -467,7 +467,7 @@ namespace RS_Engine
                 RManager.outLog("  + KNN is active, ordering and taking.. ");
 
                 //for each user
-                foreach (var u in user_user_similarity_dictionary_num.Select(x => x.Key).ToList())
+                foreach (var u in user_user_similarity_dictionary_num.Keys.ToList())
                     //sort the predictions and take knn
                     user_user_similarity_dictionary_num[u] = user_user_similarity_dictionary_num[u].OrderByDescending(x => x.Value).Take(CB_UB_KNN).ToDictionary(kp => kp.Key, kp => kp.Value);
 
