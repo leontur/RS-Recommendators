@@ -329,11 +329,6 @@ namespace RS_Engine
             item_profile_and_interaction_merge_nodup.Union(item_profile.Select(x => (int)x[0]).ToList());
             item_profile_and_interaction_merge_nodup = item_profile_and_interaction_merge_nodup.Distinct().ToList();
 
-            //Populate item_with_onemore_interaction_by_target
-            var tmp_item_onemore = interactions.Where(x => target_users_hashset.Contains(x[0])).Select(x => x[1]).ToList().Distinct().ToList();
-            foreach (var itInt in tmp_item_onemore)
-                item_with_onemore_interaction_by_target.Add(itInt);
-
             //INFO
             outLog("");
             outLog("  + all datasets conversion: OK");
@@ -696,5 +691,6 @@ namespace RS_Engine
             //MS_AZURE_CS END
             /////////////////////////////
         }
+
     }
 }

@@ -87,6 +87,7 @@ namespace RS_Engine
             //CB + CF
             //Execute DICTIONARIES
             createDictionaries();
+            createHashSetOfItemsWithAtLeastOneInteractionByTarget();
 
             ///////////////////////////////////////////////
             //CB
@@ -97,11 +98,25 @@ namespace RS_Engine
             //Execute USER BASED
             //computeCFUserUserSimilarity();
             computeCFCBHybridUserUserSimilarity();
+
+            //FREEING
+            RManager.outLog("  - freeing memory (GC) ");
+            REngineCBDICT.users_attributes.Clear();
+            REngineCBDICT.users_attributes = null;
+            GC.Collect();
+
             predictCFUserBasedRecommendations();
 
             //Execute ITEM BASED
             //computeCFItemItemSimilarity();
             computeCFCBHybridItemItemSimilarity();
+
+            //FREEING
+            RManager.outLog("  - freeing memory (GC) ");
+            REngineCBDICT.items_attributes.Clear();
+            REngineCBDICT.items_attributes = null;
+            GC.Collect();
+
             predictCFItemBasedRecommendations();
 
             //Execute HYBRID
@@ -361,6 +376,25 @@ namespace RS_Engine
             }
 
 
+        }
+        private static void createHashSetOfItemsWithAtLeastOneInteractionByTarget()
+        {
+            //Populate 
+            //Rmanager: item_with_onemore_interaction_by_target
+            foreach (var item in RManager.item_users_dictionary)
+                foreach (var user in item.Value)
+                    if (RManager.target_users_hashset.Contains(user.Key))
+                    {
+                        if (!RManager.item_with_onemore_interaction_by_target.Contains(item.Key))
+                            RManager.item_with_onemore_interaction_by_target.Add(item.Key);
+                        break;
+                    }
+
+            /* alternative way
+            var tmp_item_onemore = interactions.Where(x => target_users_hashset.Contains(x[0])).Select(x => x[1]).Distinct().ToList();
+            foreach (var itInt in tmp_item_onemore)
+                item_with_onemore_interaction_by_target.Add(itInt);
+            */
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////

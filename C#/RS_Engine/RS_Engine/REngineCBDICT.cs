@@ -25,6 +25,10 @@ namespace RS_Engine
         public const int CB_UB_KNN = 400;
         public const int CB_IB_KNN = 0;
 
+        //Limits
+        public const int ATTR_SIM_LIMIT = 5;
+        public const int ITEMITEM_SIM_LIMIT = 300;
+
         /////////////////////////////////////////////
         //EXECUTION VARS
         public static IDictionary<int, IDictionary<int, double>> CB_user_user_sim_dictionary = new Dictionary<int, IDictionary<int, double>>();
@@ -56,10 +60,24 @@ namespace RS_Engine
             compute_TF_IDF_IB();
 
             computeCBUserUserSimilarity();
+
+            //FREEING
+            RManager.outLog("  - freeing memory (GC) ");
+            attributes_users.Clear();
+            attributes_users = null;
+            GC.Collect();
+
             //predictCBUserBasedRecommendations();
             predictCBUserBasedNormalizedRecommendations();
 
             computeCBItemItemSimilarity(); //(include 'estimate')
+
+            //FREEING
+            RManager.outLog("  - freeing memory (GC) ");
+            attributes_items.Clear();
+            attributes_items = null;
+            GC.Collect();
+
             //predictCBItemBasedRecommendations();
             predictCBItemBasedNormalizedRecommendations();
         }
@@ -69,7 +87,7 @@ namespace RS_Engine
         public static void InitUserCBDict()
         {
             //attributes array
-            string[] attr = new string[] { "jr_", "cl_", "di_", "ii_", "c_", "r_", "ex1_", "ex2_", "ex3_", "ed_", "ef_" };
+            string[] attr = new string[] { "Uj", "Uc1", "Ud", "Ui", "Uc2", "Ur", "Ue1", "Ue2", "Ue3", "Ue4", "Ue5" };
 
             //counter
             int par_counter = RManager.user_profile.Count();
@@ -188,7 +206,7 @@ namespace RS_Engine
         public static void InitItemCBDict()
         {
             //attributes array
-            string[] attr = new string[] { "tit_", "cl_", "di_", "ii_", "c_", "r_", "la_", "lo_", "em_", "tag_", "cr_", "act_" };
+            string[] attr = new string[] { "It1", "Ic1", "Id", "Ii", "Ic2", "Ir", "Il", "Il", "Ie", "It2", "Ic3", "Ia" };
 
             //counter
             int par_counter = RManager.item_profile.Count();
@@ -324,25 +342,25 @@ namespace RS_Engine
 
             //temp dictionaries
             IDictionary<int, double> user_tf = new Dictionary<int, double>();
-            IDictionary<string, double> attr_tf = new Dictionary<string, double>();
-            int users_count = users_attributes.Count();
+            IDictionary<string, double> attr_idf = new Dictionary<string, double>();
+            int users_count = users_attributes.Count;
 
             //for each user, create the time frequency TF dictionary
             foreach (var us in users_attributes)
-                user_tf[us.Key] = 1 / us.Value.Count();
+                user_tf[us.Key] = 1.0 / us.Value.Count;
 
             //for each attribute, create the time frequency TF dictionary
             foreach (var at in attributes_users)
-                attr_tf[at.Key] = Math.Log10(users_count / at.Value.Count());
+                attr_idf[at.Key] = Math.Log10(users_count / at.Value.Count());
 
             //UPDATE values in global dictionaries
             foreach (var us in users_attributes.Keys.ToList())
                 foreach (var at in users_attributes[us].Keys.ToList())
-                    users_attributes[us][at] *= (user_tf[us] * attr_tf[at]);
+                    users_attributes[us][at] *= (user_tf[us] * attr_idf[at]);
 
             foreach (var at in attributes_users.Keys.ToList())
                 foreach (var us in attributes_users[at].Keys.ToList())
-                    attributes_users[at][us] *= (user_tf[us] * attr_tf[at]);
+                    attributes_users[at][us] *= (user_tf[us] * attr_idf[at]);
 
             //SORTING by attribute
             foreach (var us in users_attributes.Keys.ToList())
@@ -359,25 +377,25 @@ namespace RS_Engine
 
             //temp dictionaries
             IDictionary<int, double> item_tf = new Dictionary<int, double>();
-            IDictionary<string, double> attr_tf = new Dictionary<string, double>();
+            IDictionary<string, double> attr_idf = new Dictionary<string, double>();
             int users_count = items_attributes.Count();
 
             //for each user, create the time frequency TF dictionary
             foreach (var us in items_attributes)
-                item_tf[us.Key] = 1 / us.Value.Count();
+                item_tf[us.Key] = 1.0 / us.Value.Count();
 
             //for each attribute, create the time frequency TF dictionary
             foreach (var at in attributes_items)
-                attr_tf[at.Key] = Math.Log10(users_count / at.Value.Count());
+                attr_idf[at.Key] = Math.Log10(users_count / at.Value.Count());
 
             //UPDATE values in global dictionaries
             foreach (var us in items_attributes.Keys.ToList())
                 foreach (var at in items_attributes[us].Keys.ToList())
-                    items_attributes[us][at] *= (item_tf[us] * attr_tf[at]);
+                    items_attributes[us][at] *= (item_tf[us] * attr_idf[at]);
 
             foreach (var at in attributes_items.Keys.ToList())
                 foreach (var us in attributes_items[at].Keys.ToList())
-                    attributes_items[at][us] *= (item_tf[us] * attr_tf[at]);
+                    attributes_items[at][us] *= (item_tf[us] * attr_idf[at]);
 
             //SORTING by attribute
             foreach (var us in items_attributes.Keys.ToList())
@@ -665,23 +683,19 @@ namespace RS_Engine
 
             //calculating similarity
             //for every target user (user_prediction_dictionary_num contains all target users)
-            foreach (var u in user_prediction_dictionary_num)
+            foreach (var user in user_prediction_dictionary_num.Keys.ToList())
             {
                 //counter
                 if (--c_tot % 100 == 0)
                     RManager.outLog(" - remaining " + c_tot, true, true, true);
 
-                //get current user id
-                int user = u.Key;
+                //instantiate
                 user_prediction_dictionary.Add(user, new Dictionary<int, double>());
                 double max = 0;
 
                 //foreach prediction for the user
-                foreach (var i in user_prediction_dictionary_num[user])
+                foreach (var item in user_prediction_dictionary_num[user].Keys.ToList())
                 {
-                    //item id
-                    int item = i.Key;
-
                     if (RManager.user_items_dictionary.ContainsKey(user))
                     {
                         if (!RManager.user_items_dictionary[user].ContainsKey(item))
@@ -689,7 +703,7 @@ namespace RS_Engine
                             if (RManager.item_profile_enabled_hashset.Contains(item))
                             {
                                 user_prediction_dictionary[user][item] = user_prediction_dictionary_num[user][item] / (user_prediction_dictionary_norm[user] + PRED_SHRINK_UB);
-                                max = Math.Max(max, user_prediction_dictionary_num[user][item]);
+                                max = Math.Max(max, user_prediction_dictionary[user][item]);
                             }
                         }
                     }
@@ -698,18 +712,28 @@ namespace RS_Engine
                         if (RManager.item_profile_enabled_hashset.Contains(item))
                         {
                             user_prediction_dictionary[user][item] = user_prediction_dictionary_num[user][item] / (user_prediction_dictionary_norm[user] + PRED_SHRINK_UB);
-                            max = Math.Max(max, user_prediction_dictionary_num[user][item]);
+                            max = Math.Max(max, user_prediction_dictionary[user][item]);
                         }
                     }
                 }
 
                 //normalization
-                foreach (var item in user_prediction_dictionary[user])
-                    user_prediction_dictionary[user][item.Key] = user_prediction_dictionary[user][item.Key] / max;
+                foreach (var item in user_prediction_dictionary[user].Keys.ToList())
+                    user_prediction_dictionary[user][item] = user_prediction_dictionary[user][item] / max;
             }
 
             //expose
-            CB_UB_user_prediction_dictionary = user_prediction_dictionary;
+            CB_UB_user_prediction_dictionary = user_prediction_dictionary.ToDictionary(kp => kp.Key, kp => kp.Value);
+
+            //FREEING
+            RManager.outLog("  - freeing memory (GC) ");
+            user_prediction_dictionary.Clear();
+            user_prediction_dictionary = null;
+            user_prediction_dictionary_num.Clear();
+            user_prediction_dictionary_num = null;
+            user_prediction_dictionary_norm.Clear();
+            user_prediction_dictionary_norm = null;
+            GC.Collect();
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////
@@ -731,34 +755,32 @@ namespace RS_Engine
             foreach (var item in RManager.item_with_onemore_interaction_by_target)
             {
                 //counter
-                if (--c_tot % 2000 == 0)
+                if (--c_tot % 500 == 0)
                     RManager.outLog(" - remaining " + c_tot, true, true, true);
 
                 //creating user key in the coefficients dictionaries
                 item_item_similarity_dictionary_num.Add(item, new Dictionary<int, double>());
 
                 //getting item's attributes, and foreach                
-                foreach (var att in items_attributes[item].Keys)
+                foreach (var att in items_attributes[item].Keys.Take(ATTR_SIM_LIMIT).ToList())
                 {
-                    foreach (var ij in attributes_items[att])
+                    foreach (var item2 in attributes_items[att].Keys)
                     {
-                        int item2 = ij.Key;
-
                         if (item == item2)
                             continue;
 
-                        //creating coefficients
-                        double num = items_attributes[item][att] * items_attributes[item2][att];
-
                         //storing coefficients
+                        double num = items_attributes[item][att] * items_attributes[item2][att];
                         if (item_item_similarity_dictionary_num[item].ContainsKey(item2))
                             item_item_similarity_dictionary_num[item][item2] += num;
                         else
                             //add to similarity dictionary
                             item_item_similarity_dictionary_num[item].Add(item2, num);
-
                     }
                 }
+
+                //avoid out of mem (limit storing of similar items by taking only best n)
+                item_item_similarity_dictionary_num[item] = item_item_similarity_dictionary_num[item].OrderByDescending(x => x.Value).Take(ITEMITEM_SIM_LIMIT).ToDictionary(kp => kp.Key, kp => kp.Value);
             }
 
             //exposing
@@ -773,11 +795,10 @@ namespace RS_Engine
                 foreach(var attribute in item.Value)
                 {
                     //storing coefficient
-                    double nrm = Math.Pow(attribute.Value, 2);
                     if (item_similarity_dictionary_norm.ContainsKey(item.Key))
-                        item_similarity_dictionary_norm[item.Key] += nrm;
+                        item_similarity_dictionary_norm[item.Key] += Math.Pow(attribute.Value, 2);
                     else
-                        item_similarity_dictionary_norm.Add(item.Key, nrm);
+                        item_similarity_dictionary_norm.Add(item.Key, Math.Pow(attribute.Value, 2));
                 }
                 item_similarity_dictionary_norm[item.Key] = Math.Sqrt(item_similarity_dictionary_norm[item.Key]);
             }
@@ -788,17 +809,15 @@ namespace RS_Engine
 
             //calculating similarity
             //for every item
-            foreach (var i in item_item_similarity_dictionary_num)
+            foreach (var item in item_item_similarity_dictionary_num.Keys.ToList())
             {
                 //counter
                 if (--c_tot % 2000 == 0)
                     RManager.outLog(" - remaining " + c_tot, true, true, true);
 
-                //get current item id
-                int item = i.Key;
-
-                foreach (var item_j in i.Value)
-                    CB_item_item_sim_dictionary[item][item_j.Key] /= (item_similarity_dictionary_norm[item] * item_similarity_dictionary_norm[item_j.Key] + SIM_SHRINK_IB);
+                //compute similarity
+                foreach (var item2 in item_item_similarity_dictionary_num[item].Keys.ToList())
+                    CB_item_item_sim_dictionary[item][item2] /= (item_similarity_dictionary_norm[item] * item_similarity_dictionary_norm[item2] + SIM_SHRINK_IB);
 
             }
 
@@ -1003,22 +1022,17 @@ namespace RS_Engine
 
             //calculating similarity
             //for every target user (users_prediction_dictionary_num contains all target users)
-            foreach (var u in users_prediction_dictionary_num)
+            foreach (var user in users_prediction_dictionary_num.Keys.ToList())
             {
                 //counter
                 if (--c_tot % 100 == 0)
                     RManager.outLog(" - remaining " + c_tot, true, true, true);
 
-                //get current user id
-                int user = u.Key;
                 double max = 0;
 
                 //for each item predicted for the user
-                foreach (var item_pred in users_prediction_dictionary_num[user])
+                foreach (var sim_item in users_prediction_dictionary_num[user].Keys.ToList())
                 {
-                    //get current item id
-                    int sim_item = item_pred.Key;
-
                     //only if this item is recommendable
                     if (RManager.item_profile_enabled_hashset.Contains(sim_item))
                     {
@@ -1031,12 +1045,20 @@ namespace RS_Engine
                     }
                 }
 
-                foreach (var item in users_prediction_dictionary_num[user])
-                    users_prediction_dictionary_num[user][item.Key] = users_prediction_dictionary_num[user][item.Key] / max;
+                foreach (var item in users_prediction_dictionary_num[user].Keys.ToList())
+                    users_prediction_dictionary_num[user][item] = users_prediction_dictionary_num[user][item] / max;
             }
 
             //expose
-            CB_IB_user_prediction_dictionary = users_prediction_dictionary_num;
+            CB_IB_user_prediction_dictionary = users_prediction_dictionary_num.ToDictionary(kp => kp.Key, kp => kp.Value);
+
+            //FREEING
+            RManager.outLog("  - freeing memory (GC) ");
+            users_prediction_dictionary_num.Clear();
+            users_prediction_dictionary_num = null;
+            users_prediction_dictionary_den.Clear();
+            users_prediction_dictionary_den = null;
+            GC.Collect();
         }
 
     }
