@@ -543,7 +543,7 @@ namespace RS_Engine
 
             //left margin
             if (carriageret)
-                s = "\rRS:>(" + runChars[runCharsPos] + ") " + s + "   ";
+                s = "\rRS:>  " + s + " (" + runChars[runCharsPos] + ")" + "    ";
             else
             {
                 if(lastWasInline)

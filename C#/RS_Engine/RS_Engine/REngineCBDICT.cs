@@ -8,18 +8,23 @@ using System.Threading.Tasks;
 
 namespace RS_Engine
 {
+    /**
+     * |COMPUTE DICTIONARIES
+     * |ALGORITHM EXECUTION SUMMARY
+     * 
+     */
     class REngineCBDICT
     {
         /////////////////////////////////////////////
         //ALGORITHM PARAMETERS
 
         //UB
-        public const int SIM_SHRINK_UB = 10;
-        public const int PRED_SHRINK_UB = 10;
+        public const double SIM_SHRINK_UB = 10;
+        public const double PRED_SHRINK_UB = 10;
 
         //IB
-        public const int SIM_SHRINK_IB = 5;
-        public const int PRED_SHRINK_IB = 10;
+        public const double SIM_SHRINK_IB = 5;
+        public const double PRED_SHRINK_IB = 10;
 
         //CB KNN (0=disabled)
         public const int CB_UB_KNN = 400;
@@ -27,6 +32,7 @@ namespace RS_Engine
 
         //Limits
         public const int ATTR_SIM_LIMIT = 4;
+        public const int USERUSER_SIM_LIMIT = CB_UB_KNN;
         public const int ITEMITEM_SIM_LIMIT = 400;
 
         /////////////////////////////////////////////
@@ -281,12 +287,12 @@ namespace RS_Engine
                     });
 
                 //serialize
-                using (Stream stream = File.Open(Path.Combine(RManager.SERIALTPATH, "CBDICT_items_attributes.bin"), FileMode.Create))
+                /*using (Stream stream = File.Open(Path.Combine(RManager.SERIALTPATH, "CBDICT_items_attributes.bin"), FileMode.Create))
                 {
                     RManager.outLog("  + writing serialized file " + "CBDICT_items_attributes.bin");
                     var bformatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
                     bformatter.Serialize(stream, items_attributes);
-                }
+                }*/
             }
             else
             {
@@ -314,12 +320,12 @@ namespace RS_Engine
                             attributes_items[atr.Key].Add(itm.Key, 1);
 
                 //serialize
-                using (Stream stream = File.Open(Path.Combine(RManager.SERIALTPATH, "CBDICT_attributes_items.bin"), FileMode.Create))
+                /*using (Stream stream = File.Open(Path.Combine(RManager.SERIALTPATH, "CBDICT_attributes_items.bin"), FileMode.Create))
                 {
                     RManager.outLog("  + writing serialized file " + "CBDICT_attributes_items.bin");
                     var bformatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
                     bformatter.Serialize(stream, attributes_items);
-                }
+                }*/
             }
             else
             {
@@ -423,18 +429,18 @@ namespace RS_Engine
             object sync = new object();
             Parallel.ForEach(
                 RManager.target_users,
-                new ParallelOptions { MaxDegreeOfParallelism = 8 },
+                new ParallelOptions { MaxDegreeOfParallelism = 16 },
                 user =>
                 {
                     //counter
                     Interlocked.Decrement(ref par_counter);
                     int count = Interlocked.CompareExchange(ref par_counter, 0, 0);
-                    if (count % 200 == 0) RManager.outLog("  - remaining: " + count, true, true, true);
+                    if (count % 50 == 0) RManager.outLog("  - remaining: " + count, true, true, true);
 
-                    lock (sync)
-                    {
+                    //lock (sync)
+                    //{
                         //creating user key in the coefficients dictionaries
-                        //lock (sync)
+                        lock (sync)
                             user_user_similarity_dictionary_num.Add(user, new Dictionary<int, double>());
 
                         //for each attribute of the user
@@ -452,7 +458,7 @@ namespace RS_Engine
                                     double num = users_attributes[user][att.Key] * users_attributes[u][att.Key];
 
                                     //storing coefficients
-                                    //lock (sync)
+                                    lock (sync)
                                         if (user_user_similarity_dictionary_num[user].ContainsKey(u))
                                             user_user_similarity_dictionary_num[user][u] += num;
                                         else
@@ -461,7 +467,12 @@ namespace RS_Engine
 
                             }
                         }
-                    }
+
+                        //avoid out of mem (limit storing of similar items by taking only best n)
+                        lock (sync)
+                            user_user_similarity_dictionary_num[user] = user_user_similarity_dictionary_num[user].OrderByDescending(x => x.Value).Take(USERUSER_SIM_LIMIT).ToDictionary(kp => kp.Key, kp => kp.Value);
+
+                    //}
                 });
 
             //for each user, create normalization
@@ -695,7 +706,7 @@ namespace RS_Engine
             foreach (var user in user_prediction_dictionary_num.Keys.ToList())
             {
                 //counter
-                if (--c_tot % 100 == 0)
+                if (--c_tot % 500 == 0)
                     RManager.outLog(" - remaining " + c_tot, true, true, true);
 
                 //instantiate
@@ -772,10 +783,11 @@ namespace RS_Engine
                     int count = Interlocked.CompareExchange(ref par_counter, 0, 0);
                     if (count % 2000 == 0) RManager.outLog("  - remaining: " + count, true, true, true);
 
-                    lock (sync)
-                    {
+                    //lock (sync)
+                    //{
                         //creating user key in the coefficients dictionaries
-                        item_item_similarity_dictionary_num.Add(item, new Dictionary<int, double>());
+                        lock (sync)
+                            item_item_similarity_dictionary_num.Add(item, new Dictionary<int, double>());
 
                         //getting item's attributes, and foreach                
                         foreach (var att in items_attributes[item].Keys.Take(ATTR_SIM_LIMIT).ToList())
@@ -787,18 +799,21 @@ namespace RS_Engine
 
                                 //storing coefficients
                                 double num = items_attributes[item][att] * items_attributes[item2][att];
-                                if (item_item_similarity_dictionary_num[item].ContainsKey(item2))
-                                    item_item_similarity_dictionary_num[item][item2] += num;
-                                else
-                                    //add to similarity dictionary
-                                    item_item_similarity_dictionary_num[item].Add(item2, num);
+
+                                lock (sync)
+                                    if (item_item_similarity_dictionary_num[item].ContainsKey(item2))
+                                        item_item_similarity_dictionary_num[item][item2] += num;
+                                    else
+                                        //add to similarity dictionary
+                                        item_item_similarity_dictionary_num[item].Add(item2, num);
                             }
                         }
 
                         //avoid out of mem (limit storing of similar items by taking only best n)
-                        item_item_similarity_dictionary_num[item] = item_item_similarity_dictionary_num[item].OrderByDescending(x => x.Value).Take(ITEMITEM_SIM_LIMIT).ToDictionary(kp => kp.Key, kp => kp.Value);
+                        lock (sync)
+                            item_item_similarity_dictionary_num[item] = item_item_similarity_dictionary_num[item].OrderByDescending(x => x.Value).Take(ITEMITEM_SIM_LIMIT).ToDictionary(kp => kp.Key, kp => kp.Value);
 
-                    }
+                    //}
                 });
 
             //exposing
@@ -1036,7 +1051,7 @@ namespace RS_Engine
 
             //counter
             c_tot = users_prediction_dictionary_num.Count();
-            RManager.outLog("  + estimating ratings of similar items ");
+            RManager.outLog("  + normalizing similar items ");
 
             //calculating similarity
             //for every target user (users_prediction_dictionary_num contains all target users)

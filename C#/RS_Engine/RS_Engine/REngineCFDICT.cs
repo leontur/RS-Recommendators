@@ -20,12 +20,12 @@ namespace RS_Engine
         //ALGORITHM PARAMETERS
 
         //UB
-        private const int SIM_SHRINK_UB = 10;
-        private const int PRED_SHRINK_UB = 10;
+        private const double SIM_SHRINK_UB = 10;
+        private const double PRED_SHRINK_UB = 10;
 
         //IB
-        private const int SIM_SHRINK_IB = 20;
-        private const int PRED_SHRINK_IB = 10;
+        private const double SIM_SHRINK_IB = 20;
+        private const double PRED_SHRINK_IB = 10;
 
         //CF KNN (0=disabled)
         private const int CF_UB_KNN = 110;
@@ -39,9 +39,15 @@ namespace RS_Engine
         private const double HYBRID_W_WEIGHT = 0.4;
 
         //HR
-        private const int HYBRID_R_WEIGHT_I = 4;
+        private const double HYBRID_R_WEIGHT_I = 4;
         private const double HYBRID_R_WEIGHT_U = 0.5;
         private const int HYBRID_R_KNN = 30;
+
+        //HR NORM
+        private const double HYBRID_NORM_R_WEIGHT = 0.0;
+        private const double HYBRID_NORM_R_WEIGHT_I = 0.5;
+        private const double HYBRID_NORM_R_WEIGHT_U_CF = 0.0;
+        private const double HYBRID_NORM_R_WEIGHT_U_CB = 0.0;
 
         /////////////////////////////////////////////
         //EXECUTION VARS
@@ -119,9 +125,30 @@ namespace RS_Engine
 
             predictCFItemBasedRecommendations();
 
-            //Execute HYBRID
-            computeCFHybridWeightedRecommendations();
-            computeCFHybridRankRecommendations();
+            //Execute RANKS
+            //computeCFHybridWeightedRecommendations();
+            //computeCFHybridRankRecommendations();
+
+            var CFHRNR = computeCFHybridRankNormalizedRecommendations(
+                REngineCBDICT.CB_IB_user_prediction_dictionary,
+                HYBRID_NORM_R_WEIGHT_I,
+                CF_IB_user_prediction_dictionary,
+                HYBRID_NORM_R_WEIGHT_I
+                );
+
+            CFHRNR = computeCFHybridRankNormalizedRecommendations(
+                CF_UB_user_prediction_dictionary,
+                HYBRID_NORM_R_WEIGHT_U_CF,
+                CFHRNR,
+                HYBRID_NORM_R_WEIGHT
+                );
+
+            CFHRNR = computeCFHybridRankNormalizedRecommendations(
+                CFHRNR,
+                HYBRID_NORM_R_WEIGHT,
+                REngineCBDICT.CB_UB_user_prediction_dictionary,
+                HYBRID_NORM_R_WEIGHT_U_CB
+                );
 
             ///////////////////////////////////////////////
             //CBCF2
@@ -132,7 +159,9 @@ namespace RS_Engine
             ///////////////////////////////////////////////
             //Execute OUTPUT
             //generateOutput(CF_HW_user_prediction_dictionary);
-            generateOutput(CF_HR_user_prediction_dictionary);
+            //generateOutput(CF_HR_user_prediction_dictionary);
+
+            generateOutput(CFHRNR);
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////
@@ -1190,7 +1219,7 @@ namespace RS_Engine
             foreach (var item in item_item_similarity_dictionary.Keys.ToList())
                 foreach (var item2 in item_item_similarity_dictionary[item].Keys.ToList())
                     if (CB_similarity_dictionary[item].ContainsKey(item2))
-                        item_item_similarity_dictionary[item][item] += (CB_similarity_dictionary[item][item] * CFCB_HYBRID_IB);
+                        item_item_similarity_dictionary[item][item2] += CB_similarity_dictionary[item][item2] * CFCB_HYBRID_IB;
 
             //KNN
             if (CF_IB_KNN > 0)
@@ -1499,6 +1528,49 @@ namespace RS_Engine
             CF_HR_user_prediction_dictionary = users_prediction_dictionary;
         }
 
+        //Hybrid Normalized Rank
+        private static IDictionary<int, IDictionary<int, double>> computeCFHybridRankNormalizedRecommendations(IDictionary<int, IDictionary<int, double>> UB_user_pred, double UB_w, IDictionary<int, IDictionary<int, double>> IB_user_pred, double IB_w)
+        {
+            //info
+            RManager.outLog("  + computeCFHybridRankNormalizedRecommendations(): ");
+
+            //output
+            IDictionary<int, IDictionary<int, double>> users_prediction_dictionary = new Dictionary<int, IDictionary<int, double>>();
+
+            //UB
+            //for each user in User Based prediction
+            foreach (var u in UB_user_pred)
+            {
+                //instatntiate
+                users_prediction_dictionary.Add(u.Key, new Dictionary<int, double>());
+
+                //for each item in the User Based prediction
+                foreach (var i in u.Value)
+                    users_prediction_dictionary[u.Key].Add(i.Key, (UB_user_pred[u.Key][i.Key] * UB_w));
+            }
+
+            //IB
+            //for each user in Item Based prediction
+            foreach (var u in IB_user_pred)
+            {
+                //instatntiate
+                if(!users_prediction_dictionary.ContainsKey(u.Key))
+                    users_prediction_dictionary.Add(u.Key, new Dictionary<int, double>());
+
+                //for each item in the Item Based prediction
+                foreach (var i in u.Value)
+                {
+                    double val = IB_user_pred[u.Key][i.Key] * IB_w;
+                    if (users_prediction_dictionary[u.Key].ContainsKey(i.Key))
+                        users_prediction_dictionary[u.Key][i.Key] += val;
+                    else
+                        users_prediction_dictionary[u.Key].Add(i.Key, val);
+                }
+            }
+
+            return users_prediction_dictionary;
+        }
+
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         //GENERATE OUTPUT STRUCTURED DATA
         private static void generateOutput(IDictionary<int, IDictionary<int, double>> users_prediction_dictionary)
@@ -1555,7 +1627,7 @@ namespace RS_Engine
                 //MERGE LISTS OF PREDICTIONS
                 //adding all predictions 
                 //NOTE: the way I add the lists makes the CF with more 'priority' that the others
-                if (A_CF_TIT)
+                if (A_CBCF_DICT)
                 {
                     //get list of predictions
                         //if (u.Value.Count > 0) //if the list of recommendable items is not empty
