@@ -26,8 +26,8 @@ namespace RS_Engine
         public const int CB_IB_KNN = 0;
 
         //Limits
-        public const int ATTR_SIM_LIMIT = 5;
-        public const int ITEMITEM_SIM_LIMIT = 300;
+        public const int ATTR_SIM_LIMIT = 4;
+        public const int ITEMITEM_SIM_LIMIT = 400;
 
         /////////////////////////////////////////////
         //EXECUTION VARS
@@ -83,7 +83,7 @@ namespace RS_Engine
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////
-        //CREATE CB DICTIONARIES (for IDF use)
+        //CREATE CB DICTIONARIES (for IDF use) (UB)&(IB)
         public static void InitUserCBDict()
         {
             //attributes array
@@ -213,7 +213,7 @@ namespace RS_Engine
             RManager.outLog("  + InitItemCBDict():");
 
             //check if already serialized (for fast fetching)
-            if (!File.Exists(Path.Combine(RManager.SERIALTPATH, "CBDICT_items_attributes.bin")))
+            if (true || !File.Exists(Path.Combine(RManager.SERIALTPATH, "CBDICT_items_attributes.bin")))
             {
 
                 //IDF
@@ -300,7 +300,7 @@ namespace RS_Engine
             }
 
             //check if already serialized (for fast fetching)
-            if (!File.Exists(Path.Combine(RManager.SERIALTPATH, "CBDICT_attributes_items.bin")))
+            if (true || !File.Exists(Path.Combine(RManager.SERIALTPATH, "CBDICT_attributes_items.bin")))
             {
                 //IDF
                 //initialize attributes (global) dictionary
@@ -334,7 +334,7 @@ namespace RS_Engine
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////
-        //COMPUTE TF AND IDF (UB)
+        //COMPUTE TF AND IDF (UB)&(IB)
         public static void compute_TF_IDF_UB()
         {
             //info
@@ -369,7 +369,6 @@ namespace RS_Engine
             foreach (var at in attributes_users.Keys.ToList())
                 attributes_users[at] = attributes_users[at].OrderByDescending(x => x.Value).ToDictionary(kp => kp.Key, kp => kp.Value);
         }
-        //COMPUTE TF AND IDF (IB)
         public static void compute_TF_IDF_IB()
         {
             //info
@@ -417,44 +416,53 @@ namespace RS_Engine
             IDictionary<int, double> user_similarity_dictionary_norm = new Dictionary<int, double>();
 
             //counter
-            int c_tot = RManager.target_users.Count();
+            int par_counter = RManager.target_users.Count();
             RManager.outLog("  + calculating all coefficients ");
 
             //for every target user
-            foreach (var user in RManager.target_users)
-            {
-                //counter
-                if (--c_tot % 500 == 0)
-                    RManager.outLog(" - remaining " + c_tot, true, true, true);
-
-                //creating user key in the coefficients dictionaries
-                user_user_similarity_dictionary_num.Add(user, new Dictionary<int, double>());
-
-                //for each attribute of the user
-                foreach (var att in users_attributes[user])
+            object sync = new object();
+            Parallel.ForEach(
+                RManager.target_users,
+                new ParallelOptions { MaxDegreeOfParallelism = 8 },
+                user =>
                 {
-                    var user_list = attributes_users[att.Key].Keys;
-                    foreach (var u in user_list)
+                    //counter
+                    Interlocked.Decrement(ref par_counter);
+                    int count = Interlocked.CompareExchange(ref par_counter, 0, 0);
+                    if (count % 200 == 0) RManager.outLog("  - remaining: " + count, true, true, true);
+
+                    lock (sync)
                     {
-                        if (u == user)
-                            continue;
+                        //creating user key in the coefficients dictionaries
+                        //lock (sync)
+                            user_user_similarity_dictionary_num.Add(user, new Dictionary<int, double>());
 
-                        if (RManager.user_items_dictionary.ContainsKey(u))
+                        //for each attribute of the user
+                        foreach (var att in users_attributes[user])
                         {
-                            //creating coefficients
-                            double num = users_attributes[user][att.Key] * users_attributes[u][att.Key];
+                            var user_list = attributes_users[att.Key].Keys;
+                            foreach (var u in user_list)
+                            {
+                                if (u == user)
+                                    continue;
 
-                            //storing coefficients
-                            if (user_user_similarity_dictionary_num[user].ContainsKey(u))
-                                user_user_similarity_dictionary_num[user][u] += num;
-                            else
-                                //add to similarity dictionary
-                                user_user_similarity_dictionary_num[user].Add(u, num);
+                                if (RManager.user_items_dictionary.ContainsKey(u))
+                                {
+                                    //creating coefficients
+                                    double num = users_attributes[user][att.Key] * users_attributes[u][att.Key];
+
+                                    //storing coefficients
+                                    //lock (sync)
+                                        if (user_user_similarity_dictionary_num[user].ContainsKey(u))
+                                            user_user_similarity_dictionary_num[user][u] += num;
+                                        else
+                                            user_user_similarity_dictionary_num[user].Add(u, num);
+                                }
+
+                            }
                         }
-
                     }
-                }
-            }
+                });
 
             //for each user, create normalization
             foreach (var user in users_attributes)
@@ -469,34 +477,35 @@ namespace RS_Engine
                 user_similarity_dictionary_norm[user.Key] = Math.Sqrt(user_similarity_dictionary_norm[user.Key]);
             }
 
-
+            //counter
+            int c_tot = user_user_similarity_dictionary_num.Keys.Count();
             RManager.outLog("  + calculating user_user similarity ");
+
+            if (CB_UB_KNN > 0)
+                RManager.outLog("  + KNN is active, ordering and taking.. ");
 
             //for each user, compute the uu simil
             foreach (var user in user_user_similarity_dictionary_num.Keys.ToList())
+            {
+                //counter
+                if (--c_tot % 1000 == 0)
+                    RManager.outLog(" - remaining " + c_tot, true, true, true);
+
                 foreach (var u in user_user_similarity_dictionary_num[user].Keys.ToList())
-                    user_user_similarity_dictionary_num[user][u] =
-                        user_user_similarity_dictionary_num[user][u] /
-                        (user_similarity_dictionary_norm[user] * user_similarity_dictionary_norm[u] + SIM_SHRINK_UB);
+                    user_user_similarity_dictionary_num[user][u] /= user_similarity_dictionary_norm[user] * user_similarity_dictionary_norm[u] + SIM_SHRINK_UB;
 
-            if (CB_UB_KNN > 0)
-            {
-                //ordering and taking only top similar KNN
-                RManager.outLog("  + KNN is active, ordering and taking.. ");
+                if (CB_UB_KNN > 0)
+                {
+                    //ordering and taking only top similar KNN
+                    user_user_similarity_dictionary_num[user] = user_user_similarity_dictionary_num[user].OrderByDescending(x => x.Value).Take(CB_UB_KNN).ToDictionary(kp => kp.Key, kp => kp.Value);
 
-                //for each user
-                foreach (var u in user_user_similarity_dictionary_num.Keys.ToList())
-                    //sort the predictions and take knn
-                    user_user_similarity_dictionary_num[u] = user_user_similarity_dictionary_num[u].OrderByDescending(x => x.Value).Take(CB_UB_KNN).ToDictionary(kp => kp.Key, kp => kp.Value);
-
-                //Exposing
-                CB_user_user_sim_dictionary = user_user_similarity_dictionary_num;
+                    if (--c_tot % 5000 == 0)
+                        GC.Collect();
+                }
             }
-            else
-            {
-                //Exposing
-                CB_user_user_sim_dictionary = user_user_similarity_dictionary_num;
-            }
+            
+            //Exposing
+            CB_user_user_sim_dictionary = user_user_similarity_dictionary_num;
         }
 
         //CREATE USER BASED RECOMMENDATIONS
@@ -748,40 +757,49 @@ namespace RS_Engine
             IDictionary<int, double> item_similarity_dictionary_norm = new Dictionary<int, double>();
 
             //counter
-            int c_tot = RManager.item_with_onemore_interaction_by_target.Count();
+            int par_counter = RManager.item_with_onemore_interaction_by_target.Count();
             RManager.outLog("  + calculating all coefficients ");
 
             //for every item
-            foreach (var item in RManager.item_with_onemore_interaction_by_target)
-            {
-                //counter
-                if (--c_tot % 500 == 0)
-                    RManager.outLog(" - remaining " + c_tot, true, true, true);
-
-                //creating user key in the coefficients dictionaries
-                item_item_similarity_dictionary_num.Add(item, new Dictionary<int, double>());
-
-                //getting item's attributes, and foreach                
-                foreach (var att in items_attributes[item].Keys.Take(ATTR_SIM_LIMIT).ToList())
+            object sync = new object();
+            Parallel.ForEach(
+                RManager.item_with_onemore_interaction_by_target,
+                new ParallelOptions { MaxDegreeOfParallelism = 16 },
+                item =>
                 {
-                    foreach (var item2 in attributes_items[att].Keys)
+                    //counter
+                    Interlocked.Decrement(ref par_counter);
+                    int count = Interlocked.CompareExchange(ref par_counter, 0, 0);
+                    if (count % 2000 == 0) RManager.outLog("  - remaining: " + count, true, true, true);
+
+                    lock (sync)
                     {
-                        if (item == item2)
-                            continue;
+                        //creating user key in the coefficients dictionaries
+                        item_item_similarity_dictionary_num.Add(item, new Dictionary<int, double>());
 
-                        //storing coefficients
-                        double num = items_attributes[item][att] * items_attributes[item2][att];
-                        if (item_item_similarity_dictionary_num[item].ContainsKey(item2))
-                            item_item_similarity_dictionary_num[item][item2] += num;
-                        else
-                            //add to similarity dictionary
-                            item_item_similarity_dictionary_num[item].Add(item2, num);
+                        //getting item's attributes, and foreach                
+                        foreach (var att in items_attributes[item].Keys.Take(ATTR_SIM_LIMIT).ToList())
+                        {
+                            foreach (var item2 in attributes_items[att].Keys)
+                            {
+                                if (item == item2)
+                                    continue;
+
+                                //storing coefficients
+                                double num = items_attributes[item][att] * items_attributes[item2][att];
+                                if (item_item_similarity_dictionary_num[item].ContainsKey(item2))
+                                    item_item_similarity_dictionary_num[item][item2] += num;
+                                else
+                                    //add to similarity dictionary
+                                    item_item_similarity_dictionary_num[item].Add(item2, num);
+                            }
+                        }
+
+                        //avoid out of mem (limit storing of similar items by taking only best n)
+                        item_item_similarity_dictionary_num[item] = item_item_similarity_dictionary_num[item].OrderByDescending(x => x.Value).Take(ITEMITEM_SIM_LIMIT).ToDictionary(kp => kp.Key, kp => kp.Value);
+
                     }
-                }
-
-                //avoid out of mem (limit storing of similar items by taking only best n)
-                item_item_similarity_dictionary_num[item] = item_item_similarity_dictionary_num[item].OrderByDescending(x => x.Value).Take(ITEMITEM_SIM_LIMIT).ToDictionary(kp => kp.Key, kp => kp.Value);
-            }
+                });
 
             //exposing
             CB_item_item_sim_dictionary = item_item_similarity_dictionary_num;
@@ -804,7 +822,7 @@ namespace RS_Engine
             }
 
             //counter
-            c_tot = item_item_similarity_dictionary_num.Count();
+            int c_tot = item_item_similarity_dictionary_num.Count();
             RManager.outLog("  + calculating item_item similarity ");
 
             //calculating similarity
@@ -984,7 +1002,7 @@ namespace RS_Engine
                         int item = ij.Key;
 
                         //get the dictionary of similar items and the similarity value
-                        var ij_s_dict = CB_item_item_sim_dictionary[item];
+                        var ij_s_dict = CB_item_item_sim_dictionary[item];//<<
 
                         //for every similar item of the current item
                         foreach (var sim_item in ij_s_dict)

@@ -729,10 +729,10 @@ namespace RS_Engine
             }
 
             //similarity combination
-            foreach(var user in user_user_similarity_dictionary)
-                foreach(var user2 in user.Value)
-                    if(CB_similarity_dictionary[user.Key].ContainsKey(user2.Key))
-                        user_user_similarity_dictionary[user.Key][user2.Key] += (CB_similarity_dictionary[user.Key][user2.Key] * CFCB_HYBRID_UB);
+            foreach(var user in user_user_similarity_dictionary.Keys.ToList())
+                foreach(var user2 in user_user_similarity_dictionary[user].Keys.ToList())
+                    if(CB_similarity_dictionary[user].ContainsKey(user2))
+                        user_user_similarity_dictionary[user][user2] += (CB_similarity_dictionary[user][user2] * CFCB_HYBRID_UB);
 
             //KNN
             if (CF_UB_KNN > 0)
@@ -741,7 +741,7 @@ namespace RS_Engine
                 RManager.outLog("  + KNN is active, ordering and taking.. ");
 
                 //for each user
-                foreach (var u in user_user_similarity_dictionary.Select(x => x.Key).ToList())
+                foreach (var u in user_user_similarity_dictionary.Keys.ToList())
                     //sort the predictions and take knn
                     user_user_similarity_dictionary[u] = user_user_similarity_dictionary[u].OrderByDescending(x => x.Value).Take(CF_UB_KNN).ToDictionary(kp => kp.Key, kp => kp.Value);
 
@@ -1187,10 +1187,10 @@ namespace RS_Engine
             }
 
             //similarity combination
-            foreach (var item in item_item_similarity_dictionary)
-                foreach (var item2 in item.Value)
-                    if (CB_similarity_dictionary[item.Key].ContainsKey(item2.Key))
-                        item_item_similarity_dictionary[item.Key][item.Key] += (CB_similarity_dictionary[item.Key][item.Key] * CFCB_HYBRID_IB);
+            foreach (var item in item_item_similarity_dictionary.Keys.ToList())
+                foreach (var item2 in item_item_similarity_dictionary[item].Keys.ToList())
+                    if (CB_similarity_dictionary[item].ContainsKey(item2))
+                        item_item_similarity_dictionary[item][item] += (CB_similarity_dictionary[item][item] * CFCB_HYBRID_IB);
 
             //KNN
             if (CF_IB_KNN > 0)
