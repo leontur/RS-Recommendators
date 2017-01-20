@@ -31,9 +31,9 @@ namespace RS_Engine
         public const int CB_IB_KNN = 0;
 
         //Limits
-        public const int ATTR_SIM_LIMIT = 4;
+        public const int ATTR_SIM_LIMIT = 5;
         public const int USERUSER_SIM_LIMIT = CB_UB_KNN;
-        public const int ITEMITEM_SIM_LIMIT = 400;
+        public const int ITEMITEM_SIM_LIMIT = 1000;
 
         /////////////////////////////////////////////
         //EXECUTION VARS
@@ -115,7 +115,7 @@ namespace RS_Engine
                         //counter
                         Interlocked.Decrement(ref par_counter);
                         int count = Interlocked.CompareExchange(ref par_counter, 0, 0);
-                        if (count % 200 == 0) RManager.outLog("  - remaining: " + count, true, true, true);
+                        if (count % 1000 == 0) RManager.outLog("  - remaining: " + count, true, true, true);
 
                         lock (sync)
                         {
@@ -234,7 +234,7 @@ namespace RS_Engine
                         //counter
                         Interlocked.Decrement(ref par_counter);
                         int count = Interlocked.CompareExchange(ref par_counter, 0, 0);
-                        if (count % 200 == 0) RManager.outLog("  - remaining: " + count, true, true, true);
+                        if (count % 2000 == 0) RManager.outLog("  - remaining: " + count, true, true, true);
 
                         lock(sync){
 
@@ -435,7 +435,7 @@ namespace RS_Engine
                     //counter
                     Interlocked.Decrement(ref par_counter);
                     int count = Interlocked.CompareExchange(ref par_counter, 0, 0);
-                    if (count % 50 == 0) RManager.outLog("  - remaining: " + count, true, true, true);
+                    if (count % 25 == 0) RManager.outLog("  - remaining: " + count, true, true, true);
 
                     //lock (sync)
                     //{
@@ -711,7 +711,7 @@ namespace RS_Engine
 
                 //instantiate
                 user_prediction_dictionary.Add(user, new Dictionary<int, double>());
-                double max = 0;
+                double max = 0.0;
 
                 //foreach prediction for the user
                 foreach (var item in user_prediction_dictionary_num[user].Keys.ToList())
@@ -781,7 +781,7 @@ namespace RS_Engine
                     //counter
                     Interlocked.Decrement(ref par_counter);
                     int count = Interlocked.CompareExchange(ref par_counter, 0, 0);
-                    if (count % 2000 == 0) RManager.outLog("  - remaining: " + count, true, true, true);
+                    if (count % 1000 == 0) RManager.outLog("  - remaining: " + count, true, true, true);
 
                     //lock (sync)
                     //{
@@ -1061,7 +1061,7 @@ namespace RS_Engine
                 if (--c_tot % 100 == 0)
                     RManager.outLog(" - remaining " + c_tot, true, true, true);
 
-                double max = 0;
+                double max = 0.0;
 
                 //for each item predicted for the user
                 foreach (var sim_item in users_prediction_dictionary_num[user].Keys.ToList())
