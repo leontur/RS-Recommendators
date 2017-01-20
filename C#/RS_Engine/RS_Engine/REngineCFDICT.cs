@@ -28,7 +28,7 @@ namespace RS_Engine
         private const double PRED_SHRINK_IB = 10;
 
         //CF KNN (0=disabled)
-        private const int CF_UB_KNN = 110;
+        private const int CF_UB_KNN = 130;
         private const int CF_IB_KNN = 0;
 
         //CF+CB HYBRID
@@ -115,6 +115,12 @@ namespace RS_Engine
             //predictCFUserBasedRecommendations();
             predictCFUserBasedNormalizedRecommendations();
 
+            //FREEING
+            RManager.outLog("  - freeing memory (GC) ");
+            CF_user_user_sim_dictionary.Clear();
+            CF_user_user_sim_dictionary = null;
+            GC.Collect();
+
             //Execute ITEM BASED
             //computeCFItemItemSimilarity();
             computeCFCBHybridItemItemSimilarity();
@@ -128,6 +134,12 @@ namespace RS_Engine
             //predictCFItemBasedRecommendations();
             predictCFItemBasedNormalizedRecommendations();
 
+            //FREEING
+            RManager.outLog("  - freeing memory (GC) ");
+            CF_item_item_sim_dictionary.Clear();
+            CF_item_item_sim_dictionary = null;
+            GC.Collect();
+
             //Execute RANKS
             //computeCFHybridWeightedRecommendations();
             //computeCFHybridRankRecommendations();
@@ -140,7 +152,7 @@ namespace RS_Engine
                 HYBRID_NORM_R_WEIGHT_I
                 );
 
-            generateOutput(CFHRNR);
+            //generateOutput(CFHRNR);
 
             //CFUB<>(CBIB<>CFIB)
             CFHRNR = computeCFHybridRankNormalizedRecommendations(
@@ -150,7 +162,7 @@ namespace RS_Engine
                 HYBRID_NORM_R_WEIGHT
                 );
 
-            generateOutput(CFHRNR);
+            //generateOutput(CFHRNR);
 
             //(CFUB<>(CBIB<>CFIB))<>CBUB
             CFHRNR = computeCFHybridRankNormalizedRecommendations(
@@ -326,52 +338,46 @@ namespace RS_Engine
                 }
             }
 
-            //counter
-            par_counter = RManager.interactions.Count();
-            RManager.outLog("  + CF_IB_IDF_dictionary");
-
             //check if already serialized (for fast fetching)
             if (!File.Exists(Path.Combine(RManager.SERIALTPATH, "CFDICT_CF_IB_IDF_dictionary.bin")))
             {
-
                 //temp dictionary for total interactions count
-                IDictionary<int, int> item_inter_count = new Dictionary<int, int>();
+                IDictionary<int, double> item_inter_count = new Dictionary<int, double>();
+
+                //temp lists of ordered interactions
+                var interactionsOrdered = RManager.interactions.OrderBy(x => x[3]).Select(x => x[1]).ToList();
+                
+                //counter
+                par_counter = interactionsOrdered.Count();
+                RManager.outLog("  + CF_IB_IDF_dictionary");
 
                 //for every item
                 object sync = new object();
                 Parallel.ForEach(
-                    RManager.interactions,
-                    new ParallelOptions { MaxDegreeOfParallelism = 8 },
-                    i =>
+                    interactionsOrdered,
+                    new ParallelOptions { MaxDegreeOfParallelism = 16 },
+                    item =>
                     {
                         //counter
                         Interlocked.Decrement(ref par_counter);
                         int count = Interlocked.CompareExchange(ref par_counter, 0, 0);
                         if (count % 2000 == 0) RManager.outLog("  - remaining: " + count, true, true, true);
 
-                        //getting item id
-                        int item = (int)i[1];
-
                         //create an entry in the dictionary
                         //counting times of interactions per items (with no duplicates)
                         lock (sync)
                         {
                             if (!item_inter_count.ContainsKey(item))
-                            {
-                                item_inter_count.Add(item, 1);
-                            }
+                                item_inter_count.Add(item, 1.0);
                             else
-                            {
-                                item_inter_count[item] += 1;
-                            }
+                                item_inter_count[item] += 1.0;
                         }
-
                     }
                 );
 
                 //for every item
                 par_counter = item_inter_count.Count();
-                int interactions_size = RManager.interactions.Count();
+                double interactions_size = interactionsOrdered.Count();
                 Parallel.ForEach(
                     item_inter_count,
                     new ParallelOptions { MaxDegreeOfParallelism = 8 },
@@ -911,6 +917,7 @@ namespace RS_Engine
             CF_UB_user_prediction_dictionary = users_prediction_dictionary;
         }
 
+        //CREATE USER_USER NORMALIZED RECOMMENDATIONS 
         private static void predictCFUserBasedNormalizedRecommendations()
         {
             //info
@@ -1797,7 +1804,7 @@ namespace RS_Engine
             //for each user in User Based prediction
             foreach (var u in UB_user_pred)
             {
-                //instatntiate
+                //instantiate
                 users_prediction_dictionary.Add(u.Key, new Dictionary<int, double>());
 
                 //for each item in the User Based prediction
@@ -1809,8 +1816,8 @@ namespace RS_Engine
             //for each user in Item Based prediction
             foreach (var u in IB_user_pred)
             {
-                //instatntiate
-                if(!users_prediction_dictionary.ContainsKey(u.Key))
+                //instantiate
+                if (!users_prediction_dictionary.ContainsKey(u.Key))
                     users_prediction_dictionary.Add(u.Key, new Dictionary<int, double>());
 
                 //for each item in the Item Based prediction
@@ -1876,7 +1883,7 @@ namespace RS_Engine
                 
                 //instantiate the list of (final) most similar items
                 List<int> rec_items = new List<int>(); //DICT
-                List<int> CB_U_rec_items = new List<int>(); //UU
+                //List<int> CB_U_rec_items = new List<int>(); //UU
 
                 //ALGORITHMS EXECUTION
                 //MERGE LISTS OF PREDICTIONS
@@ -1887,7 +1894,7 @@ namespace RS_Engine
                     //get list of predictions
                         //if (u.Value.Count > 0) //if the list of recommendable items is not empty
                     //retrieve the id(s) of recommendable items (ordered by the best, to the poor)
-                    List<int> CF_rec_items = u.Value.OrderByDescending(x => x.Value).Select(x => x.Key).Take(100).ToList();
+                    List<int> CF_rec_items = u.Value.OrderByDescending(x => x.Value).Select(x => x.Key).Take(100).ToList(); //<<<<<<<<<<<<<<<< FORSE ASCENDING???
                     //else
                         //the user has not clicked anything (cannot find similar users basing on current user clicks!)
                         //RManager.outLog(" Target USER_ID " + user + " has 0 predictions!");
@@ -1896,7 +1903,7 @@ namespace RS_Engine
                 }
 
                 //////////////////////////////
-
+                /*
                 //(OTHER ALGORITHMS FILL)
                 //if recommendations are not enough
                 if (rec_items.Count < 5)
@@ -1932,7 +1939,7 @@ namespace RS_Engine
                     }
 
 
-                    /* disabled, for DICT already done in the code, apply only to the others algorithms*/
+                   // disabled, for DICT already done in the code, apply only to the others algorithms
                     //ADVANCED FILTER (ALREADY CLICKED)
                     if (!RManager.ISTESTMODE)
                     {
@@ -1968,7 +1975,6 @@ namespace RS_Engine
                         }
                     }    
 
-                    /**/
                     //grouping to order the list by the most recurring items
                     //(if an item is present many times is because is predicted by many algorithms simultaneously!)
                     var rec_items_group = rec_items.GroupBy(i => i).OrderByDescending(grp => grp.Count());//.Select(x => x.Key).ToList();
@@ -1999,7 +2005,8 @@ namespace RS_Engine
                         rec_items.AddRange(CB_U_rec_items);
                     }
                 }
-                
+                */
+
                 /*
                 //(SUPER-HYBRID)
                 //if recommendations are not enough
@@ -2039,10 +2046,23 @@ namespace RS_Engine
             RManager.outLog(" INFO: added top5 in " + top5_counter + " cases!");
 
             //Converting output for file write (the writer function wants a list of list of 5 int, ordered by the target_users list)
-            List<List<int>> output_dictionary_as_target_users_list = output_dictionary.ToList().OrderBy(x => x.Key).Select(x => x.Value).ToList();
+            List<int> out_tgt_lst = new List<int>();
+            List<List<int>> out_pred_lsts = new List<List<int>>();
+            foreach(var us in output_dictionary)
+            {
+                out_tgt_lst.Add(us.Key);
+                out_pred_lsts.Add(us.Value);
+            }
+
+            //consistency check
+            if (out_tgt_lst.Count != out_pred_lsts.Count)
+                RManager.outLog(" ERROR: the two output lists counts are not equal!");
+
+            //OLD WAY (don't know if correct)
+            //List<List<int>> output_dictionary_as_target_users_list = output_dictionary.ToList().OrderBy(x => x.Key).Select(x => x.Value).ToList();
 
             //OUTPUT_SUBMISSION
-            RManager.exportRecToSubmit(RManager.target_users, output_dictionary_as_target_users_list);
+            RManager.exportRecToSubmit(out_tgt_lst, out_pred_lsts);
         }
 
     }

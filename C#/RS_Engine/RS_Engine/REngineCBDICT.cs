@@ -27,13 +27,13 @@ namespace RS_Engine
         public const double PRED_SHRINK_IB = 10;
 
         //CB KNN (0=disabled)
-        public const int CB_UB_KNN = 400;
+        public const int CB_UB_KNN = 500;
         public const int CB_IB_KNN = 0;
 
         //Limits
         public const int ATTR_SIM_LIMIT = 5;
         public const int USERUSER_SIM_LIMIT = CB_UB_KNN;
-        public const int ITEMITEM_SIM_LIMIT = 1000;
+        public const int ITEMITEM_SIM_LIMIT = 5000;
 
         /////////////////////////////////////////////
         //EXECUTION VARS
@@ -767,6 +767,24 @@ namespace RS_Engine
             IDictionary<int, IDictionary<int, double>> item_item_similarity_dictionary_num = new Dictionary<int, IDictionary<int, double>>();
             IDictionary<int, double> item_similarity_dictionary_norm = new Dictionary<int, double>();
 
+            //(SPOSTATO SOPRA PER FARE A RUNTIME LA NORMALIZZAZIONE)
+            //info
+            RManager.outLog("  + computeCBItemItemSimilarity Norm Estimation: ");
+
+            //foreach items and its attributes
+            foreach (var item in items_attributes)
+            {
+                foreach (var attribute in item.Value)
+                {
+                    //storing coefficient
+                    if (item_similarity_dictionary_norm.ContainsKey(item.Key))
+                        item_similarity_dictionary_norm[item.Key] += Math.Pow(attribute.Value, 2);
+                    else
+                        item_similarity_dictionary_norm.Add(item.Key, Math.Pow(attribute.Value, 2));
+                }
+                item_similarity_dictionary_norm[item.Key] = Math.Sqrt(item_similarity_dictionary_norm[item.Key]);
+            }
+
             //counter
             int par_counter = RManager.item_with_onemore_interaction_by_target.Count();
             RManager.outLog("  + calculating all coefficients ");
@@ -809,6 +827,11 @@ namespace RS_Engine
                             }
                         }
 
+                        //SIM ESTIMATION
+                        foreach (var item2 in item_item_similarity_dictionary_num[item].Keys.ToList())
+                            lock (sync)
+                                item_item_similarity_dictionary_num[item][item2] = item_item_similarity_dictionary_num[item][item2] / (item_similarity_dictionary_norm[item] * item_similarity_dictionary_norm[item2] + SIM_SHRINK_IB);
+
                         //avoid out of mem (limit storing of similar items by taking only best n)
                         lock (sync)
                             item_item_similarity_dictionary_num[item] = item_item_similarity_dictionary_num[item].OrderByDescending(x => x.Value).Take(ITEMITEM_SIM_LIMIT).ToDictionary(kp => kp.Key, kp => kp.Value);
@@ -819,23 +842,7 @@ namespace RS_Engine
             //exposing
             CB_item_item_sim_dictionary = item_item_similarity_dictionary_num;
            
-            //info
-            RManager.outLog("  + computeCBItemItemSimilarity Estimate: ");
-
-            //foreach items and its attributes
-            foreach(var item in items_attributes)
-            {
-                foreach(var attribute in item.Value)
-                {
-                    //storing coefficient
-                    if (item_similarity_dictionary_norm.ContainsKey(item.Key))
-                        item_similarity_dictionary_norm[item.Key] += Math.Pow(attribute.Value, 2);
-                    else
-                        item_similarity_dictionary_norm.Add(item.Key, Math.Pow(attribute.Value, 2));
-                }
-                item_similarity_dictionary_norm[item.Key] = Math.Sqrt(item_similarity_dictionary_norm[item.Key]);
-            }
-
+            /*
             //counter
             int c_tot = item_item_similarity_dictionary_num.Count();
             RManager.outLog("  + calculating item_item similarity ");
@@ -853,7 +860,8 @@ namespace RS_Engine
                     CB_item_item_sim_dictionary[item][item2] /= (item_similarity_dictionary_norm[item] * item_similarity_dictionary_norm[item2] + SIM_SHRINK_IB);
 
             }
-
+            */
+            /*
             if (CB_IB_KNN > 0)
             {
                 //ordering and taking only top similar KNN
@@ -864,7 +872,7 @@ namespace RS_Engine
                     //sort the predictions and take knn
                     CB_item_item_sim_dictionary[i] = CB_item_item_sim_dictionary[i].OrderByDescending(x => x.Value).Take(CB_IB_KNN).ToDictionary(kp => kp.Key, kp => kp.Value);
             }
-
+            */
         }
 
         //CREATE ITEM BASED RECOMMENDATIONS
