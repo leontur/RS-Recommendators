@@ -44,10 +44,10 @@ namespace RS_Engine
         private const int HYBRID_R_KNN = 30;
 
         //HR NORM
-        private const double HYBRID_NORM_R_WEIGHT = 1.0; //0 //4
+        /*private const double HYBRID_NORM_R_WEIGHT = 1.0; //0 //4
         private const double HYBRID_NORM_R_WEIGHT_I = 0.5;
         private const double HYBRID_NORM_R_WEIGHT_U_CF = 1.0; //0 //0.5
-        private const double HYBRID_NORM_R_WEIGHT_U_CB = 1.0; //0 //0.5
+        private const double HYBRID_NORM_R_WEIGHT_U_CB = 1.0; //0 //0.5*/
 
         /////////////////////////////////////////////
         //EXECUTION VARS
@@ -144,32 +144,29 @@ namespace RS_Engine
             //computeCFHybridWeightedRecommendations();
             //computeCFHybridRankRecommendations();
 
-            //CBIB<>CFIB
+
+            //CFUB-CFIB
             var CFHRNR = computeCFHybridRankNormalizedRecommendations(
-                REngineCBDICT.CB_IB_user_prediction_dictionary,
-                HYBRID_NORM_R_WEIGHT_I,
-                CF_IB_user_prediction_dictionary,
-                HYBRID_NORM_R_WEIGHT_I
-                );
-
-            //generateOutput(CFHRNR);
-
-            //CFUB<>(CBIB<>CFIB)
-            CFHRNR = computeCFHybridRankNormalizedRecommendations(
                 CF_UB_user_prediction_dictionary,
-                HYBRID_NORM_R_WEIGHT_U_CF,
-                CFHRNR,
-                HYBRID_NORM_R_WEIGHT
+                0.9,
+                CF_IB_user_prediction_dictionary,
+                1.0
                 );
 
-            //generateOutput(CFHRNR);
+            //CFUBIB-CBIB
+            CFHRNR = computeCFHybridRankNormalizedRecommendations(
+                REngineCBDICT.CB_IB_user_prediction_dictionary,
+                1.0,
+                CFHRNR,
+                1.0
+                );
 
-            //(CFUB<>(CBIB<>CFIB))<>CBUB
+            //CBIBCFIBUB-CBUB
             CFHRNR = computeCFHybridRankNormalizedRecommendations(
                 CFHRNR,
-                HYBRID_NORM_R_WEIGHT,
+                4.0,
                 REngineCBDICT.CB_UB_user_prediction_dictionary,
-                HYBRID_NORM_R_WEIGHT_U_CB
+                0.5
                 );
 
             generateOutput(CFHRNR);
@@ -1894,7 +1891,7 @@ namespace RS_Engine
                     //get list of predictions
                         //if (u.Value.Count > 0) //if the list of recommendable items is not empty
                     //retrieve the id(s) of recommendable items (ordered by the best, to the poor)
-                    List<int> CF_rec_items = u.Value.OrderByDescending(x => x.Value).Select(x => x.Key).Take(100).ToList(); //<<<<<<<<<<<<<<<< FORSE ASCENDING???
+                    List<int> CF_rec_items = u.Value.OrderByDescending(x => x.Value).Select(x => x.Key).Take(100).ToList();
                     //else
                         //the user has not clicked anything (cannot find similar users basing on current user clicks!)
                         //RManager.outLog(" Target USER_ID " + user + " has 0 predictions!");
