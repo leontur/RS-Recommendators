@@ -1,0 +1,176 @@
+RS:> 
+RS:> -----------------------------------------------------------------
+RS:>  ** RECOMMENDATORS ENGINE **
+RS:> -----------------------------------------------------------------
+RS:>     ____________________________
+RS:>     Algorithms
+RS:>     1) TOP
+RS:>     2) CB-F (ok)
+RS:>     3) U-CF
+RS:>     4) I-CF
+RS:> 
+RS:>     5)  CF DICT + CB DICT (chiama anche 6:UB/IB/HYBRID)
+RS:>     55) CB DICT (cannot call alone)
+RS:> 
+RS:>     6) HYBRID CB+CF 2.0
+RS:>     ____________________________
+RS:>     TEST Mode
+RS:>     7) test mode: enable here to initialize the dataset as train/test and do EVAL (not use for kaggle scope)
+RS:>     ____________________________
+RS:>     8) EVAL mode: execute EVAL with input a specific csv (not use for kaggle scope)
+RS:>     9) .bin size calculator
+RS:>     ____________________________
+RS:>     0) exit
+RS:> -----------------------------------------------------------------
+RS:> 
+RS:>     > RS:>     ==> selected program (5)
+RS:> -----------------------------------------------------------------
+RS:>   + initializing RS 
+RS:>   + initializing dataset retrievement 
+RS:>   + reading dataset: interactions
+RS:>   + dataset read OK | interactions_f count= 546865 | conversion..
+RS:>   + reading dataset: target_users
+RS:>   + dataset read OK | target_users_f count= 10001 | conversion..
+RS:>   + reading serialized file user_profile.bin
+RS:>   + reading serialized file item_profile.bin
+RS:>   + reading serialized file item_profile_enabled.bin
+RS:>   + populating auxiliary data structures 
+RS:> 
+RS:>   + all datasets conversion: OK
+RS:>   -total lines | interactions      >>> 546864
+RS:>   -total lines | item_profile      >>> 167956
+RS:>   -total lines | item_profile_enab >>> 63446
+RS:>   -total lines | target_users      >>> 10000
+RS:>   -total lines | user_profile      >>> 40000
+RS:> 
+RS:> -----------------------------------------------------------------
+RS:>   # running program 5
+RS:> 
+RS:>   + processing..
+RS:>   + CF Algorithm..
+RS:>   + creating DICTIONARIES.. 
+RS:>   + user_items_dictionary
+
+RS:>   + writing serialized file CFDICT_user_items_dictionary.bin
+RS:>   + item_users_dictionary
+
+RS:>   + writing serialized file CFDICT_item_users_dictionary.bin
+RS:>   + CF_IB_IDF_dictionary
+
+RS:>   + writing serialized file CFDICT_CF_IB_IDF_dictionary.bin
+RS:>   + processing..
+RS:>   + CB Algorithm..
+RS:>   + InitUserCBDict():
+RS:>   + reading serialized file CBDICT_users_attributes.bin
+RS:>   + reading serialized file CBDICT_attributes_users.bin
+RS:>   + InitItemCBDict():
+
+RS:>   + compute_TF_IDF_UB(): 
+RS:>   + compute_TF_IDF_IB(): 
+RS:>   + computeCBUserUserSimilarity(): 
+RS:>   + calculating all coefficients 
+
+RS:>   + calculating user_user similarity 
+RS:>   + KNN is active, ordering and taking.. 
+RS:>   - freeing memory (GC) 
+RS:>   + predictCBUserBasedNormalizedRecommendations(): 
+RS:>   + calculating all coefficients 
+
+RS:>   + normalizing similar items 
+
+RS:>   - freeing memory (GC) 
+RS:>   + computeCBItemItemSimilarity(): 
+RS:>   + computeCBItemItemSimilarity Norm Estimation: 
+RS:>   + calculating all coefficients 
+
+RS:>   - freeing memory (GC) 
+RS:>   + predictCBItemBasedNormalizedRecommendations(): 
+RS:>   + aggregation of predictions 
+
+RS:>   + normalizing similar items 
+
+RS:>   - freeing memory (GC) 
+RS:>   + computeCFCBHybridUserUserSimilarity(): 
+RS:>   + calculating all coefficients 
+
+RS:>   + calculating user_user similarity 
+
+RS:>   + user user HYBRID (CF+CB): 
+RS:>   + calculating all coefficients 
+
+RS:>   + similarity estimate 
+
+RS:>   + KNN is active, ordering and taking.. 
+RS:>   - freeing memory (GC) 
+RS:>   + predictCFUserBasedNormalizedRecommendations(): 
+RS:>   + aggregation of predictions 
+
+RS:>   + estimating ratings of similar items 
+
+RS:>   - freeing memory (GC) 
+RS:>   + computeCFCBHybridItemItemSimilarity(): 
+RS:>   + calculating all coefficients 
+
+RS:>   + calculating item_item similarity 
+
+RS:>   + user user HYBRID (CF+CB): 
+RS:>   + calculating all coefficients 
+
+RS:>   + similarity estimate 
+
+RS:>   - freeing memory (GC) 
+RS:>   + predictCFItemBasedNormalizedRecommendations(): 
+RS:>   + aggregation of predictions 
+
+RS:>   + estimating ratings of similar items 
+
+RS:>   - freeing memory (GC) 
+RS:>   + computeCFHybridRankNormalizedRecommendations(): 
+RS:>   + computeCFHybridRankNormalizedRecommendations(): 
+RS:>   + computeCFHybridRankNormalizedRecommendations(): 
+RS:>  + Output CB+CF DICT :> True
+RS:>  + Output CF TIT  :> False
+RS:>  + Output CF TAG  :> False
+RS:>  + Output CF RAT  :> False
+RS:>  + Output CF UU   :> False
+RS:>  + Output CF II   :> False
+RS:>   + generating output structured data 
+RS:>   + the input dictionary count is: 10000
+
+RS:>  INFO: added super hybrid in 0 cases!
+RS:>  INFO: added top5 in 0 cases!
+RS:>  >>>>>> generating output file, wait a minute..
+RS:>  >>>>>> output submission file created: ../../../Output/submission_2017-01-21_18-18-12_1.csv
+RS:> 
+RS:> -----------------------------------------------------------------
+RS:>  ** RECOMMENDATORS ENGINE **
+RS:> -----------------------------------------------------------------
+RS:>     ____________________________
+RS:>     Algorithms
+RS:>     1) TOP
+RS:>     2) CB-F (ok)
+RS:>     3) U-CF
+RS:>     4) I-CF
+RS:> 
+RS:>     5)  CF DICT + CB DICT (chiama anche 6:UB/IB/HYBRID)
+RS:>     55) CB DICT (cannot call alone)
+RS:> 
+RS:>     6) HYBRID CB+CF 2.0
+RS:>     ____________________________
+RS:>     TEST Mode
+RS:>     7) test mode: enable here to initialize the dataset as train/test and do EVAL (not use for kaggle scope)
+RS:>     ____________________________
+RS:>     8) EVAL mode: execute EVAL with input a specific csv (not use for kaggle scope)
+RS:>     9) .bin size calculator
+RS:>     ____________________________
+RS:>     0) exit
+RS:> -----------------------------------------------------------------
+RS:> 
+RS:>     > RS:>     ==> selected program (0)
+RS:> -----------------------------------------------------------------
+RS:> -----------------------------------------------------------------
+RS:>   # running program 0
+RS:> 
+RS:> -----------------------------------------------------------------
+RS:>  >>>>>> halting RS..
+RS:>  >>>>>> log saved to ../../../Output/result_2017-01-21_18-18-12.txt  :) 

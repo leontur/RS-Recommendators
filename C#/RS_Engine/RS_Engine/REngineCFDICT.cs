@@ -106,39 +106,47 @@ namespace RS_Engine
             //computeCFUserUserSimilarity();
             computeCFCBHybridUserUserSimilarity();
 
+            /*
             //FREEING
             RManager.outLog("  - freeing memory (GC) ");
             REngineCBDICT.users_attributes.Clear();
             REngineCBDICT.users_attributes = null;
             GC.Collect();
+            */
 
             //predictCFUserBasedRecommendations();
             predictCFUserBasedNormalizedRecommendations();
 
+            /*
             //FREEING
             RManager.outLog("  - freeing memory (GC) ");
             CF_user_user_sim_dictionary.Clear();
             CF_user_user_sim_dictionary = null;
             GC.Collect();
+            */
 
             //Execute ITEM BASED
             //computeCFItemItemSimilarity();
             computeCFCBHybridItemItemSimilarity();
 
+            /*
             //FREEING
             RManager.outLog("  - freeing memory (GC) ");
             REngineCBDICT.items_attributes.Clear();
             REngineCBDICT.items_attributes = null;
             GC.Collect();
+            */
 
             //predictCFItemBasedRecommendations();
             predictCFItemBasedNormalizedRecommendations();
 
+            /*
             //FREEING
             RManager.outLog("  - freeing memory (GC) ");
             CF_item_item_sim_dictionary.Clear();
             CF_item_item_sim_dictionary = null;
             GC.Collect();
+            */
 
             //Execute RANKS
             //computeCFHybridWeightedRecommendations();
@@ -152,6 +160,17 @@ namespace RS_Engine
                 CF_IB_user_prediction_dictionary,
                 1.0
                 );
+
+            ////0.01371 OK!!!!! vvvvvvvvvvvvvvvvvvvvvvv
+            CFHRNR = computeCFHybridRankNormalizedRecommendations(
+                CFHRNR,
+                6.0,
+                REngineCBDICT.CB_UB_user_prediction_dictionary,
+                0.5
+                );
+
+            generateOutput(CFHRNR); //1
+            ////^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
             //CFUBIB-CBIB
             CFHRNR = computeCFHybridRankNormalizedRecommendations(
@@ -169,7 +188,7 @@ namespace RS_Engine
                 0.5
                 );
 
-            generateOutput(CFHRNR);
+            generateOutput(CFHRNR); //2
 
             ///////////////////////////////////////////////
             //CBCF2
@@ -191,7 +210,7 @@ namespace RS_Engine
             RManager.outLog("  + creating DICTIONARIES.. ");
 
             //counter
-            int par_counter = RManager.user_profile.Count();
+            int par_counter = RManager.interactions.Count();
             RManager.outLog("  + user_items_dictionary");
             
             //check if already serialized (for fast fetching)
@@ -201,20 +220,23 @@ namespace RS_Engine
                 //for every user
                 object sync = new object();
                 Parallel.ForEach(
-                    RManager.user_profile,
+                    RManager.interactions,
                     new ParallelOptions { MaxDegreeOfParallelism = 8 },
-                    u =>
+                    inter =>
                     {
                         //counter
                         Interlocked.Decrement(ref par_counter);
                         int count = Interlocked.CompareExchange(ref par_counter, 0, 0);
-                        if (count % 200 == 0) RManager.outLog("  - remaining: " + count, true, true, true);
+                        if (count % 10000 == 0) RManager.outLog("  - remaining: " + count, true, true, true);
 
+                        //OLD WAY, FROM USERS
+                        /*
                         //getting user id
                         int user = (int)u[0];
 
                         //retrieving the ranked interactions dict of the user
                         IDictionary<int, int> user_r_i = REngineCBCF2.createRankedInteractionsForUser(user, false);
+                        */
 
                         /*
                         //OLD way (get interactions by ordering by most heavy or most recent)
@@ -229,7 +251,7 @@ namespace RS_Engine
                                     RManager.interactions.Where(x => x[0] == user && x[1] == clicked).OrderByDescending(x => x[3]).Select(x => x[2]).ToList().First() //interaction_type
                                     );
                         */
-
+                        /*
                         //create an entry in the dictionary
                         //associating all the interactions of the user (with no duplicates)
                         lock (sync)
@@ -239,6 +261,20 @@ namespace RS_Engine
                                                 user, //user_id
                                                 user_r_i //dictionary with inside every clicked item and its ranked interaction
                                                 );
+                        }
+                        */
+
+                        //NEW WAY, FROM INTERACTIONS
+                        lock (sync)
+                        {
+                            int user = inter[0];
+                            int item = inter[1];
+
+                            if (!RManager.user_items_dictionary.ContainsKey(user))
+                                RManager.user_items_dictionary.Add(user, new Dictionary<int, int>());
+                            
+                            if (!RManager.user_items_dictionary[user].ContainsKey(item))
+                                RManager.user_items_dictionary[user].Add(item, 1);
                         }
                     }
                 );
@@ -263,7 +299,7 @@ namespace RS_Engine
             }
     
             //counter
-            par_counter = RManager.item_profile.Count();
+            par_counter = RManager.interactions.Count();
             RManager.outLog("  + item_users_dictionary");
 
             //check if already serialized (for fast fetching)
@@ -273,21 +309,23 @@ namespace RS_Engine
                 //for every item
                 object sync = new object();
                 Parallel.ForEach(
-                    RManager.item_profile,
+                    RManager.interactions,
                     new ParallelOptions { MaxDegreeOfParallelism = 8 },
-                    i =>
+                    inter =>
                     {
                         //counter
                         Interlocked.Decrement(ref par_counter);
                         int count = Interlocked.CompareExchange(ref par_counter, 0, 0);
-                        if (count % 200 == 0) RManager.outLog("  - remaining: " + count, true, true, true);
-                        
+                        if (count % 10000 == 0) RManager.outLog("  - remaining: " + count, true, true, true);
+
+                        //OLD WAY, FROM ITEMS
+                        /*
                         //getting item id
                         int item = (int)i[0];
 
                         //retrieving the ranked interactions dict of the user
                         IDictionary<int, int> item_r_u = REngineCBCF2.createRankedInteractionsForItem(item);
-
+                        */
                         /*
                         //OLD way (get interactions by ordering by most heavy or most recent)
                         //retrieving the list of users that interacted with this item
@@ -301,7 +339,7 @@ namespace RS_Engine
                                     RManager.interactions.Where(x => x[1] == item && x[0] == userclick).OrderByDescending(x => x[3]).Select(x => x[2]).ToList().First() //interaction_type
                                     );
                         */
-
+                        /*
                         //create an entry in the dictionary
                         //associating all the users that interacted (with no duplicates)
                         lock (sync)
@@ -312,7 +350,20 @@ namespace RS_Engine
                                                     item_r_u //dictionary with inside every user (that clicked) and its ranked interaction
                                                     );
                         }
+                        */
 
+                        //NEW WAY, FROM INTERACTIONS
+                        lock (sync)
+                        {
+                            int user = inter[0];
+                            int item = inter[1];
+
+                            if (!RManager.item_users_dictionary.ContainsKey(item))
+                                RManager.item_users_dictionary.Add(item, new Dictionary<int, int>());
+
+                            if (!RManager.item_users_dictionary[item].ContainsKey(user))
+                                RManager.item_users_dictionary[item].Add(user, 1);
+                        }
                     }
                 );
 
@@ -352,13 +403,13 @@ namespace RS_Engine
                 object sync = new object();
                 Parallel.ForEach(
                     interactionsOrdered,
-                    new ParallelOptions { MaxDegreeOfParallelism = 16 },
+                    new ParallelOptions { MaxDegreeOfParallelism = 8 },
                     item =>
                     {
                         //counter
                         Interlocked.Decrement(ref par_counter);
                         int count = Interlocked.CompareExchange(ref par_counter, 0, 0);
-                        if (count % 2000 == 0) RManager.outLog("  - remaining: " + count, true, true, true);
+                        if (count % 10000 == 0) RManager.outLog("  - remaining: " + count, true, true, true);
 
                         //create an entry in the dictionary
                         //counting times of interactions per items (with no duplicates)
@@ -367,7 +418,7 @@ namespace RS_Engine
                             if (!item_inter_count.ContainsKey(item))
                                 item_inter_count.Add(item, 1.0);
                             else
-                                item_inter_count[item] += 1.0;
+                                item_inter_count[item] = item_inter_count[item] + 1.0;
                         }
                     }
                 );
@@ -383,7 +434,7 @@ namespace RS_Engine
                         //counter
                         Interlocked.Decrement(ref par_counter);
                         int count = Interlocked.CompareExchange(ref par_counter, 0, 0);
-                        if (count % 2000 == 0) RManager.outLog("  - remaining: " + count, true, true, true);
+                        if (count % 10000 == 0) RManager.outLog("  - remaining: " + count, true, true, true);
 
                         //create an entry in the dictionary
                         //counting times of interactions per items (with no duplicates)

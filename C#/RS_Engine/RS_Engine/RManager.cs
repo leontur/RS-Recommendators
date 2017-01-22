@@ -532,7 +532,7 @@ namespace RS_Engine
 
         //LOGGER
         //log in console and in file for every program run
-        private static string[] runChars = new string[] { "|", "/", "-", "\\", "\\", "\\", "\\", "\\", "\\", "\\" };
+        private static string[] runChars = new string[] { "|", "/", "-", "\\", "\\", "\\", "\\", "\\", "\\", "\\", "\\", "\\", "\\", "\\", "\\", "\\" };
         private static int runCharsPos = 0;
         private static bool lastWasInline = false;
         public static void outLog(string s, bool inline = false, bool carriageret = false, bool onlyconsole = false)
