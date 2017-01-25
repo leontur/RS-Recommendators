@@ -28,7 +28,7 @@ namespace RS_Engine
         private const double PRED_SHRINK_IB = 10;
 
         //CF KNN (0=disabled)
-        private const int CF_UB_KNN = 130;
+        private const int CF_UB_KNN = 150;
         private const int CF_IB_KNN = 0;
 
         //CF+CB HYBRID
@@ -42,12 +42,6 @@ namespace RS_Engine
         private const double HYBRID_R_WEIGHT_I = 4;
         private const double HYBRID_R_WEIGHT_U = 0.5;
         private const int HYBRID_R_KNN = 30;
-
-        //HR NORM
-        /*private const double HYBRID_NORM_R_WEIGHT = 1.0; //0 //4
-        private const double HYBRID_NORM_R_WEIGHT_I = 0.5;
-        private const double HYBRID_NORM_R_WEIGHT_U_CF = 1.0; //0 //0.5
-        private const double HYBRID_NORM_R_WEIGHT_U_CB = 1.0; //0 //0.5*/
 
         /////////////////////////////////////////////
         //EXECUTION VARS
@@ -152,49 +146,66 @@ namespace RS_Engine
             //computeCFHybridWeightedRecommendations();
             //computeCFHybridRankRecommendations();
 
+            //////////////////////////////////
 
             //CFUB-CFIB
-            var CFHRNR = computeCFHybridRankNormalizedRecommendations(
+            var CFHRNR1 = computeCFHybridRankNormalizedRecommendations(
                 CF_UB_user_prediction_dictionary,
-                0.9,
+                0.8, //0.9 //1.2
                 CF_IB_user_prediction_dictionary,
-                1.0
+                1.4  //1.0 //0.9
                 );
 
-            ////0.01371 OK!!!!! vvvvvvvvvvvvvvvvvvvvvvv
-            CFHRNR = computeCFHybridRankNormalizedRecommendations(
-                CFHRNR,
-                6.0,
+            ////0.01371 (6.0) | 0.01373 (10.0) | ora in prova per incremento (20.0)
+            var CFHRNR2 = computeCFHybridRankNormalizedRecommendations(
+                CFHRNR1,
+                20.0,
                 REngineCBDICT.CB_UB_user_prediction_dictionary,
                 0.5
                 );
 
-            generateOutput(CFHRNR); //1
-            ////^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            CFHRNR2 = CFHRNR2.ToDictionary(kv => kv.Key, kv => kv.Value);
 
-            //CFUBIB-CBIB
-            CFHRNR = computeCFHybridRankNormalizedRecommendations(
+            generateOutput(CFHRNR2); //OUT 1
+
+            //////////////////////////////////
+
+            var CFHRNR3 = computeCFHybridRankNormalizedRecommendations(
+                CFHRNR2,
+                1.5,
                 REngineCBDICT.CB_IB_user_prediction_dictionary,
-                1.0,
-                CFHRNR,
-                1.0
+                5.0
                 );
 
-            //CBIBCFIBUB-CBUB
-            CFHRNR = computeCFHybridRankNormalizedRecommendations(
-                CFHRNR,
-                4.0,
-                REngineCBDICT.CB_UB_user_prediction_dictionary,
-                0.5
-                );
+            CFHRNR3 = CFHRNR3.ToDictionary(kv => kv.Key, kv => kv.Value);
 
-            generateOutput(CFHRNR); //2
+            //FREEING
+            RManager.outLog("  - freeing memory (GC) ");
+            CFHRNR1.Clear();
+            CFHRNR1 = null;
+            REngineCBDICT.users_attributes.Clear();
+            REngineCBDICT.users_attributes = null;
+            CF_user_user_sim_dictionary.Clear();
+            CF_user_user_sim_dictionary = null;
+            REngineCBDICT.items_attributes.Clear();
+            REngineCBDICT.items_attributes = null;
+            CF_item_item_sim_dictionary.Clear();
+            CF_item_item_sim_dictionary = null;
+            REngineCBDICT.CB_IB_user_prediction_dictionary.Clear();
+            REngineCBDICT.CB_IB_user_prediction_dictionary = null;
+            REngineCBDICT.CB_UB_user_prediction_dictionary.Clear();
+            REngineCBDICT.CB_UB_user_prediction_dictionary = null;
+            GC.Collect();
+
+            generateOutput(CFHRNR3); //OUT 2
 
             ///////////////////////////////////////////////
             //CBCF2
             //Execute
-            //RManager.outLog("  + executing ALSO CBCF2! .. ");
-            //REngineCBCF2.getRecommendations();
+            RManager.outLog("  + executing ALSO CBCF2! .. ");
+            REngineCBCF2.getRecommendations();
+
+            generateOutput(CFHRNR2); //OUT 3
 
             ///////////////////////////////////////////////
             //Execute OUTPUT
@@ -1890,18 +1901,16 @@ namespace RS_Engine
             bool A_CBCF_DICT  = true;   //CF from dictionaries DICT
 
             //OTHER ALGORITHMS
-            bool A_CF_TIT   = false;   //CF over TITLES
-            bool A_CF_TAG   = false;   //CF over TAGS
-            bool A_CF_RAT   = false;   //CF over RATING
-            bool A_CB_UU    = false;   //CB over user-user similarity
-            bool A_CB_II    = false;   //CB over item-item similarity (<<<<<<< yet to be implemented in CBCF2 (FROM CBF)!!)
+            bool A_CF_TIT   = true;   //CF over TITLES
+            bool A_CF_TAG   = true;   //CF over TAGS
+            bool A_CF_RAT   = true;   //CF over RATING
+            bool A_CB_UU    = false;  //CB over user-user similarity
 
             RManager.outLog(" + Output CB+CF DICT :> " + A_CBCF_DICT);
             RManager.outLog(" + Output CF TIT  :> " + A_CF_TIT);
             RManager.outLog(" + Output CF TAG  :> " + A_CF_TAG);
             RManager.outLog(" + Output CF RAT  :> " + A_CF_RAT);
             RManager.outLog(" + Output CF UU   :> " + A_CB_UU);
-            RManager.outLog(" + Output CF II   :> " + A_CB_II);
 
             //counter
             int c_tot = users_prediction_dictionary.Count();
@@ -1931,7 +1940,7 @@ namespace RS_Engine
                 
                 //instantiate the list of (final) most similar items
                 List<int> rec_items = new List<int>(); //DICT
-                //List<int> CB_U_rec_items = new List<int>(); //UU
+                List<int> CB_U_rec_items = new List<int>(); //UU
 
                 //ALGORITHMS EXECUTION
                 //MERGE LISTS OF PREDICTIONS
@@ -1942,7 +1951,7 @@ namespace RS_Engine
                     //get list of predictions
                         //if (u.Value.Count > 0) //if the list of recommendable items is not empty
                     //retrieve the id(s) of recommendable items (ordered by the best, to the poor)
-                    List<int> CF_rec_items = u.Value.OrderByDescending(x => x.Value).Select(x => x.Key).Take(100).ToList();
+                    List<int> CF_rec_items = u.Value.OrderByDescending(x => x.Value).Select(x => x.Key).Take(250).ToList();
                     //else
                         //the user has not clicked anything (cannot find similar users basing on current user clicks!)
                         //RManager.outLog(" Target USER_ID " + user + " has 0 predictions!");
@@ -1951,7 +1960,6 @@ namespace RS_Engine
                 }
 
                 //////////////////////////////
-                /*
                 //(OTHER ALGORITHMS FILL)
                 //if recommendations are not enough
                 if (rec_items.Count < 5)
@@ -1978,16 +1986,8 @@ namespace RS_Engine
                         //adding predictions 
                         rec_items.AddRange(CF_RAT_rec_items);
                     }
-                    if (A_CB_II)
-                    {
-                        //get list of predictions
-                        //List<int> CB_I_rec_items = ...;
-                        //adding predictions 
-                        //rec_items.AddRange(CB_I_rec_items);
-                    }
 
-
-                   // disabled, for DICT already done in the code, apply only to the others algorithms
+                    //disabled, for DICT already done in the code, apply only to the others algorithms
                     //ADVANCED FILTER (ALREADY CLICKED)
                     if (!RManager.ISTESTMODE)
                     {
@@ -2053,7 +2053,7 @@ namespace RS_Engine
                         rec_items.AddRange(CB_U_rec_items);
                     }
                 }
-                */
+                
 
                 /*
                 //(SUPER-HYBRID)

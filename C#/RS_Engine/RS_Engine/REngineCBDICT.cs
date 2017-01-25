@@ -31,9 +31,10 @@ namespace RS_Engine
         public const int CB_IB_KNN = 0;
 
         //Limits
-        public const int ATTR_SIM_LIMIT = 10;
+        public const int ATTR_SIM_LIMIT_US = 2500;
+        public const int ATTR_SIM_LIMIT_IT = 5;
         public const int USERUSER_SIM_LIMIT = CB_UB_KNN;
-        public const int ITEMITEM_SIM_LIMIT = 500;
+        public const int ITEMITEM_SIM_LIMIT = 2500;
 
         /////////////////////////////////////////////
         //EXECUTION VARS
@@ -349,7 +350,7 @@ namespace RS_Engine
             //temp dictionaries
             IDictionary<int, double> user_tf = new Dictionary<int, double>();
             IDictionary<string, double> attr_idf = new Dictionary<string, double>();
-            int users_count = users_attributes.Count;
+            int users_count = users_attributes.Keys.Count;
 
             //for each user, create the time frequency TF dictionary
             foreach (var us in users_attributes)
@@ -446,8 +447,7 @@ namespace RS_Engine
                         //for each attribute of the user
                         foreach (var att in users_attributes[user])
                         {
-                            var user_list = attributes_users[att.Key].Keys;
-                            foreach (var u in user_list)
+                            foreach (var u in attributes_users[att.Key].Keys.Take(ATTR_SIM_LIMIT_US).ToList())
                             {
                                 if (u == user)
                                     continue;
@@ -808,7 +808,7 @@ namespace RS_Engine
                             item_item_similarity_dictionary_num.Add(item, new Dictionary<int, double>());
 
                         //getting item's attributes, and foreach                
-                        foreach (var att in items_attributes[item].Keys.Take(ATTR_SIM_LIMIT).ToList())
+                        foreach (var att in items_attributes[item].Keys.Take(ATTR_SIM_LIMIT_IT).ToList())
                         {
                             foreach (var item2 in attributes_items[att].Keys)
                             {
