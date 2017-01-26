@@ -571,6 +571,7 @@ namespace RS_Engine
                 temporary_timestamps.Add(u, interactions_batch.Where(x => x[0] == u).Select(x => x[3]).OrderByDescending(x => x).First());
 
             //ordering by timestamp
+            var last_7_days_ts = 1446336000;
             var ordered_temporary_timestamps = temporary_timestamps.OrderByDescending(x => x.Value);
             int total = ordered_temporary_timestamps.Count();
             int iteractioncount = 0;
@@ -578,11 +579,17 @@ namespace RS_Engine
             {
                 //increasing rank (in case of first and second most fresh, increase more)
                 if (iteractioncount == 0)
-                    output_dictionary[u.Key] += total * 4;
+                    output_dictionary[u.Key] += total * 3;
                 else if (iteractioncount == 1)
                     output_dictionary[u.Key] += total * 2;
                 else
                     output_dictionary[u.Key] += total;
+
+                //bonus if interaction was in last 7 days
+                if (u.Value >= last_7_days_ts)
+                    output_dictionary[u.Key] *= 10;
+
+                //counters
                 total--;
                 iteractioncount++;
             }

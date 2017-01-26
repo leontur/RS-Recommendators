@@ -151,12 +151,12 @@ namespace RS_Engine
             //CFUB-CFIB
             var CFHRNR1 = computeCFHybridRankNormalizedRecommendations(
                 CF_UB_user_prediction_dictionary,
-                0.8, //0.9 //1.2
+                0.6, //0.9 //1.2 //0.8
                 CF_IB_user_prediction_dictionary,
-                1.4  //1.0 //0.9
+                1.8  //1.0 //0.9 //1.4
                 );
 
-            ////0.01371 (6.0) | 0.01373 (10.0) | ora in prova per incremento (20.0)
+            ////0.01371 (6.0) | 0.01373 (10.0) | 0.01413 (20.0) ora in prova per incremento (xx.0)
             var CFHRNR2 = computeCFHybridRankNormalizedRecommendations(
                 CFHRNR1,
                 20.0,
@@ -240,17 +240,25 @@ namespace RS_Engine
                         int count = Interlocked.CompareExchange(ref par_counter, 0, 0);
                         if (count % 10000 == 0) RManager.outLog("  - remaining: " + count, true, true, true);
 
-                        //OLD WAY, FROM USERS
-                        /*
+                        //OLD WAY (Ranked interaction)
+
                         //getting user id
-                        int user = (int)u[0];
+                        int user = inter[0];
 
                         //retrieving the ranked interactions dict of the user
-                        IDictionary<int, int> user_r_i = REngineCBCF2.createRankedInteractionsForUser(user, false);
-                        */
+                        if (!RManager.user_items_dictionary.ContainsKey(user))
+                        {
+                            IDictionary<int, int> user_r_i = REngineCBCF2.createRankedInteractionsForUser(user, false);
+
+                            //create an entry in the dictionary
+                            //associating all the interactions of the user (with no duplicates)
+                            //(value: dictionary with inside every clicked item and its ranked interaction)
+                            lock (sync)
+                                RManager.user_items_dictionary.Add(user, user_r_i);
+                        }
 
                         /*
-                        //OLD way (get interactions by ordering by most heavy or most recent)
+                        //OLD OLD way (get interactions by ordering by most heavy or most recent)
                         //retrieving the list of interactions made by the user
                         List<int> curr_user_interacted_items = RManager.interactions.Where(x => x[0] == (int)u[0]).Select(x => x[1]).Distinct().ToList();
                         //create a dictionary for every interacted item (with no interaction_type duplicates, only the bigger for each distinct interaction)
@@ -262,19 +270,8 @@ namespace RS_Engine
                                     RManager.interactions.Where(x => x[0] == user && x[1] == clicked).OrderByDescending(x => x[3]).Select(x => x[2]).ToList().First() //interaction_type
                                     );
                         */
-                        /*
-                        //create an entry in the dictionary
-                        //associating all the interactions of the user (with no duplicates)
-                        lock (sync)
-                        {
-                            if (!RManager.user_items_dictionary.ContainsKey(user))
-                                    RManager.user_items_dictionary.Add(
-                                                user, //user_id
-                                                user_r_i //dictionary with inside every clicked item and its ranked interaction
-                                                );
-                        }
-                        */
 
+                        /*
                         //NEW WAY, FROM INTERACTIONS
                         lock (sync)
                         {
@@ -287,6 +284,7 @@ namespace RS_Engine
                             if (!RManager.user_items_dictionary[user].ContainsKey(item))
                                 RManager.user_items_dictionary[user].Add(item, 1);
                         }
+                        */
                     }
                 );
 
@@ -329,16 +327,25 @@ namespace RS_Engine
                         int count = Interlocked.CompareExchange(ref par_counter, 0, 0);
                         if (count % 10000 == 0) RManager.outLog("  - remaining: " + count, true, true, true);
 
-                        //OLD WAY, FROM ITEMS
-                        /*
-                        //getting item id
-                        int item = (int)i[0];
+                        //OLD WAY (Ranked interaction)
 
-                        //retrieving the ranked interactions dict of the user
-                        IDictionary<int, int> item_r_u = REngineCBCF2.createRankedInteractionsForItem(item);
-                        */
+                        //getting item id
+                        int item = inter[1];
+
+                        //retrieving the ranked interactions dict of the item
+                        if (!RManager.item_users_dictionary.ContainsKey(item))
+                        {
+                            IDictionary<int, int> item_r_u = REngineCBCF2.createRankedInteractionsForItem(item);
+
+                            //create an entry in the dictionary
+                            //associating all the users that interacted (with no duplicates)
+                            //(value: dictionary with inside every user (that clicked) and its ranked interaction)
+                            lock (sync)
+                                RManager.item_users_dictionary.Add(item, item_r_u);
+                        }
+
                         /*
-                        //OLD way (get interactions by ordering by most heavy or most recent)
+                        //OLD OLD way (get interactions by ordering by most heavy or most recent)
                         //retrieving the list of users that interacted with this item
                         List<int> curr_item_interacted_users = RManager.interactions.Where(x => x[1] == item).Select(x => x[0]).Distinct().ToList();
                         //create a dictionary for every user that clicked this item (with no interaction_type duplicates, only the bigger for each distinct user)
@@ -350,19 +357,8 @@ namespace RS_Engine
                                     RManager.interactions.Where(x => x[1] == item && x[0] == userclick).OrderByDescending(x => x[3]).Select(x => x[2]).ToList().First() //interaction_type
                                     );
                         */
+                        
                         /*
-                        //create an entry in the dictionary
-                        //associating all the users that interacted (with no duplicates)
-                        lock (sync)
-                        {
-                            if(!RManager.item_users_dictionary.ContainsKey((int)i[0]))
-                                    RManager.item_users_dictionary.Add(
-                                                    item, //(item_)id
-                                                    item_r_u //dictionary with inside every user (that clicked) and its ranked interaction
-                                                    );
-                        }
-                        */
-
                         //NEW WAY, FROM INTERACTIONS
                         lock (sync)
                         {
@@ -375,6 +371,7 @@ namespace RS_Engine
                             if (!RManager.item_users_dictionary[item].ContainsKey(user))
                                 RManager.item_users_dictionary[item].Add(user, 1);
                         }
+                        */
                     }
                 );
 
