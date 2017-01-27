@@ -246,16 +246,16 @@ namespace RS_Engine
                         int user = inter[0];
 
                         //retrieving the ranked interactions dict of the user
-                        if (!RManager.user_items_dictionary.ContainsKey(user))
-                        {
-                            IDictionary<int, int> user_r_i = REngineCBCF2.createRankedInteractionsForUser(user, false);
+                        lock (sync)
+                            if (!RManager.user_items_dictionary.ContainsKey(user))
+                            {
+                                IDictionary<int, int> user_r_i = REngineCBCF2.createRankedInteractionsForUser(user, false);
 
-                            //create an entry in the dictionary
-                            //associating all the interactions of the user (with no duplicates)
-                            //(value: dictionary with inside every clicked item and its ranked interaction)
-                            lock (sync)
+                                //create an entry in the dictionary
+                                //associating all the interactions of the user (with no duplicates)
+                                //(value: dictionary with inside every clicked item and its ranked interaction)
                                 RManager.user_items_dictionary.Add(user, user_r_i);
-                        }
+                            }
 
                         /*
                         //OLD OLD way (get interactions by ordering by most heavy or most recent)
@@ -333,16 +333,16 @@ namespace RS_Engine
                         int item = inter[1];
 
                         //retrieving the ranked interactions dict of the item
-                        if (!RManager.item_users_dictionary.ContainsKey(item))
-                        {
-                            IDictionary<int, int> item_r_u = REngineCBCF2.createRankedInteractionsForItem(item);
+                        lock (sync)
+                            if (!RManager.item_users_dictionary.ContainsKey(item))
+                            {
+                                IDictionary<int, int> item_r_u = REngineCBCF2.createRankedInteractionsForItem(item);
 
-                            //create an entry in the dictionary
-                            //associating all the users that interacted (with no duplicates)
-                            //(value: dictionary with inside every user (that clicked) and its ranked interaction)
-                            lock (sync)
+                                //create an entry in the dictionary
+                                //associating all the users that interacted (with no duplicates)
+                                //(value: dictionary with inside every user (that clicked) and its ranked interaction)
                                 RManager.item_users_dictionary.Add(item, item_r_u);
-                        }
+                            }
 
                         /*
                         //OLD OLD way (get interactions by ordering by most heavy or most recent)

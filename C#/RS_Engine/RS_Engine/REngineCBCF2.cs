@@ -457,11 +457,12 @@ namespace RS_Engine
 
             //instantiating ranked list
             foreach (var i in interactions_dist)
-                output_dictionary.Add(i, 0);
+                output_dictionary.Add(i, 1);
 
             ///////////////////////////
             //ASSIGNING RANKINGS
 
+            /*
             //1
             //BY CLICK NUMBER
             foreach (var i in interactions_all)
@@ -481,7 +482,7 @@ namespace RS_Engine
                 //increasing rank
                 output_dictionary[i] *= w;
             }
-
+            */
             //3
             //BY FRESHNESS
             
@@ -499,16 +500,16 @@ namespace RS_Engine
             foreach (var i in ordered_temporary_timestamps)
             {
                 //increasing rank (in case of first and second most fresh, increase more)
-                if(iteractioncount == 0)
-                    output_dictionary[i.Key] += total * 3;
-                else if(iteractioncount == 1)
-                    output_dictionary[i.Key] += total * 2;
-                else
-                    output_dictionary[i.Key] += total;
+                if (iteractioncount == 0)
+                    output_dictionary[i.Key] += 1; //total * 3;
+                //else if (iteractioncount == 1)
+                    //output_dictionary[i.Key] += 1; //total * 2;
+                //else
+                   // output_dictionary[i.Key] += total;
 
                 //bonus if interaction was in last 7 days
                 if(i.Value >= last_7_days_ts)
-                    output_dictionary[i.Key] *= 10;
+                    output_dictionary[i.Key] += 3;
 
                 //counters
                 total--;
@@ -536,11 +537,12 @@ namespace RS_Engine
 
             //instantiating ranked list
             foreach (var u in users_dist)
-                output_dictionary.Add(u, 0);
+                output_dictionary.Add(u, 1);
 
             ///////////////////////////
             //ASSIGNING RANKINGS
 
+            /*
             //1
             //BY CLICK NUMBER
             foreach (var u in users_all)
@@ -560,7 +562,7 @@ namespace RS_Engine
                 //increasing rank
                 output_dictionary[u] *= w;
             }
-
+            */
             //3
             //BY FRESHNESS
 
@@ -579,15 +581,15 @@ namespace RS_Engine
             {
                 //increasing rank (in case of first and second most fresh, increase more)
                 if (iteractioncount == 0)
-                    output_dictionary[u.Key] += total * 3;
-                else if (iteractioncount == 1)
-                    output_dictionary[u.Key] += total * 2;
-                else
-                    output_dictionary[u.Key] += total;
+                    output_dictionary[u.Key] += 1; //total * 3;
+                //else if (iteractioncount == 1)
+                    //output_dictionary[u.Key] += total * 2;
+                //else
+                    //output_dictionary[u.Key] += total;
 
                 //bonus if interaction was in last 7 days
                 if (u.Value >= last_7_days_ts)
-                    output_dictionary[u.Key] *= 10;
+                    output_dictionary[u.Key] += 3;
 
                 //counters
                 total--;
