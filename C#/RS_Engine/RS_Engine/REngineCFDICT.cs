@@ -148,7 +148,7 @@ namespace RS_Engine
 
             //////////////////////////////////
 
-            //CFUB-CFIB
+            //CFUB+CFIB
             var CFHRNR1 = computeCFHybridRankNormalizedRecommendations(
                 CF_UB_user_prediction_dictionary,
                 0.6, //0.9 //1.2 //0.8
@@ -156,25 +156,25 @@ namespace RS_Engine
                 1.8  //1.0 //0.9 //1.4
                 );
 
+            //(CFUB+CFIB)+CBUB
             ////0.01371 (6.0) | 0.01373 (10.0) | 0.01413 (20.0) ora in prova per incremento (xx.0)
             var CFHRNR2 = computeCFHybridRankNormalizedRecommendations(
                 CFHRNR1,
-                20.0,
+                20.0, //10.0 //20.0
                 REngineCBDICT.CB_UB_user_prediction_dictionary,
-                0.5
+                0.3   //0.5  //0.5
                 );
 
             CFHRNR2 = CFHRNR2.ToDictionary(kv => kv.Key, kv => kv.Value);
-
             generateOutput(CFHRNR2); //OUT 1
 
             //////////////////////////////////
 
             var CFHRNR3 = computeCFHybridRankNormalizedRecommendations(
                 CFHRNR2,
-                1.5,
+                0.9,  //1.5
                 REngineCBDICT.CB_IB_user_prediction_dictionary,
-                5.0
+                10.0  //5.0
                 );
 
             CFHRNR3 = CFHRNR3.ToDictionary(kv => kv.Key, kv => kv.Value);

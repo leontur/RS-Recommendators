@@ -501,7 +501,7 @@ namespace RS_Engine
             {
                 //increasing rank (in case of first and second most fresh, increase more)
                 if (iteractioncount == 0)
-                    output_dictionary[i.Key] += 1; //total * 3;
+                    output_dictionary[i.Key] = 2; //total * 3;
                 //else if (iteractioncount == 1)
                     //output_dictionary[i.Key] += 1; //total * 2;
                 //else
@@ -509,7 +509,7 @@ namespace RS_Engine
 
                 //bonus if interaction was in last 7 days
                 if(i.Value >= last_7_days_ts)
-                    output_dictionary[i.Key] += 3;
+                    output_dictionary[i.Key] = 5;
 
                 //counters
                 total--;
@@ -581,7 +581,7 @@ namespace RS_Engine
             {
                 //increasing rank (in case of first and second most fresh, increase more)
                 if (iteractioncount == 0)
-                    output_dictionary[u.Key] += 1; //total * 3;
+                    output_dictionary[u.Key] = 2; //total * 3;
                 //else if (iteractioncount == 1)
                     //output_dictionary[u.Key] += total * 2;
                 //else
@@ -589,7 +589,7 @@ namespace RS_Engine
 
                 //bonus if interaction was in last 7 days
                 if (u.Value >= last_7_days_ts)
-                    output_dictionary[u.Key] += 3;
+                    output_dictionary[u.Key] = 5;
 
                 //counters
                 total--;
