@@ -36,6 +36,12 @@ namespace RS_Engine
         //shrink value for weighted average (futile)
         private static double SHRINK = 0;
 
+        //TIMESTAMPS
+        private static long last_15_days_unix_ts = 1445731200;
+        private static long last_9_days_unix_ts = 1446163200;
+        private static long last_7_days_unix_ts = 1446336000;
+        private static long last_5_days_unix_ts = 1446508800;
+
         /////////////////////////////////////////////
         //EXECUTION VARS
         public static IDictionary<int, IDictionary<int, double>> CF2_user_user_sim_dictionary = new Dictionary<int, IDictionary<int, double>>();
@@ -493,27 +499,32 @@ namespace RS_Engine
                 temporary_timestamps.Add(i, interactions_batch.Where(x => x[1] == i).Select(x => x[3]).OrderByDescending(x => x).First());
 
             //ordering by timestamp
-            var last_7_days_ts = 1446336000;
             var ordered_temporary_timestamps = temporary_timestamps.OrderByDescending(x => x.Value);
-            int total = ordered_temporary_timestamps.Count();
-            int iteractioncount = 0;
+            //int total = ordered_temporary_timestamps.Count();
+            //int iteractioncount = 0;
             foreach (var i in ordered_temporary_timestamps)
             {
                 //increasing rank (in case of first and second most fresh, increase more)
-                if (iteractioncount == 0)
-                    output_dictionary[i.Key] = 2; //total * 3;
+                //if (iteractioncount == 0)
+                    //output_dictionary[i.Key] = 2; //total * 3;
                 //else if (iteractioncount == 1)
                     //output_dictionary[i.Key] += 1; //total * 2;
                 //else
                    // output_dictionary[i.Key] += total;
 
                 //bonus if interaction was in last 7 days
-                if(i.Value >= last_7_days_ts)
+                if(i.Value >= last_5_days_unix_ts)
+                    output_dictionary[i.Key] = 6;
+                else if (i.Value >= last_7_days_unix_ts)
                     output_dictionary[i.Key] = 5;
+                else if (i.Value >= last_9_days_unix_ts)
+                    output_dictionary[i.Key] = 3;
+                //else if (i.Value >= last_15_days_unix_ts)
+                    //output_dictionary[i.Key] = 2;
 
                 //counters
-                total--;
-                iteractioncount++;
+                //total--;
+                //iteractioncount++;
             }
 
             //note that this function assigns only ranks, the output is NOT ordered
@@ -573,27 +584,32 @@ namespace RS_Engine
                 temporary_timestamps.Add(u, interactions_batch.Where(x => x[0] == u).Select(x => x[3]).OrderByDescending(x => x).First());
 
             //ordering by timestamp
-            var last_7_days_ts = 1446336000;
             var ordered_temporary_timestamps = temporary_timestamps.OrderByDescending(x => x.Value);
-            int total = ordered_temporary_timestamps.Count();
-            int iteractioncount = 0;
+            //int total = ordered_temporary_timestamps.Count();
+            //int iteractioncount = 0;
             foreach (var u in ordered_temporary_timestamps)
             {
                 //increasing rank (in case of first and second most fresh, increase more)
-                if (iteractioncount == 0)
-                    output_dictionary[u.Key] = 2; //total * 3;
+                //if (iteractioncount == 0)
+                    //output_dictionary[u.Key] = 2; //total * 3;
                 //else if (iteractioncount == 1)
                     //output_dictionary[u.Key] += total * 2;
                 //else
                     //output_dictionary[u.Key] += total;
 
                 //bonus if interaction was in last 7 days
-                if (u.Value >= last_7_days_ts)
+                if (u.Value >= last_5_days_unix_ts)
+                    output_dictionary[u.Key] = 6;
+                else if (u.Value >= last_7_days_unix_ts)
                     output_dictionary[u.Key] = 5;
+                else if (u.Value >= last_9_days_unix_ts)
+                    output_dictionary[u.Key] = 3;
+                //else if (u.Value >= last_15_days_unix_ts)
+                    //output_dictionary[i.Key] = 2;
 
                 //counters
-                total--;
-                iteractioncount++;
+                //total--;
+                //iteractioncount++;
             }
 
             //note that this function assigns only ranks, the output is NOT ordered

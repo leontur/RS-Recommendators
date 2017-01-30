@@ -151,9 +151,9 @@ namespace RS_Engine
             //CFUB+CFIB
             var CFHRNR1 = computeCFHybridRankNormalizedRecommendations(
                 CF_UB_user_prediction_dictionary,
-                0.6, //0.9 //1.2 //0.8
+                0.7, //0.9 //1.2 //0.8
                 CF_IB_user_prediction_dictionary,
-                1.8  //1.0 //0.9 //1.4
+                1.65  //1.0 //0.9 //1.4
                 );
 
             //(CFUB+CFIB)+CBUB
@@ -162,7 +162,7 @@ namespace RS_Engine
                 CFHRNR1,
                 20.0, //10.0 //20.0
                 REngineCBDICT.CB_UB_user_prediction_dictionary,
-                0.3   //0.5  //0.5
+                0.4   //0.5  //0.5
                 );
 
             CFHRNR2 = CFHRNR2.ToDictionary(kv => kv.Key, kv => kv.Value);
