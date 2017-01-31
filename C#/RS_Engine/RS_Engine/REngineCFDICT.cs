@@ -249,7 +249,7 @@ namespace RS_Engine
                         lock (sync)
                             if (!RManager.user_items_dictionary.ContainsKey(user))
                             {
-                                IDictionary<int, int> user_r_i = REngineCBCF2.createRankedInteractionsForUser(user, false);
+                                var user_r_i = REngineCBCF2.createRankedInteractionsForUser(user, false);
 
                                 //create an entry in the dictionary
                                 //associating all the interactions of the user (with no duplicates)
@@ -303,7 +303,7 @@ namespace RS_Engine
                 {
                     RManager.outLog("  + reading serialized file " + "CFDICT_user_items_dictionary.bin");
                     var bformatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
-                    RManager.user_items_dictionary = (IDictionary<int, IDictionary<int, int>>)bformatter.Deserialize(stream);
+                    RManager.user_items_dictionary = (IDictionary<int, IDictionary<int, double>>)bformatter.Deserialize(stream);
                 }
             }
     
@@ -336,7 +336,7 @@ namespace RS_Engine
                         lock (sync)
                             if (!RManager.item_users_dictionary.ContainsKey(item))
                             {
-                                IDictionary<int, int> item_r_u = REngineCBCF2.createRankedInteractionsForItem(item);
+                                var item_r_u = REngineCBCF2.createRankedInteractionsForItem(item);
 
                                 //create an entry in the dictionary
                                 //associating all the users that interacted (with no duplicates)
@@ -390,7 +390,7 @@ namespace RS_Engine
                 {
                     RManager.outLog("  + reading serialized file " + "CFDICT_item_users_dictionary.bin");
                     var bformatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
-                    RManager.item_users_dictionary = (IDictionary<int, IDictionary<int, int>>)bformatter.Deserialize(stream);
+                    RManager.item_users_dictionary = (IDictionary<int, IDictionary<int, double>>)bformatter.Deserialize(stream);
                 }
             }
 
@@ -528,7 +528,7 @@ namespace RS_Engine
                 user_user_similarity_dictionary_num.Add(user, new Dictionary<int, double>());
 
                 //get the interacted items and the related best interaction type for each clicked item
-                IDictionary<int, int> interacted_items = u.Value;
+                var interacted_items = u.Value;
 
                 //for every interacted items (by this user)
                 foreach(var i in interacted_items)
@@ -538,7 +538,7 @@ namespace RS_Engine
 
                     //get the dictionary of that item (that contains the users which have interacted with)
                     //and from that, get list of users that interacted with 
-                    IDictionary<int, int> interacted_users = RManager.item_users_dictionary[item];
+                    var interacted_users = RManager.item_users_dictionary[item];
 
                     //get the list of users which have interacted with the same item of the current user
                     List<int> user_list = interacted_users.Keys.ToList();
@@ -547,8 +547,8 @@ namespace RS_Engine
                     foreach (var sim_user in user_list)
                     {
                         //retrieving interaction coefficients
-                        int interaction_type = i.Value;
-                        int interaction_type_of_sim_user = 0;
+                        double interaction_type = i.Value;
+                        double interaction_type_of_sim_user = 0;
 
                         //creating coefficients
                         double num;
@@ -659,7 +659,7 @@ namespace RS_Engine
                 user_user_similarity_dictionary_num.Add(user, new Dictionary<int, double>());
 
                 //get the interacted items and the related best interaction type for each clicked item
-                IDictionary<int, int> interacted_items = u.Value;
+                var interacted_items = u.Value;
 
                 //for every interacted items (by this user)
                 foreach (var i in interacted_items)
@@ -669,7 +669,7 @@ namespace RS_Engine
 
                     //get the dictionary of that item (that contains the users which have interacted with)
                     //and from that, get list of users that interacted with 
-                    IDictionary<int, int> interacted_users = RManager.item_users_dictionary[item];
+                    var interacted_users = RManager.item_users_dictionary[item];
 
                     //get the list of users which have interacted with the same item of the current user
                     List<int> user_list = interacted_users.Keys.ToList();
@@ -678,8 +678,8 @@ namespace RS_Engine
                     foreach (var sim_user in user_list)
                     {
                         //retrieving interaction coefficients
-                        int interaction_type = i.Value;
-                        int interaction_type_of_sim_user = 0;
+                        double interaction_type = i.Value;
+                        double interaction_type_of_sim_user = 0.0;
 
                         //creating coefficients
                         double num;
@@ -1130,7 +1130,7 @@ namespace RS_Engine
                 item_item_similarity_dictionary_num.Add(item, new Dictionary<int, double>());
 
                 //get the users that interacted with the current item and the related best interaction type for each clicked item
-                IDictionary<int, int> interacting_users = i.Value;
+                var interacting_users = i.Value;
 
                 //for every user that interacted with this item
                 foreach (var u in interacting_users)
@@ -1140,7 +1140,7 @@ namespace RS_Engine
 
                     //get the dictionary of that user (that contains the items which have interacted with)
                     //and from that, get list of items that interacted with 
-                    IDictionary<int, int> interacted_items = RManager.user_items_dictionary[user];
+                    var interacted_items = RManager.user_items_dictionary[user];
 
                     //get the list of items which have been interacted by the current user
                     List<int> item_list = interacted_items.Keys.ToList();
@@ -1152,8 +1152,8 @@ namespace RS_Engine
                             continue;
 
                         //retrieving interaction coefficients
-                        int interaction_type = interacted_items[item];//u.Value;
-                        int interaction_type_of_sim_item = interacted_items[sim_item];
+                        double interaction_type = interacted_items[item];//u.Value;
+                        double interaction_type_of_sim_item = interacted_items[sim_item];
 
                         //creating coefficients
                         double num = interaction_type * interaction_type_of_sim_item;
@@ -1252,7 +1252,7 @@ namespace RS_Engine
                 item_item_similarity_dictionary_num.Add(item, new Dictionary<int, double>());
 
                 //get the users that interacted with the current item and the related best interaction type for each clicked item
-                IDictionary<int, int> interacting_users = i.Value;
+                var interacting_users = i.Value;
 
                 //for every user that interacted with this item
                 foreach (var u in interacting_users)
@@ -1262,7 +1262,7 @@ namespace RS_Engine
 
                     //get the dictionary of that user (that contains the items which have interacted with)
                     //and from that, get list of items that interacted with 
-                    IDictionary<int, int> interacted_items = RManager.user_items_dictionary[user];
+                    var interacted_items = RManager.user_items_dictionary[user];
 
                     //get the list of items which have been interacted by the current user
                     List<int> item_list = interacted_items.Keys.ToList();
@@ -1274,8 +1274,8 @@ namespace RS_Engine
                             continue;
 
                         //retrieving interaction coefficients
-                        int interaction_type = interacted_items[item];//u.Value;
-                        int interaction_type_of_sim_item = interacted_items[sim_item];
+                        double interaction_type = interacted_items[item];//u.Value;
+                        double interaction_type_of_sim_item = interacted_items[sim_item];
 
                         //creating coefficients
                         double num = interaction_type * interaction_type_of_sim_item;
@@ -1466,7 +1466,7 @@ namespace RS_Engine
                     users_prediction_dictionary_den.Add(uu, new Dictionary<int, double>());
 
                     //get list of items with which the user interacted
-                    IDictionary<int, int> i_r_dict = RManager.user_items_dictionary[uu];
+                    var i_r_dict = RManager.user_items_dictionary[uu];
 
                     //for every item in this dictionary
                     foreach (var ij in i_r_dict)
@@ -1578,7 +1578,7 @@ namespace RS_Engine
                 if (RManager.user_items_dictionary.ContainsKey(uu)) //only for security reason
                 {
                     //get list of items with which the user interacted
-                    IDictionary<int, int> i_r_dict = RManager.user_items_dictionary[uu];
+                    var i_r_dict = RManager.user_items_dictionary[uu];
 
                     //for every item in this dictionary
                     foreach (var ij in i_r_dict)

@@ -412,10 +412,10 @@ namespace RS_Engine
         //(INTERACTIONS RANKING)
         //GET the RANKED INTERACTIONS for THE USER (based on this user clicks)
         //key: item_id, value: computed-rank
-        public static IDictionary<int, int> getRankedInteractionsForUser(int u, bool onlyactive)
+        public static IDictionary<int, double> getRankedInteractionsForUser(int u, bool onlyactive)
         {
             //getting from cache
-            IDictionary<int, int> ranked_interactions = new Dictionary<int, int>();
+            IDictionary<int, double> ranked_interactions = new Dictionary<int, double>();
 
             //try get from cache
             bool cached = RManager.user_items_dictionary.TryGetValue(u, out ranked_interactions);
@@ -440,10 +440,10 @@ namespace RS_Engine
 
             return ranked_interactions;
         }
-        public static IDictionary<int, int> createRankedInteractionsForUser(int u, bool onlyactive)
+        public static IDictionary<int, double> createRankedInteractionsForUser(int u, bool onlyactive)
         {
             //keys are interacted items, values are the item plausibility
-            IDictionary<int, int> output_dictionary = new Dictionary<int, int>();
+            IDictionary<int, double> output_dictionary = new Dictionary<int, double>();
 
             //getting interactions
             List<List<int>> interactions_batch = RManager.interactions.Where(i => i[0] == u).ToList();
@@ -463,7 +463,7 @@ namespace RS_Engine
 
             //instantiating ranked list
             foreach (var i in interactions_dist)
-                output_dictionary.Add(i, 1);
+                output_dictionary.Add(i, 1.0);
 
             ///////////////////////////
             //ASSIGNING RANKINGS
@@ -514,11 +514,11 @@ namespace RS_Engine
 
                 //bonus if interaction was in last 7 days
                 if(i.Value >= last_5_days_unix_ts)
-                    output_dictionary[i.Key] = 6;
+                    output_dictionary[i.Key] = 4.5;
                 else if (i.Value >= last_7_days_unix_ts)
-                    output_dictionary[i.Key] = 5;
+                    output_dictionary[i.Key] = 4.0;
                 else if (i.Value >= last_9_days_unix_ts)
-                    output_dictionary[i.Key] = 3;
+                    output_dictionary[i.Key] = 1.05;
                 //else if (i.Value >= last_15_days_unix_ts)
                     //output_dictionary[i.Key] = 2;
 
@@ -532,10 +532,10 @@ namespace RS_Engine
         }
         //GET the RANKED INTERACTIONS for THE ITEM (based on every user clicks)
         //key: user_id, value: computed-rank
-        public static IDictionary<int, int> createRankedInteractionsForItem(int i)
+        public static IDictionary<int, double> createRankedInteractionsForItem(int i)
         {
             //keys are users that interact, values are the item plausibility
-            IDictionary<int, int> output_dictionary = new Dictionary<int, int>();
+            IDictionary<int, double> output_dictionary = new Dictionary<int, double>();
 
             //getting interactions
             List<List<int>> interactions_batch = RManager.interactions.Where(x => x[1] == i).ToList();
@@ -548,7 +548,7 @@ namespace RS_Engine
 
             //instantiating ranked list
             foreach (var u in users_dist)
-                output_dictionary.Add(u, 1);
+                output_dictionary.Add(u, 1.0);
 
             ///////////////////////////
             //ASSIGNING RANKINGS
@@ -599,11 +599,11 @@ namespace RS_Engine
 
                 //bonus if interaction was in last 7 days
                 if (u.Value >= last_5_days_unix_ts)
-                    output_dictionary[u.Key] = 6;
+                    output_dictionary[u.Key] = 4.5;
                 else if (u.Value >= last_7_days_unix_ts)
-                    output_dictionary[u.Key] = 5;
+                    output_dictionary[u.Key] = 4.0;
                 else if (u.Value >= last_9_days_unix_ts)
-                    output_dictionary[u.Key] = 3;
+                    output_dictionary[u.Key] = 1.05;
                 //else if (u.Value >= last_15_days_unix_ts)
                     //output_dictionary[i.Key] = 2;
 
@@ -630,7 +630,7 @@ namespace RS_Engine
             foreach (var su in most_sim)
             {
                 //get top SIM_USER_RANGE_TAKE_ITEMS most ranked items
-                IDictionary<int, int> su_sim_interaction_ranked_dictionary =
+                IDictionary<int, double> su_sim_interaction_ranked_dictionary =
                     getRankedInteractionsForUser(su, true).OrderByDescending(x => x.Value).Take(SIM_USER_RANGE_TAKE_ITEMS).ToDictionary(kp => kp.Key, kp => kp.Value);
 
                 //TODO non è detto che incrementi, potrebbe pescare tutti item diversi
@@ -668,7 +668,7 @@ namespace RS_Engine
             foreach (var su in most_sim)
             {
                 //get top SIM_USER_RANGE_TAKE_ITEMS most ranked items
-                IDictionary<int, int> su_sim_interaction_ranked_dictionary =
+                IDictionary<int, double> su_sim_interaction_ranked_dictionary =
                     getRankedInteractionsForUser(su, true).OrderByDescending(x => x.Value).Take(SIM_TITLE_USER_RANGE_TAKE_ITEMS).ToDictionary(kp => kp.Key, kp => kp.Value);
 
                 //TODO non è detto che incrementi, potrebbe pescare tutti item diversi
@@ -718,7 +718,7 @@ namespace RS_Engine
         public static IDictionary<int, DoubleValueListInt> collectTitlesOfInterestForUser(int user_id)
         {
             //retrieve the user ranked interactions
-            IDictionary<int, int> ranked_interaction = getRankedInteractionsForUser(user_id, false);
+            IDictionary<int, double> ranked_interaction = getRankedInteractionsForUser(user_id, false);
 
             //get for each ranked interaction the related titles and rank
             //key: item_id, Value (doubled): list of titles, rank of item(and so of titles)
@@ -731,7 +731,7 @@ namespace RS_Engine
         public struct DoubleValueListInt
         {
             public List<int> Value1;
-            public int Value2;
+            public double Value2;
         }
         //return the value of similarity
         public static double computeTitleBasedSimilarityForRankedInteractions(IDictionary<int, DoubleValueListInt> R1, IDictionary<int, DoubleValueListInt> R2)
@@ -756,7 +756,7 @@ namespace RS_Engine
                     if(i1.Key == i2.Key)
                     {
                         //get rank values of current item of user 2 (that indicate how much other user has interacted with this item)
-                        int rank2 = i2.Value.Value2;
+                        double rank2 = i2.Value.Value2;
 
                         //get the two lists of titles
                         List<int> titles1 = i1.Value.Value1;
@@ -806,7 +806,7 @@ namespace RS_Engine
             foreach (var su in most_sim)
             {
                 //get top SIM_USER_RANGE_TAKE_ITEMS most ranked items
-                IDictionary<int, int> su_sim_interaction_ranked_dictionary =
+                IDictionary<int, double> su_sim_interaction_ranked_dictionary =
                     getRankedInteractionsForUser(su, true).OrderByDescending(x => x.Value).Take(SIM_TAG_USER_RANGE_TAKE_ITEMS).ToDictionary(kp => kp.Key, kp => kp.Value);
 
                 //TODO non è detto che incrementi, potrebbe pescare tutti item diversi
@@ -856,7 +856,7 @@ namespace RS_Engine
         public static IDictionary<int, DoubleValueListInt> collectTagsOfInterestForUser(int user_id)
         {
             //retrieve the user ranked interactions
-            IDictionary<int, int> ranked_interaction = getRankedInteractionsForUser(user_id, false);
+            IDictionary<int, double> ranked_interaction = getRankedInteractionsForUser(user_id, false);
 
             //get for each ranked interaction the related tags and rank
             //key: item_id, Value (doubled): list of tags, rank of item(and so of tags)
@@ -889,7 +889,7 @@ namespace RS_Engine
                     if (i1.Key == i2.Key)
                     {
                         //get rank values of current item of user 2 (that indicate how much other user has interacted with this item)
-                        int rank2 = i2.Value.Value2;
+                        double rank2 = i2.Value.Value2;
 
                         //get the two lists of titles
                         List<int> titles1 = i1.Value.Value1;
@@ -938,7 +938,7 @@ namespace RS_Engine
             foreach (var su in most_sim)
             {
                 //get top SIM_USER_RANGE_TAKE_ITEMS most ranked items
-                IDictionary<int, int> su_sim_interaction_ranked_dictionary =
+                IDictionary<int, double> su_sim_interaction_ranked_dictionary =
                     getRankedInteractionsForUser(su, true).OrderByDescending(x => x.Value).Take(SIM_RATING_USER_RANGE_TAKE_ITEMS).ToDictionary(kp => kp.Key, kp => kp.Value);
 
                 //TODO non è detto che incrementi, potrebbe pescare tutti item diversi

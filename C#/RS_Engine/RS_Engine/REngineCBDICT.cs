@@ -905,7 +905,7 @@ namespace RS_Engine
                     users_prediction_dictionary_den.Add(uu, new Dictionary<int, double>());
 
                     //get list of items with which the user interacted
-                    IDictionary<int, int> i_r_dict = RManager.user_items_dictionary[uu];
+                    var i_r_dict = RManager.user_items_dictionary[uu];
 
                     //for every item in this dictionary
                     foreach (var ij in i_r_dict)
@@ -1016,7 +1016,7 @@ namespace RS_Engine
                     users_prediction_dictionary_den.Add(uu, new Dictionary<int, double>());
 
                     //get list of items with which the user interacted
-                    IDictionary<int, int> i_r_dict = RManager.user_items_dictionary[uu];
+                    var i_r_dict = RManager.user_items_dictionary[uu];
 
                     //for every item in this dictionary
                     foreach (var ij in i_r_dict)

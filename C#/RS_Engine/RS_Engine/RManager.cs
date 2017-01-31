@@ -31,8 +31,8 @@ namespace RS_Engine
         public static List<List<int>> output_useritems = new List<List<int>>();
 
         //DICTIONARIES DATA STRUCTURES
-        public static IDictionary<int, IDictionary<int, int>> user_items_dictionary = new Dictionary<int, IDictionary<int, int>>();
-        public static IDictionary<int, IDictionary<int, int>> item_users_dictionary = new Dictionary<int, IDictionary<int, int>>();
+        public static IDictionary<int, IDictionary<int, double>> user_items_dictionary = new Dictionary<int, IDictionary<int, double>>();
+        public static IDictionary<int, IDictionary<int, double>> item_users_dictionary = new Dictionary<int, IDictionary<int, double>>();
         public static HashSet<int> item_with_onemore_interaction_by_target = new HashSet<int>();
 
         //Global vars
