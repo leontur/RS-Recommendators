@@ -37,7 +37,6 @@ namespace RS_Engine
         private static double SHRINK = 0;
 
         //TIMESTAMPS
-        private static long last_15_days_unix_ts = 1445731200;
         private static long last_9_days_unix_ts = 1446163200;
         private static long last_7_days_unix_ts = 1446336000;
         private static long last_5_days_unix_ts = 1446508800;
@@ -519,8 +518,6 @@ namespace RS_Engine
                     output_dictionary[i.Key] = 4.0;
                 else if (i.Value >= last_9_days_unix_ts)
                     output_dictionary[i.Key] = 1.05;
-                //else if (i.Value >= last_15_days_unix_ts)
-                    //output_dictionary[i.Key] = 2;
 
                 //counters
                 //total--;
@@ -604,8 +601,6 @@ namespace RS_Engine
                     output_dictionary[u.Key] = 4.0;
                 else if (u.Value >= last_9_days_unix_ts)
                     output_dictionary[u.Key] = 1.05;
-                //else if (u.Value >= last_15_days_unix_ts)
-                    //output_dictionary[i.Key] = 2;
 
                 //counters
                 //total--;

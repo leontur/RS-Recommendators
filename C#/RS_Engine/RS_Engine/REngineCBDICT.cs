@@ -32,9 +32,9 @@ namespace RS_Engine
 
         //Limits
         public const int ATTR_SIM_LIMIT_US = 2500;
-        public const int ATTR_SIM_LIMIT_IT = 7;
+        public const int ATTR_SIM_LIMIT_IT = 6;
         public const int USERUSER_SIM_LIMIT = CB_UB_KNN;
-        public const int ITEMITEM_SIM_LIMIT = 2000;
+        public const int ITEMITEM_SIM_LIMIT = 3200;
 
         /////////////////////////////////////////////
         //EXECUTION VARS
