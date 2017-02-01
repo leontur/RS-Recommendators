@@ -192,7 +192,7 @@ namespace RS_Engine
                         curr_user_line[m] = (m <= uix) ? user_user_simil[uix][m] : user_user_simil[m][uix];
 
                     //CALL COMPUTATION FOR USER AT INDEX u
-                    par_data_out[u] = REngineOUTPUT.findItemsToRecommendForTarget_U_U(u, curr_user_line.ToList(), SIM_RANGE);
+                    par_data_out[u] = REngineCBF_ICF_UCF_OUTPUT.findItemsToRecommendForTarget_U_U(u, curr_user_line.ToList(), SIM_RANGE);
                 });
 
             //Converting for output

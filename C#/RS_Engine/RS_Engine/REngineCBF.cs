@@ -65,85 +65,6 @@ namespace RS_Engine
             RManager.outLog("  >>>>>> ARE YOU SURE TO CONTINUE?  THIS IS A VERY LONG RUNNING PROGRAM");
             Console.ReadKey();
 
-            /* NO MORE IN USE, FOR TIME AND SIZE REASON, WE CALCULATE THE NEEDED ROW SIMILARITY IN THE OUTPUT CREATION FOR THE CURRENT USER
-            //check if already serialized (for fast fetching)
-            if (RManager.ISTESTMODE || !File.Exists(Path.Combine(RManager.SERIALTPATH, "item_item_simil.bin")))
-            {
-                RManager.outLog("  + computing item-item similarity matrix");
-
-                //POPULATE item_item matrix
-                // NOTE:
-                //  triangular matrix: create a jagged matrix to have half memory consumption
-                //    \  i2..
-                //  i1     1   
-                //  :     ...      1    
-                //        ...     ...      1
-
-                //PARALLEL VARS
-                int par_length1 = i_size;
-                double[][] par_data1 = new double[par_length1][];
-                int par_counter1 = par_length1;
-
-                //PARALLEL FOR
-                //foreach i1, i2 === item_profile list index
-                Parallel.For(0, par_length1, new ParallelOptions { MaxDegreeOfParallelism = 2 },
-                    i1 => {
-
-                        //counter
-                        Interlocked.Decrement(ref par_counter1);
-                        int count = Interlocked.CompareExchange(ref par_counter1, 0, 0);
-                        if (count % 50 == 0) RManager.outLog("  - remaining: " + count, true, true, true);
-
-                        //generate user row
-                        int r_sz = i1 + 1;
-                        item_item_simil[i1] = new float[r_sz];
-
-                        //PARALLEL FOR
-                        //populating the row
-                        Parallel.For(0, r_sz, new ParallelOptions { MaxDegreeOfParallelism = 64 },
-                            i2 => {
-
-                                if (i1 == i2)
-                                {
-                                    item_item_simil[i1][i2] = (float)1;
-                                }
-                                else
-                                {
-                                    //COMPUTE SIMILARITY for these two vectors
-                                    //item_item_simil[i1][i2] = computeCosineSimilarity(i1, i2);
-                                    item_item_simil[i1][i2] = computeWeightAvgSimilarity(i1, i2); //WARINING, now it's with lists
-                                }
-
-                            });
-                    });
-
-                //serialize
-                if (!RManager.ISTESTMODE)
-                {
-                    using (Stream stream = File.Open(Path.Combine(RManager.SERIALTPATH, "item_item_simil.bin"), FileMode.Create))
-                    {
-                        RManager.outLog("  + writing serialized file " + "item_item_simil.bin");
-                        var bformatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
-                        bformatter.Serialize(stream, item_item_simil);
-                    }
-                }
-                else
-                {
-                    RManager.outLog("  + serialized file not saved because in test mode ");
-                }
-            }
-            else
-            {
-                //deserialize
-                using (Stream stream = File.Open(Path.Combine(RManager.SERIALTPATH, "item_item_simil.bin"), FileMode.Open))
-                {
-                    RManager.outLog("  + reading serialized file " + "item_item_simil.bin");
-                    var bformatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
-                    item_item_simil = (float[][])bformatter.Deserialize(stream);
-                }
-            }
-            */
-
             //printing weights for log
             RManager.outLog("");
             RManager.outLog("  SIM_WEIGHTS");
@@ -158,18 +79,6 @@ namespace RS_Engine
             RManager.outLog("   -" + SIM_WEIGHTS[8] + " tags");
             RManager.outLog("   -" + SIM_WEIGHTS[9] + " created_at");
             RManager.outLog("");
-
-            /*
-            //debug
-            for (int i=1; i<2; i++)
-            {
-                Console.WriteLine("\n\nROW " + i);
-                for(int j=0; j< item_item_simil[i].Length; j++)
-                {
-                    Console.Write(" | " + item_item_simil[i][j]);
-                }
-            }
-            */
 
             //////////////////////////////////////////////////////////////////////
 
@@ -208,7 +117,7 @@ namespace RS_Engine
                     List<int> interactions_of_user_top = all_user_interactions_ids[u].Take(INTER_RANGE).ToList();
 
                     //CALL COMPUTATION FOR USER AT INDEX u
-                    par_data_out[u] = REngineOUTPUT.findItemsToRecommendForTarget_U_I(u, interactions_of_user_top, SIM_RANGE, SIM_RANGE_SKIP);
+                    par_data_out[u] = REngineCBF_ICF_UCF_OUTPUT.findItemsToRecommendForTarget_U_I(u, interactions_of_user_top, SIM_RANGE, SIM_RANGE_SKIP);
                 });
 
             //serialize CACHE

@@ -65,16 +65,16 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="REngineCBDICT.cs" />
+    <Compile Include="REngineCB_HYBRID.cs" />
     <Compile Include="REngineCBF.cs" />
     <Compile Include="REngineCBCF2.cs" />
     <Compile Include="REngineICF.cs" />
-    <Compile Include="REngineOUTPUT.cs" />
+    <Compile Include="REngineCBF_ICF_UCF_OUTPUT.cs" />
     <Compile Include="REngineUCF.cs" />
     <Compile Include="REngineEVAL.cs" />
     <Compile Include="REngineSPLIT.cs" />
     <Compile Include="REngineTOP.cs" />
-    <Compile Include="REngineCFDICT.cs" />
+    <Compile Include="REngineCF_HYBRID.cs" />
     <Compile Include="RManager.cs" />
     <Compile Include="RUtils.cs" />
   </ItemGroup>

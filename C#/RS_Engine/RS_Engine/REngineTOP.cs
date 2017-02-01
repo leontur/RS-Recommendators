@@ -65,18 +65,15 @@ namespace RS_Engine
                 //save and print
                 List<int> interactions_top = interactions_item_id_group_by.Select(x => x.Key).Take(5).ToList();
 
-                
                 //debug
                 //foreach(var i in interactions_top)
                     //RManager.outLog("   -saved top 5 > " + i);
-                
 
                 return interactions_top;
             }
             else
-            {
                 return top5;
-            }
+            
         }
     }
 }

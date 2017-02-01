@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace RS_Engine
 {
-    class REngineOUTPUT
+    class REngineCBF_ICF_UCF_OUTPUT
     {
         /**
          * |METHOD CALLED BY ALGORITHMS TO GENERATE OUTPUT STRUCTURED DATA
@@ -143,16 +143,6 @@ namespace RS_Engine
         * 
         * |invoked from CBF
         * 
-        * 
-        *
-//RIFARE DESCRIZIONE PER BENE
-* -get top SIM_RANGE users similar to target
-    * -get their interactions and merge all to select most commons
-    * 
-    * -select only not already interacted by target
-    * -select top 5
-    * 
-    * -output
         */
         public static int[] findItemsToRecommendForTarget_U_I(int u, List<int> current_user_interactions_ordered_list, int SIM_RANGE, int SIM_RANGE_SKIP)
         {
@@ -233,9 +223,9 @@ namespace RS_Engine
                 top_similarities_for_each_current_user_interactions_ordered_list_for_skip_check.Add(similar_items_skip.ToList());
             }
 
-            //////// !!!!!!!!!!
-            //TRY 1 (provo a mescolare tutte le liste di quelli piu simili per vedere se ci sono items più ricorrenti e scegliere quelli)
-            //      (non è detto funzioni, da qui in poi potrebbe essere necessario cambiarlo radicalmente)
+            ////////
+            //(provo a mescolare tutte le liste di quelli piu simili per vedere se ci sono items più ricorrenti e scegliere quelli)
+            //(non da molti risultati -> passare a DICT)
 
             //collecting all items in one list
             List<int> similar_items_merge = top_similarities_for_each_current_user_interactions_ordered_list.SelectMany(x => x).ToList();

@@ -119,6 +119,7 @@ namespace RS_Engine
             {
                 RManager.user_profile.RemoveAll(x => (int)x[0] == i);
             }
+
             RManager.outLog("  -total lines | user_profile (trained) >>> " + RManager.user_profile.Count());
             */
 

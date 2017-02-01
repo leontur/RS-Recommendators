@@ -8,6 +8,20 @@ using System.Threading.Tasks;
 
 namespace RS_Engine
 {
+    /**
+     * |CONTENT BASED - COLLABORATIVE FILTERING
+     * |COLLECTION OF VARIOUS ALGORITHM
+     * |INVOKED EVEN FROM DICT
+     * 
+     * -SIMILARITY BETWEEN USERS
+     *  BY CREATING A WEIGHTED AVERAGE
+     * 
+     * -INTERACTIONS RANKING
+     *
+     * -COLLABORATIVE FILTERING BASED ON JOB TITLES
+     * -COLLABORATIVE FILTERING BASED ON JOB TAGS
+     * -COLLABORATIVE FILTERING BASED ON ITEM RATINGS
+     */
     class REngineCBCF2
     {
         /////////////////////////////////////////////
@@ -33,9 +47,6 @@ namespace RS_Engine
         private static int[] SIM_WEIGHTS = new int[11];
         private static int den = -1;
 
-        //shrink value for weighted average (futile)
-        private static double SHRINK = 0;
-
         //TIMESTAMPS
         private static long last_9_days_unix_ts = 1446163200;
         private static long last_7_days_unix_ts = 1446336000;
@@ -57,7 +68,7 @@ namespace RS_Engine
 
             //Assigning weights
             SIM_WEIGHTS[0] = 8;   //jobroles	
-            SIM_WEIGHTS[1] = 8;  //career_level	
+            SIM_WEIGHTS[1] = 8;   //career_level	
             SIM_WEIGHTS[2] = 3;   //discipline_id	
             SIM_WEIGHTS[3] = 3;   //industry_id	
             SIM_WEIGHTS[4] = 5;   //country	
@@ -336,7 +347,7 @@ namespace RS_Engine
                 num += similarities[i] * SIM_WEIGHTS[i];
 
             //return in similarity matrix
-            return num / (den + SHRINK);
+            return num / den;
         }
         //CALLED MANY TIMES FOR WEIGHTED AVERAGE
         private static double computeWeightAvgSimilarityForUsersCells_0_10(List<int> row1CList, List<int> row2CList)
@@ -467,14 +478,13 @@ namespace RS_Engine
             ///////////////////////////
             //ASSIGNING RANKINGS
 
+            //disabled because not helping
             /*
-            //1
             //BY CLICK NUMBER
             foreach (var i in interactions_all)
                 //increasing rank (counting number of clicks)
                 output_dictionary[i] += 1;
 
-            //2
             //BY CLICK TYPE
             foreach (var i in interactions_dist)
             {
@@ -488,7 +498,8 @@ namespace RS_Engine
                 output_dictionary[i] *= w;
             }
             */
-            //3
+
+            ///////////////////////////
             //BY FRESHNESS
             
             //creating list of interactions_dist item with its bigger timestamp
@@ -499,29 +510,15 @@ namespace RS_Engine
 
             //ordering by timestamp
             var ordered_temporary_timestamps = temporary_timestamps.OrderByDescending(x => x.Value);
-            //int total = ordered_temporary_timestamps.Count();
-            //int iteractioncount = 0;
             foreach (var i in ordered_temporary_timestamps)
             {
-                //increasing rank (in case of first and second most fresh, increase more)
-                //if (iteractioncount == 0)
-                    //output_dictionary[i.Key] = 2; //total * 3;
-                //else if (iteractioncount == 1)
-                    //output_dictionary[i.Key] += 1; //total * 2;
-                //else
-                   // output_dictionary[i.Key] += total;
-
-                //bonus if interaction was in last 7 days
-                if(i.Value >= last_5_days_unix_ts)
-                    output_dictionary[i.Key] = 4.5;
-                else if (i.Value >= last_7_days_unix_ts)
+                //BONUS if the interaction was in last x days
+                //if(i.Value >= last_5_days_unix_ts)
+                    //output_dictionary[i.Key] = 4.5;
+                if (i.Value >= last_7_days_unix_ts)
                     output_dictionary[i.Key] = 4.0;
-                else if (i.Value >= last_9_days_unix_ts)
-                    output_dictionary[i.Key] = 1.05;
-
-                //counters
-                //total--;
-                //iteractioncount++;
+                //else if (i.Value >= last_9_days_unix_ts)
+                    //output_dictionary[i.Key] = 1.05;
             }
 
             //note that this function assigns only ranks, the output is NOT ordered
@@ -550,14 +547,13 @@ namespace RS_Engine
             ///////////////////////////
             //ASSIGNING RANKINGS
 
+            //disabled because not helping
             /*
-            //1
             //BY CLICK NUMBER
             foreach (var u in users_all)
                 //increasing rank (counting number of clicks)
                 output_dictionary[u] += 1;
 
-            //2
             //BY CLICK TYPE
             foreach (var u in users_dist)
             {
@@ -571,7 +567,8 @@ namespace RS_Engine
                 output_dictionary[u] *= w;
             }
             */
-            //3
+
+            ///////////////////////////
             //BY FRESHNESS
 
             //creating list of users_dist item with its bigger timestamp
@@ -582,29 +579,15 @@ namespace RS_Engine
 
             //ordering by timestamp
             var ordered_temporary_timestamps = temporary_timestamps.OrderByDescending(x => x.Value);
-            //int total = ordered_temporary_timestamps.Count();
-            //int iteractioncount = 0;
             foreach (var u in ordered_temporary_timestamps)
             {
-                //increasing rank (in case of first and second most fresh, increase more)
-                //if (iteractioncount == 0)
-                    //output_dictionary[u.Key] = 2; //total * 3;
-                //else if (iteractioncount == 1)
-                    //output_dictionary[u.Key] += total * 2;
-                //else
-                    //output_dictionary[u.Key] += total;
-
-                //bonus if interaction was in last 7 days
-                if (u.Value >= last_5_days_unix_ts)
-                    output_dictionary[u.Key] = 4.5;
-                else if (u.Value >= last_7_days_unix_ts)
+                //BONUS if the interaction was in last x days
+                //if (u.Value >= last_5_days_unix_ts)
+                    //output_dictionary[u.Key] = 4.5;
+                if (u.Value >= last_7_days_unix_ts)
                     output_dictionary[u.Key] = 4.0;
-                else if (u.Value >= last_9_days_unix_ts)
-                    output_dictionary[u.Key] = 1.05;
-
-                //counters
-                //total--;
-                //iteractioncount++;
+                //else if (u.Value >= last_9_days_unix_ts)
+                    //output_dictionary[u.Key] = 1.05;
             }
 
             //note that this function assigns only ranks, the output is NOT ordered
@@ -628,7 +611,7 @@ namespace RS_Engine
                 IDictionary<int, double> su_sim_interaction_ranked_dictionary =
                     getRankedInteractionsForUser(su, true).OrderByDescending(x => x.Value).Take(SIM_USER_RANGE_TAKE_ITEMS).ToDictionary(kp => kp.Key, kp => kp.Value);
 
-                //TODO non è detto che incrementi, potrebbe pescare tutti item diversi
+                //non è detto che incrementi, potrebbe pescare tutti item diversi
                 //add items to 'concone'
                 foreach (var i in su_sim_interaction_ranked_dictionary)
                     if (!most_sim_interaction_ranked_dictionary.ContainsKey(i.Key))
@@ -640,9 +623,7 @@ namespace RS_Engine
             //ordering (basing on the rank) and returning a variable size ordered list of items
             return most_sim_interaction_ranked_dictionary.OrderByDescending(x => x.Value).Select(x => x.Key).ToList();
         }
-        //
-        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+        
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         //(COLLABORATIVE FILTERING BASED ON JOB TITLES)
         //SINGLE COMPUTATION OF USER SIMILARITY BY USER ID (without ITSELF)
@@ -666,7 +647,7 @@ namespace RS_Engine
                 IDictionary<int, double> su_sim_interaction_ranked_dictionary =
                     getRankedInteractionsForUser(su, true).OrderByDescending(x => x.Value).Take(SIM_TITLE_USER_RANGE_TAKE_ITEMS).ToDictionary(kp => kp.Key, kp => kp.Value);
 
-                //TODO non è detto che incrementi, potrebbe pescare tutti item diversi
+                //non è detto che incrementi, potrebbe pescare tutti item diversi
                 //add items to 'concone'
                 foreach (var i in su_sim_interaction_ranked_dictionary)
                     if (!most_sim_interaction_ranked_dictionary.ContainsKey(i.Key))
@@ -778,9 +759,7 @@ namespace RS_Engine
 
             return sim;
         }
-        //
-        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+        
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         //(COLLABORATIVE FILTERING BASED ON JOB TAGS)
         //SINGLE COMPUTATION OF USER SIMILARITY BY USER ID (without ITSELF)
@@ -804,7 +783,7 @@ namespace RS_Engine
                 IDictionary<int, double> su_sim_interaction_ranked_dictionary =
                     getRankedInteractionsForUser(su, true).OrderByDescending(x => x.Value).Take(SIM_TAG_USER_RANGE_TAKE_ITEMS).ToDictionary(kp => kp.Key, kp => kp.Value);
 
-                //TODO non è detto che incrementi, potrebbe pescare tutti item diversi
+                //non è detto che incrementi, potrebbe pescare tutti item diversi
                 //add items to 'concone'
                 foreach (var i in su_sim_interaction_ranked_dictionary)
                     if (!most_sim_interaction_ranked_dictionary.ContainsKey(i.Key))
@@ -911,8 +890,6 @@ namespace RS_Engine
 
             return sim;
         }
-        //
-        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         //(COLLABORATIVE FILTERING BASED ON ITEM RATINGS)
@@ -936,7 +913,7 @@ namespace RS_Engine
                 IDictionary<int, double> su_sim_interaction_ranked_dictionary =
                     getRankedInteractionsForUser(su, true).OrderByDescending(x => x.Value).Take(SIM_RATING_USER_RANGE_TAKE_ITEMS).ToDictionary(kp => kp.Key, kp => kp.Value);
 
-                //TODO non è detto che incrementi, potrebbe pescare tutti item diversi
+                //non è detto che incrementi, potrebbe pescare tutti item diversi
                 //add items to 'concone'
                 foreach (var i in su_sim_interaction_ranked_dictionary)
                     if (!most_sim_interaction_ranked_dictionary.ContainsKey(i.Key))
@@ -1052,7 +1029,5 @@ namespace RS_Engine
 
             return sim;
         } 
-        //
-        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     }
 }

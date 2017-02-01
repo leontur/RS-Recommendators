@@ -21,9 +21,6 @@ namespace RS_Engine
      * -compute target_user to user_profile similarity matrix
      *  compute distance based similarity score for a couple of users 
      * 
-     * TODO:
-     * -compute pearson correlation coefficient for a couple of users
-     * 
      * -for each user to recommend
      * -call output structured data creation
      */
@@ -252,8 +249,6 @@ namespace RS_Engine
             /////////////////////////////////////////////
 
             RManager.outLog("  + computing TGTuser-ALLuser distance similarity matrix");
-
-            /*
             
             //DISTANCE BETWEEN 2 USERS IS BASED ON THE SIMILARITY BETWEEN THEIR CLICKED JOBS TITLES
             //compute the similarity between two users
@@ -347,8 +342,6 @@ namespace RS_Engine
                 }
             }
 
-            */
-
             /////////////////////////////////////////////
 
             //generating items to recommend for each user
@@ -372,7 +365,7 @@ namespace RS_Engine
                     List<double> curr_user_line = tgtuser_to_allusers_distance_similarity[u];
 
                     //CALL COMPUTATION FOR USER AT INDEX u
-                    par_data_out[u] = REngineOUTPUT.findItemsToRecommendForTarget_U_U(u, curr_user_line, SIM_RANGE);
+                    par_data_out[u] = REngineCBF_ICF_UCF_OUTPUT.findItemsToRecommendForTarget_U_U(u, curr_user_line, SIM_RANGE);
                 });
 
             //Converting for output

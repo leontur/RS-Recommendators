@@ -26,9 +26,6 @@ namespace RS_Engine
             Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
             String Root = Directory.GetCurrentDirectory();
 
-            //Execute shakeNpropose
-            //RUtils.shakeNpropose();
-
             //running loop
             while (running)
             {
@@ -85,18 +82,13 @@ namespace RS_Engine
             }
             else if (RManager.EXEMODE == 5)
             {
-                //PROCESSING - CFDICT
-                REngineCFDICT.getRecommendations();
+                //PROCESSING - CF + CF DICT
+                REngineCF_HYBRID.getRecommendations();
             }
             else if (RManager.EXEMODE == 6)
             {
-                //PROCESSING - HYBRID CB+CF 2.0
+                //PROCESSING - HYBRID CBCF2
                 REngineCBCF2.getRecommendations();
-            }
-            else if (RManager.EXEMODE == 55)
-            {
-                //PROCESSING - CBDICT
-                REngineCBDICT.getRecommendations();
             }
             else if (RManager.EXEMODE == 8)
             {

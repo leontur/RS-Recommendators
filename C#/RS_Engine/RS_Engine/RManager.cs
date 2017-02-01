@@ -14,14 +14,13 @@ namespace RS_Engine
         //MAIN DATA STRUCTURES (cleaned from datasets)
         public static List<List<int>> interactions = new List<List<int>>();
         public static List<int> target_users = new List<int>();
-        public static List<List<object>> user_profile = new List<List<object>>(); //also used as train matrix
+        public static List<List<object>> user_profile = new List<List<object>>();
         public static List<List<object>> item_profile = new List<List<object>>();
 
         //AUXILIARY DATA STRUCTURES
         public static List<int> item_profile_enabled_list = new List<int>();
         public static HashSet<int> item_profile_enabled_hashset = new HashSet<int>();
         public static List<List<object>> item_profile_enabled = new List<List<object>>();
-        //public static List<List<object>> item_profile_disabled = new List<List<object>>();
         public static List<int> item_profile_and_interaction_merge_nodup = new List<int>();
         public static HashSet<int> target_users_hashset = new HashSet<int>();
 
@@ -33,7 +32,7 @@ namespace RS_Engine
         //DICTIONARIES DATA STRUCTURES
         public static IDictionary<int, IDictionary<int, double>> user_items_dictionary = new Dictionary<int, IDictionary<int, double>>();
         public static IDictionary<int, IDictionary<int, double>> item_users_dictionary = new Dictionary<int, IDictionary<int, double>>();
-        public static HashSet<int> item_with_onemore_interaction_by_target = new HashSet<int>();
+        public static HashSet<int> item_with_oneormore_inter_by_a_target = new HashSet<int>();
 
         //Global vars
         public static int EXEMODE = 0;
@@ -383,11 +382,6 @@ namespace RS_Engine
 
                 outLog("  + conversion OK | submission user count= " + output_users.Count() + " | submission useritems count= " + output_useritems.Count());
             }
-
-            ////////////////////////////////////
-            //MS_AZURE_CS FORMAT PRINT
-            //convertAndPrintDatasetsToMSCS();
-           
         }
 
         //MENU SELECTOR
@@ -412,14 +406,13 @@ namespace RS_Engine
             outLog("    ____________________________");
             outLog("    Algorithms");
             outLog("    1) TOP");
-            outLog("    2) CB-F (ok)");
+            outLog("    2) CB-F");
             outLog("    3) U-CF");
             outLog("    4) I-CF");
             outLog("");
-            outLog("    5)  CF DICT + CB DICT (chiama anche 6:UB/IB/HYBRID)");
-            outLog("    55) CB DICT (cannot call alone)");
+            outLog("    5) CF DICT + CB DICT (call even 6: UB/IB/HYBRID)");
             outLog("");
-            outLog("    6) HYBRID CB+CF 2.0");
+            outLog("    6) HYBRID CBCF2");
 
             if (!ISTESTMODE)
             {
@@ -580,117 +573,5 @@ namespace RS_Engine
             //memory
             lastWasInline = carriageret;
         }
-
-
-        private static void convertAndPrintDatasetsToMSCS()
-        {
-            ////////////////////////////////////
-            //MS_AZURE_CS FORMAT PRINT
-            Console.WriteLine("MS_AZURE_CS CONVERSION..");
-            //Items
-            string item_MSCS = "";
-            int addcount = 0;
-            foreach (var it in item_profile)
-            {
-                //only if enabled 
-                if ((int)it[12] == 1)
-                {
-                    //add to MS_CS output
-                    //<Item Id>,<Item Name>,<Item Category>,[<Description>],<Features list>
-                    item_MSCS +=
-                          (int)it[0] + ","
-                        + string.Join(" ", ((List<int>)it[1]).Select(n => n.ToString()).ToArray()) + ","
-                        + (int)it[3] + ","
-                        + string.Join(" ", ((List<int>)it[10]).Select(n => n.ToString()).ToArray()) + ","
-                        + " " + "careerlevel=" + (int)it[2] + ","
-                        + " " + "industryid=" + (int)it[4] + ","
-                        + " " + "country=" + (int)it[5] + ","
-                        + " " + "region=" + (int)it[6] + ","
-                        + " " + "employment=" + (int)it[9] + ","
-                        + " " + "createdat=" + REngineCBF.UnixTimeStampToDateTime((int)it[11]).ToString("yyyy/MM/dd'T'HH:mm:ss", CultureInfo.InvariantCulture)
-                        ;
-                    item_MSCS += Environment.NewLine;
-                    addcount++;
-                    if (addcount % 3000 == 0)
-                    {
-                        //counter
-                        Console.WriteLine(".." + addcount);
-
-                        //save
-                        File.AppendAllText(BACKPATH + "Output/MS_CS_ITEMS.csv", item_MSCS);
-                        item_MSCS = "";
-                    }
-                }
-            }
-            //save last
-            File.AppendAllText(BACKPATH + "Output/MS_CS_ITEMS.csv", item_MSCS);
-            //repeat with disabled to fill 100.000 (MS_CS LIMIT)
-            item_MSCS = "";
-            foreach (var it in item_profile)
-            {
-                //only if NOTenabled 
-                if ((int)it[12] == 0 && addcount < 100000)
-                {
-                    //add to MS_CS output
-                    //<Item Id>,<Item Name>,<Item Category>,[<Description>],<Features list>
-                    item_MSCS +=
-                          (int)it[0] + ","
-                        + string.Join(" ", ((List<int>)it[1]).Select(n => n.ToString()).ToArray()) + ","
-                        + (int)it[3] + ","
-                        + string.Join(" ", ((List<int>)it[10]).Select(n => n.ToString()).ToArray()) + ","
-                        + " " + "careerlevel=" + (int)it[2] + ","
-                        + " " + "industryid=" + (int)it[4] + ","
-                        + " " + "country=" + (int)it[5] + ","
-                        + " " + "region=" + (int)it[6] + ","
-                        + " " + "employment=" + (int)it[9] + ","
-                        + " " + "createdat=" + REngineCBF.UnixTimeStampToDateTime((int)it[11]).ToString("yyyy/MM/dd'T'HH:mm:ss", CultureInfo.InvariantCulture)
-                        ;
-                    item_MSCS += Environment.NewLine;
-                    addcount++;
-                    if (addcount % 3000 == 0)
-                    {
-                        //counter
-                        Console.WriteLine(".." + addcount);
-
-                        //save
-                        File.AppendAllText(BACKPATH + "Output/MS_CS_ITEMS.csv", item_MSCS);
-                        item_MSCS = "";
-                    }
-                }
-            }
-            //save last
-            File.AppendAllText(BACKPATH + "Output/MS_CS_ITEMS.csv", item_MSCS);
-
-            //Interactions
-            string interactions_MSCS = "";
-            int addcount2 = 0;
-            foreach (var it in interactions)
-            {
-                //add to MS_CS output
-                //<User Id>,<Item Id>,<Time>,[<Event>]
-                interactions_MSCS +=
-                    it[0] + "," +
-                    it[1] + "," +
-                    REngineCBF.UnixTimeStampToDateTime(it[3]).ToString("yyyy/MM/dd'T'HH:mm:ss", CultureInfo.InvariantCulture) + "," +
-                    (it[2] == 1 ? "Click" : it[2] == 2 ? "AddShopCart" : it[2] == 3 ? "Purchase" : "")
-                    ;
-                interactions_MSCS += Environment.NewLine;
-                addcount2++;
-                if (addcount2 % 8000 == 0)
-                {
-                    //counter
-                    Console.WriteLine(".." + addcount2);
-
-                    //save
-                    File.AppendAllText(BACKPATH + "Output/MS_CS_INTERACTIONS.csv", interactions_MSCS);
-                    interactions_MSCS = "";
-                }
-            }
-            //save last
-            File.AppendAllText(BACKPATH + "Output/MS_CS_INTERACTIONS.csv", interactions_MSCS);
-            //MS_AZURE_CS END
-            /////////////////////////////
-        }
-
     }
 }
