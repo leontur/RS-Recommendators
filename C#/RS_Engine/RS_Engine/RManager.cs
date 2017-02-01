@@ -409,10 +409,10 @@ namespace RS_Engine
             outLog("    2) CB-F");
             outLog("    3) U-CF");
             outLog("    4) I-CF");
+            outLog("    6) CBCF2");
             outLog("");
-            outLog("    5) CF DICT + CB DICT (call even 6: UB/IB/HYBRID)");
+            outLog("    5) HYBRID CF+CB DICT (call even 6: UB/IB/HYBRID)");
             outLog("");
-            outLog("    6) HYBRID CBCF2");
 
             if (!ISTESTMODE)
             {

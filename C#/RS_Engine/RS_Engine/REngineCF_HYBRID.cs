@@ -132,7 +132,7 @@ namespace RS_Engine
             RManager.outLog("  + executing ALSO CBCF2! .. ");
             REngineCBCF2.getRecommendations();
 
-            generateOutput(CFHRNR2, true); //OUT 3
+            generateOutput(CFHRNR2, false); //OUT 3
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////
@@ -1111,7 +1111,7 @@ namespace RS_Engine
             //OTHER ALGORITHMS
             bool Algorithm_CF_TIT   = true;   //CF over TITLES
             bool Algorithm_CF_TAG   = true;   //CF over TAGS
-            bool Algorithm_CF_RAT   = true;   //CF over RATING
+            bool Algorithm_CF_RAT   = false;   //CF over RATING
             bool Algorithm_CB_UU    = false;  //CB over user-user similarity
 
             //info
