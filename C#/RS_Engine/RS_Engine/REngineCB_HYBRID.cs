@@ -19,18 +19,18 @@ namespace RS_Engine
         //ALGORITHM PARAMETERS
 
         //UB
-        public const double SIM_SHRINK_UB = 10;
-        public const double PRED_SHRINK_UB = 10;
+        public const double SIM_SHRINK_UB = 12;
+        public const double PRED_SHRINK_UB = 20;
         public const int CB_UB_KNN = 500;
 
         //IB
-        public const double SIM_SHRINK_IB = 5;
-        public const double PRED_SHRINK_IB = 10;
+        public const double SIM_SHRINK_IB = 7;
+        public const double PRED_SHRINK_IB = 15;
         public const int CB_IB_KNN = 2000;
 
         //Limits
         public const int ATTR_SIM_LIMIT_US = 2500;
-        public const int ATTR_SIM_LIMIT_IT = 9;
+        public const int ATTR_SIM_LIMIT_IT = 8;
         public const int USERUSER_SIM_LIMIT = CB_UB_KNN;
         public const int ITEMITEM_SIM_LIMIT = CB_IB_KNN;
 
@@ -79,7 +79,7 @@ namespace RS_Engine
             GC.Collect();
 
             //CB UU Output
-            predict_CB_UB_Recommendations();
+            compute_CB_UB_RecommendationsPredictions();
 
             //CB II
             compute_CB_ItemItem_Sim();
@@ -91,7 +91,7 @@ namespace RS_Engine
             GC.Collect();
 
             //CB II Output
-            predict_CB_IB_Recommendations();
+            compute_CB_IB_RecommendationsPredictions();
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////
@@ -516,7 +516,7 @@ namespace RS_Engine
         }
 
         //PREDICT USER BASED NORMALIZED RECOMMENDATIONS
-        public static void predict_CB_UB_Recommendations()
+        public static void compute_CB_UB_RecommendationsPredictions()
         {
             //info
             RManager.outLog("  + predict_CB_UB_Recommendations(): ");
@@ -715,7 +715,7 @@ namespace RS_Engine
         }
 
         //PREDICT ITEM BASED NORMALIZED RECOMMENDATIONS
-        public static void predict_CB_IB_Recommendations()
+        public static void compute_CB_IB_RecommendationsPredictions()
         {
             //info
             RManager.outLog("  + predict_CB_IB_Recommendations(): ");

@@ -21,17 +21,17 @@ namespace RS_Engine
         //ALGORITHM PARAMETERS
 
         //UB
-        private const double SIM_SHRINK_UB = 10;
-        private const double PRED_SHRINK_UB = 10;
-        private const int CF_UB_KNN = 150;
+        private const double SIM_SHRINK_UB = 12;
+        private const double PRED_SHRINK_UB = 12;
+        private const int CF_UB_KNN = 170;
 
         //IB
-        private const double SIM_SHRINK_IB = 20;
-        private const double PRED_SHRINK_IB = 10;
+        private const double SIM_SHRINK_IB = 22;
+        private const double PRED_SHRINK_IB = 15;
 
         //CF+CB HYBRID
-        private const double CFCB_HYBRID_UB = 1.1;
-        private const double CFCB_HYBRID_IB = 1.5;
+        private const double CFCB_HYBRID_UB = 1.2;
+        private const double CFCB_HYBRID_IB = 1.6;
 
         /////////////////////////////////////////////
         //EXECUTION VARS
@@ -66,18 +66,18 @@ namespace RS_Engine
             //CFCB HYBRID
             //Execute USER BASED
             compute_CFCB_Hybrid_UserUser_Sim();
-            predict_CF_UB_Recommendations();
+            compute_CF_UB_RecommendationsPredictions();
 
             //CFCB HYBRID
             //Execute ITEM BASED
             compute_CFCB_Hybrid_ItemItem_Sim();        
-            predict_CF_IB_Recommendations();
+            compute_CF_IB_RecommendationsPredictions();
 
             //////////////////////////////////
             //OUTPUT CREATION
 
             //CFUB and CFIB
-            var CFHRNR1 = compute_CFCB_Hybrid_Ranked_Recommendations(
+            var CFHRNR1 = compute_CFCB_Hybrid_RankedMerge_Recommendations(
                 CFCB_UB_pred_dict,
                 0.7,
                 CFCB_IB_pred_dict,
@@ -85,7 +85,7 @@ namespace RS_Engine
                 );
 
             //(CFUB and CFIB) and CBUB
-            var CFHRNR2 = compute_CFCB_Hybrid_Ranked_Recommendations(
+            var CFHRNR2 = compute_CFCB_Hybrid_RankedMerge_Recommendations(
                 CFHRNR1,
                 20.0,
                 REngineCB_HYBRID.CB_UB_pred_dict,
@@ -97,7 +97,7 @@ namespace RS_Engine
 
             //////////////////////////////////
 
-            var CFHRNR3 = compute_CFCB_Hybrid_Ranked_Recommendations(
+            var CFHRNR3 = compute_CFCB_Hybrid_RankedMerge_Recommendations(
                 CFHRNR2,
                 2.0,
                 REngineCB_HYBRID.CB_IB_pred_dict,
@@ -609,7 +609,7 @@ namespace RS_Engine
         }
         
         //CREATE USER_USER NORMALIZED RECOMMENDATIONS 
-        private static void predict_CF_UB_Recommendations()
+        private static void compute_CF_UB_RecommendationsPredictions()
         {
             //info
             RManager.outLog("  + predict_CF_UB_Recommendations(): ");
@@ -938,7 +938,7 @@ namespace RS_Engine
         }
 
         //CREATE ITEM_ITEM NORMALIZED RECOMMENDATIONS 
-        private static void predict_CF_IB_Recommendations()
+        private static void compute_CF_IB_RecommendationsPredictions()
         {
             //info
             RManager.outLog("  + predict_CF_IB_Recommendations(): ");
@@ -1059,7 +1059,7 @@ namespace RS_Engine
 
         //////////////////////////////////////////////////////////////////////////////////////////
         //HYBRID ASSIGNMENT OF NORMALIZED RANK
-        private static IDictionary<int, IDictionary<int, double>> compute_CFCB_Hybrid_Ranked_Recommendations(IDictionary<int, IDictionary<int, double>> UB_user_pred, double UB_w, IDictionary<int, IDictionary<int, double>> IB_user_pred, double IB_w)
+        private static IDictionary<int, IDictionary<int, double>> compute_CFCB_Hybrid_RankedMerge_Recommendations(IDictionary<int, IDictionary<int, double>> UB_user_pred, double UB_w, IDictionary<int, IDictionary<int, double>> IB_user_pred, double IB_w)
         {
             //info
             RManager.outLog("  + compute_CFCB_Hybrid_Ranked_Recommendations(): ");
