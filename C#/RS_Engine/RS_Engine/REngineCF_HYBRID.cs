@@ -41,7 +41,7 @@ namespace RS_Engine
         public static IDictionary<int, IDictionary<int, double>> CFCB_hybrid_itemitem_sim_dict = new Dictionary<int, IDictionary<int, double>>();
         public static IDictionary<int, IDictionary<int, double>> CFCB_IB_pred_dict = new Dictionary<int, IDictionary<int, double>>();
 
-        public static IDictionary<int, double> CF_IB_IDF_dictionary = new Dictionary<int, double>();
+        public static IDictionary<int, double> CF_Items_IDF_dictionary = new Dictionary<int, double>();
 
         /////////////////////////////////////////////
         //MAIN ALGORITHM METHOD
@@ -110,12 +110,12 @@ namespace RS_Engine
             RManager.outLog("  - freeing memory (GC) ");
             CFHRNR1.Clear();
             CFHRNR1 = null;
-            REngineCB_HYBRID.users_attributes_dict.Clear();
-            REngineCB_HYBRID.users_attributes_dict = null;
+            REngineCB_HYBRID.CB_users_attributes_dict.Clear();
+            REngineCB_HYBRID.CB_users_attributes_dict = null;
             CFCB_hybrid_useruser_sim_dict.Clear();
             CFCB_hybrid_useruser_sim_dict = null;
-            REngineCB_HYBRID.items_attributes_dict.Clear();
-            REngineCB_HYBRID.items_attributes_dict = null;
+            REngineCB_HYBRID.CB_items_attributes_dict.Clear();
+            REngineCB_HYBRID.CB_items_attributes_dict = null;
             CFCB_hybrid_itemitem_sim_dict.Clear();
             CFCB_hybrid_itemitem_sim_dict = null;
             REngineCB_HYBRID.CB_IB_pred_dict.Clear();
@@ -342,7 +342,7 @@ namespace RS_Engine
                         //counting times of interactions per items (with no duplicates)
                         lock (sync)
                         {
-                            CF_IB_IDF_dictionary.Add(
+                            CF_Items_IDF_dictionary.Add(
                                 i.Key, //item id (unique)
                                 Math.Log10(interactions_size / i.Value) // IDF log10 coefficient
                                 );
@@ -356,7 +356,7 @@ namespace RS_Engine
                 {
                     RManager.outLog("  + writing serialized file " + "CFDICT_CF_IB_IDF_dictionary.bin");
                     var bformatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
-                    bformatter.Serialize(stream, CF_IB_IDF_dictionary);
+                    bformatter.Serialize(stream, CF_Items_IDF_dictionary);
                 }
             }
             else
@@ -366,7 +366,7 @@ namespace RS_Engine
                 {
                     RManager.outLog("  + reading serialized file " + "CFDICT_CF_IB_IDF_dictionary.bin");
                     var bformatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
-                    CF_IB_IDF_dictionary = (IDictionary<int, double>)bformatter.Deserialize(stream);
+                    CF_Items_IDF_dictionary = (IDictionary<int, double>)bformatter.Deserialize(stream);
                 }
             }
 
@@ -531,14 +531,14 @@ namespace RS_Engine
                 //user
                 int user = u.Key;
                 CB_sim_dict_num.Add(user, new Dictionary<int, double>());
-                var attributes_of_the_current_user1 = REngineCB_HYBRID.users_attributes_dict[user];
+                var attributes_of_the_current_user1 = REngineCB_HYBRID.CB_users_attributes_dict[user];
 
                 //foreach similar user
                 foreach(var u2 in u.Value)
                 {
                     //user2
                     int user2 = u2.Key;
-                    var attributes_of_the_current_user2 = REngineCB_HYBRID.users_attributes_dict[user2];
+                    var attributes_of_the_current_user2 = REngineCB_HYBRID.CB_users_attributes_dict[user2];
 
                     foreach(var att in attributes_of_the_current_user1)
                     {
@@ -560,7 +560,7 @@ namespace RS_Engine
             //foreach user and its attributes, compute the vector norm
             foreach(var user in CB_sim_dict_num)
             {
-                foreach (var attr in REngineCB_HYBRID.users_attributes_dict[user.Key])
+                foreach (var attr in REngineCB_HYBRID.CB_users_attributes_dict[user.Key])
                 {
                     if (CB_sim_dict_norm.ContainsKey(user.Key))
                         CB_sim_dict_norm[user.Key] += Math.Pow(attr.Value, 2);
@@ -612,7 +612,7 @@ namespace RS_Engine
         private static void compute_CF_UB_RecommendationsPredictions()
         {
             //info
-            RManager.outLog("  + predict_CF_UB_Recommendations(): ");
+            RManager.outLog("  + compute_CF_UB_RecommendationsPredictions(): ");
 
             //runtime dictionaries
             IDictionary<int, IDictionary<int, double>> CF_uu_pred_dict = new Dictionary<int, IDictionary<int, double>>();
@@ -868,14 +868,14 @@ namespace RS_Engine
                 //item
                 int item = i.Key;
                 CB_sim_dict_num.Add(item, new Dictionary<int, double>());
-                var attributes_of_the_item1 = REngineCB_HYBRID.items_attributes_dict[item];
+                var attributes_of_the_item1 = REngineCB_HYBRID.CB_items_attributes_dict[item];
 
                 //foreach similar item
                 foreach (var i2 in i.Value)
                 {
                     //item2
                     int item2 = i2.Key;
-                    var attributes_of_the_item2 = REngineCB_HYBRID.items_attributes_dict[item2];
+                    var attributes_of_the_item2 = REngineCB_HYBRID.CB_items_attributes_dict[item2];
 
                     foreach (var att in attributes_of_the_item1)
                     {
@@ -897,7 +897,7 @@ namespace RS_Engine
             //foreach item and its attributes, compute the vector norm
             foreach (var item in CB_sim_dict_num)
             {
-                foreach (var attr in REngineCB_HYBRID.items_attributes_dict[item.Key])
+                foreach (var attr in REngineCB_HYBRID.CB_items_attributes_dict[item.Key])
                 {
                     if (CB_sim_dict_norm.ContainsKey(item.Key))
                         CB_sim_dict_norm[item.Key] += Math.Pow(attr.Value, 2);
@@ -941,7 +941,7 @@ namespace RS_Engine
         private static void compute_CF_IB_RecommendationsPredictions()
         {
             //info
-            RManager.outLog("  + predict_CF_IB_Recommendations(): ");
+            RManager.outLog("  + compute_CF_IB_RecommendationsPredictions(): ");
 
             //runtime dictionaries
             IDictionary<int, IDictionary<int, double>> CF_uu_pred_dict = new Dictionary<int, IDictionary<int, double>>();
@@ -988,7 +988,7 @@ namespace RS_Engine
                                 continue;
 
                             //coefficients
-                            double num = CF_IB_IDF_dictionary[item] * sim_item.Value;
+                            double num = CF_Items_IDF_dictionary[item] * sim_item.Value;
                             double den = sim_item.Value;
 
                             //if the current item is not predicted yet for the user, add it

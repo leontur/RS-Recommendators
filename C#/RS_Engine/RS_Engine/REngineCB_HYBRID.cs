@@ -42,13 +42,13 @@ namespace RS_Engine
         public static IDictionary<int, IDictionary<int, double>> CB_itemitem_sim_dict = new Dictionary<int, IDictionary<int, double>>();
         public static IDictionary<int, IDictionary<int, double>> CB_IB_pred_dict = new Dictionary<int, IDictionary<int, double>>();
 
-        //User - attributes dictionaries
-        public static IDictionary<int, IDictionary<string, double>> users_attributes_dict = new Dictionary<int, IDictionary<string, double>>();
-        public static IDictionary<string, IDictionary<int, double>> attributes_users_dict = new Dictionary<string, IDictionary<int, double>>();
+        //User-attributes dictionaries
+        public static IDictionary<int, IDictionary<string, double>> CB_users_attributes_dict = new Dictionary<int, IDictionary<string, double>>();
+        public static IDictionary<string, IDictionary<int, double>> CB_attributes_users_dict = new Dictionary<string, IDictionary<int, double>>();
 
-        //Item - attributes dictionaries
-        public static IDictionary<int, IDictionary<string, double>> items_attributes_dict = new Dictionary<int, IDictionary<string, double>>();
-        public static IDictionary<string, IDictionary<int, double>> attributes_items_dict = new Dictionary<string, IDictionary<int, double>>();
+        //Item-attributes dictionaries
+        public static IDictionary<int, IDictionary<string, double>> CB_items_attributes_dict = new Dictionary<int, IDictionary<string, double>>();
+        public static IDictionary<string, IDictionary<int, double>> CB_attributes_items_dict = new Dictionary<string, IDictionary<int, double>>();
 
         /////////////////////////////////////////////
         //MAIN ALGORITHM METHOD
@@ -74,8 +74,8 @@ namespace RS_Engine
 
             //FREEING
             RManager.outLog("  - freeing memory (GC) ");
-            attributes_users_dict.Clear();
-            attributes_users_dict = null;
+            CB_attributes_users_dict.Clear();
+            CB_attributes_users_dict = null;
             GC.Collect();
 
             //CB UU Output
@@ -86,8 +86,8 @@ namespace RS_Engine
 
             //FREEING
             RManager.outLog("  - freeing memory (GC) ");
-            attributes_items_dict.Clear();
-            attributes_items_dict = null;
+            CB_attributes_items_dict.Clear();
+            CB_attributes_items_dict = null;
             GC.Collect();
 
             //CB II Output
@@ -128,7 +128,7 @@ namespace RS_Engine
 
                             //getting user id
                             int userid = (int)i[0];
-                            users_attributes_dict.Add(userid, new Dictionary<string, double>());
+                            CB_users_attributes_dict.Add(userid, new Dictionary<string, double>());
 
                             //(add attribute only if > 0)
 
@@ -138,7 +138,7 @@ namespace RS_Engine
                                 if (jr != 0)
                                 {
                                     string curr = attr[0] + jr;
-                                    users_attributes_dict[userid].Add(curr, 1);
+                                    CB_users_attributes_dict[userid].Add(curr, 1);
                                 }
                             }
                             //career level TO edu_degree
@@ -147,7 +147,7 @@ namespace RS_Engine
                                 //if ((int)i[tit] != 0)
                                 //{
                                     string curr = attr[tit - 1] + (int)i[tit];
-                                    users_attributes_dict[userid].Add(curr, 1);
+                                    CB_users_attributes_dict[userid].Add(curr, 1);
                                 //}
 
                             }
@@ -157,7 +157,7 @@ namespace RS_Engine
                                 if (ef != 0)
                                 {
                                     string curr = attr[10] + ef;
-                                    users_attributes_dict[userid].Add(curr, 1);
+                                    CB_users_attributes_dict[userid].Add(curr, 1);
                                 }
                             }
                         }
@@ -168,7 +168,7 @@ namespace RS_Engine
                 {
                     RManager.outLog("  + writing serialized file " + "CBDICT_users_attributes.bin");
                     var bformatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
-                    bformatter.Serialize(stream, users_attributes_dict);
+                    bformatter.Serialize(stream, CB_users_attributes_dict);
                 }
             }
             else
@@ -178,7 +178,7 @@ namespace RS_Engine
                 {
                     RManager.outLog("  + reading serialized file " + "CBDICT_users_attributes.bin");
                     var bformatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
-                    users_attributes_dict = (IDictionary<int, IDictionary<string, double>>)bformatter.Deserialize(stream);
+                    CB_users_attributes_dict = (IDictionary<int, IDictionary<string, double>>)bformatter.Deserialize(stream);
                 }
             }
 
@@ -188,20 +188,20 @@ namespace RS_Engine
                 //IDF
                 //initialize attributes (global) dictionary
                 //for each attribute, list all users (that have it)
-                foreach (var usr in users_attributes_dict)
+                foreach (var usr in CB_users_attributes_dict)
                     foreach (var atr in usr.Value)
-                        if (!attributes_users_dict.ContainsKey(atr.Key)) 
-                            attributes_users_dict.Add(atr.Key, new Dictionary<int, double> { { usr.Key, 1 } });
+                        if (!CB_attributes_users_dict.ContainsKey(atr.Key)) 
+                            CB_attributes_users_dict.Add(atr.Key, new Dictionary<int, double> { { usr.Key, 1 } });
                         else
-                            if(!attributes_users_dict[atr.Key].ContainsKey(usr.Key))
-                                attributes_users_dict[atr.Key].Add(usr.Key, 1);
+                            if(!CB_attributes_users_dict[atr.Key].ContainsKey(usr.Key))
+                                CB_attributes_users_dict[atr.Key].Add(usr.Key, 1);
 
                 //serialize
                 using (Stream stream = File.Open(Path.Combine(RManager.SERIALTPATH, "CBDICT_attributes_users.bin"), FileMode.Create))
                 {
                     RManager.outLog("  + writing serialized file " + "CBDICT_attributes_users.bin");
                     var bformatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
-                    bformatter.Serialize(stream, attributes_users_dict);
+                    bformatter.Serialize(stream, CB_attributes_users_dict);
                 }
             }
             else
@@ -211,7 +211,7 @@ namespace RS_Engine
                 {
                     RManager.outLog("  + reading serialized file " + "CBDICT_attributes_users.bin");
                     var bformatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
-                    attributes_users_dict = (IDictionary<string, IDictionary<int, double>>)bformatter.Deserialize(stream);
+                    CB_attributes_users_dict = (IDictionary<string, IDictionary<int, double>>)bformatter.Deserialize(stream);
                 }
             }
         }
@@ -246,7 +246,7 @@ namespace RS_Engine
 
                             //getting user id
                             int itemid = (int)i[0];
-                            items_attributes_dict.Add(itemid, new Dictionary<string, double>());
+                            CB_items_attributes_dict.Add(itemid, new Dictionary<string, double>());
 
                             //(add attribute only if > 0)
 
@@ -256,7 +256,7 @@ namespace RS_Engine
                                 if (tit != 0)
                                 {
                                     string curr = attr[0] + tit;
-                                    items_attributes_dict[itemid].Add(curr, 1);
+                                    CB_items_attributes_dict[itemid].Add(curr, 1);
                                 }
                             }
                             //career level TO employment, and created_at and active_during_test
@@ -276,7 +276,7 @@ namespace RS_Engine
                                 if (val != 0)
                                 {
                                     string curr = attr[tit - 1] + val;
-                                    items_attributes_dict[itemid].Add(curr, 1);
+                                    CB_items_attributes_dict[itemid].Add(curr, 1);
                                 }
                             }
                             //tags
@@ -285,7 +285,7 @@ namespace RS_Engine
                                 if (tag != 0)
                                 {
                                     string curr = attr[9] + tag;
-                                    items_attributes_dict[itemid].Add(curr, 1);
+                                    CB_items_attributes_dict[itemid].Add(curr, 1);
                                 }
                             }
 
@@ -307,7 +307,7 @@ namespace RS_Engine
                 {
                     RManager.outLog("  + reading serialized file " + "CBDICT_items_attributes.bin");
                     var bformatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
-                    items_attributes_dict = (IDictionary<int, IDictionary<string, double>>)bformatter.Deserialize(stream);
+                    CB_items_attributes_dict = (IDictionary<int, IDictionary<string, double>>)bformatter.Deserialize(stream);
                 }
             }
 
@@ -317,13 +317,13 @@ namespace RS_Engine
                 //IDF
                 //initialize attributes (global) dictionary
                 //for each attribute, list all items (that have it)
-                foreach (var itm in items_attributes_dict)
+                foreach (var itm in CB_items_attributes_dict)
                     foreach (var atr in itm.Value)
-                        if (!attributes_items_dict.ContainsKey(atr.Key))
-                            attributes_items_dict.Add(atr.Key, new Dictionary<int, double> { { itm.Key, 1 } });
+                        if (!CB_attributes_items_dict.ContainsKey(atr.Key))
+                            CB_attributes_items_dict.Add(atr.Key, new Dictionary<int, double> { { itm.Key, 1 } });
                         else
-                            if (!attributes_items_dict[atr.Key].ContainsKey(itm.Key))
-                            attributes_items_dict[atr.Key].Add(itm.Key, 1);
+                            if (!CB_attributes_items_dict[atr.Key].ContainsKey(itm.Key))
+                            CB_attributes_items_dict[atr.Key].Add(itm.Key, 1);
 
                 //serialize
                 /*using (Stream stream = File.Open(Path.Combine(RManager.SERIALTPATH, "CBDICT_attributes_items.bin"), FileMode.Create))
@@ -340,7 +340,7 @@ namespace RS_Engine
                 {
                     RManager.outLog("  + reading serialized file " + "CBDICT_attributes_items.bin");
                     var bformatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
-                    attributes_items_dict = (IDictionary<string, IDictionary<int, double>>)bformatter.Deserialize(stream);
+                    CB_attributes_items_dict = (IDictionary<string, IDictionary<int, double>>)bformatter.Deserialize(stream);
                 }
             }
         }
@@ -355,31 +355,32 @@ namespace RS_Engine
             //temp dictionaries
             IDictionary<int, double> users_term_frequency = new Dictionary<int, double>();
             IDictionary<string, double> attributes_inverse_document_frequency = new Dictionary<string, double>();
-            int users_count = users_attributes_dict.Keys.Count;
+            double users_count = CB_users_attributes_dict.Keys.Count;
+            double n = 1.0;
 
             //for each user, create the time frequency TF dictionary
-            foreach (var us in users_attributes_dict)
-                users_term_frequency[us.Key] = 1.0 / us.Value.Count;
+            foreach (var us in CB_users_attributes_dict)
+                users_term_frequency[us.Key] = n / us.Value.Count;
 
             //for each attribute, create the time frequency TF dictionary
-            foreach (var at in attributes_users_dict)
+            foreach (var at in CB_attributes_users_dict)
                 attributes_inverse_document_frequency[at.Key] = Math.Log10(users_count / at.Value.Count());
 
             //UPDATE values in global dictionaries
-            foreach (var us in users_attributes_dict.Keys.ToList())
-                foreach (var at in users_attributes_dict[us].Keys.ToList())
-                    users_attributes_dict[us][at] *= (users_term_frequency[us] * attributes_inverse_document_frequency[at]);
+            foreach (var us in CB_users_attributes_dict.Keys.ToList())
+                foreach (var at in CB_users_attributes_dict[us].Keys.ToList())
+                    CB_users_attributes_dict[us][at] *= (users_term_frequency[us] * attributes_inverse_document_frequency[at]);
 
-            foreach (var at in attributes_users_dict.Keys.ToList())
-                foreach (var us in attributes_users_dict[at].Keys.ToList())
-                    attributes_users_dict[at][us] *= (users_term_frequency[us] * attributes_inverse_document_frequency[at]);
+            foreach (var at in CB_attributes_users_dict.Keys.ToList())
+                foreach (var us in CB_attributes_users_dict[at].Keys.ToList())
+                    CB_attributes_users_dict[at][us] *= (users_term_frequency[us] * attributes_inverse_document_frequency[at]);
 
             //SORTING by attribute
-            foreach (var us in users_attributes_dict.Keys.ToList())
-                users_attributes_dict[us] = users_attributes_dict[us].OrderByDescending(x => x.Value).ToDictionary(kp => kp.Key, kp => kp.Value);
+            foreach (var us in CB_users_attributes_dict.Keys.ToList())
+                CB_users_attributes_dict[us] = CB_users_attributes_dict[us].OrderByDescending(x => x.Value).ToDictionary(kp => kp.Key, kp => kp.Value);
 
-            foreach (var at in attributes_users_dict.Keys.ToList())
-                attributes_users_dict[at] = attributes_users_dict[at].OrderByDescending(x => x.Value).ToDictionary(kp => kp.Key, kp => kp.Value);
+            foreach (var at in CB_attributes_users_dict.Keys.ToList())
+                CB_attributes_users_dict[at] = CB_attributes_users_dict[at].OrderByDescending(x => x.Value).ToDictionary(kp => kp.Key, kp => kp.Value);
         }
         public static void compute_TF_IDF_IB()
         {
@@ -389,31 +390,31 @@ namespace RS_Engine
             //temp dictionaries
             IDictionary<int, double> item_term_frequency = new Dictionary<int, double>();
             IDictionary<string, double> attributes_inverse_document_frequency = new Dictionary<string, double>();
-            int items_count = items_attributes_dict.Count();
+            int items_count = CB_items_attributes_dict.Count();
 
             //for each user, create the time frequency TF dictionary
-            foreach (var us in items_attributes_dict)
+            foreach (var us in CB_items_attributes_dict)
                 item_term_frequency[us.Key] = 1.0 / us.Value.Count();
 
             //for each attribute, create the time frequency TF dictionary
-            foreach (var at in attributes_items_dict)
+            foreach (var at in CB_attributes_items_dict)
                 attributes_inverse_document_frequency[at.Key] = Math.Log10(items_count / at.Value.Count());
 
             //UPDATE values in global dictionaries
-            foreach (var us in items_attributes_dict.Keys.ToList())
-                foreach (var at in items_attributes_dict[us].Keys.ToList())
-                    items_attributes_dict[us][at] *= (item_term_frequency[us] * attributes_inverse_document_frequency[at]);
+            foreach (var us in CB_items_attributes_dict.Keys.ToList())
+                foreach (var at in CB_items_attributes_dict[us].Keys.ToList())
+                    CB_items_attributes_dict[us][at] *= (item_term_frequency[us] * attributes_inverse_document_frequency[at]);
 
-            foreach (var at in attributes_items_dict.Keys.ToList())
-                foreach (var us in attributes_items_dict[at].Keys.ToList())
-                    attributes_items_dict[at][us] *= (item_term_frequency[us] * attributes_inverse_document_frequency[at]);
+            foreach (var at in CB_attributes_items_dict.Keys.ToList())
+                foreach (var us in CB_attributes_items_dict[at].Keys.ToList())
+                    CB_attributes_items_dict[at][us] *= (item_term_frequency[us] * attributes_inverse_document_frequency[at]);
 
             //SORTING by attribute
-            foreach (var us in items_attributes_dict.Keys.ToList())
-                items_attributes_dict[us] = items_attributes_dict[us].OrderByDescending(x => x.Value).ToDictionary(kp => kp.Key, kp => kp.Value);
+            foreach (var us in CB_items_attributes_dict.Keys.ToList())
+                CB_items_attributes_dict[us] = CB_items_attributes_dict[us].OrderByDescending(x => x.Value).ToDictionary(kp => kp.Key, kp => kp.Value);
 
-            foreach (var at in attributes_items_dict.Keys.ToList())
-                attributes_items_dict[at] = attributes_items_dict[at].OrderByDescending(x => x.Value).ToDictionary(kp => kp.Key, kp => kp.Value);
+            foreach (var at in CB_attributes_items_dict.Keys.ToList())
+                CB_attributes_items_dict[at] = CB_attributes_items_dict[at].OrderByDescending(x => x.Value).ToDictionary(kp => kp.Key, kp => kp.Value);
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////
@@ -448,9 +449,9 @@ namespace RS_Engine
                         CB_uu_sim_dict_num.Add(user, new Dictionary<int, double>());
 
                     //for each attribute of the user
-                    foreach (var attribute in users_attributes_dict[user])
+                    foreach (var attribute in CB_users_attributes_dict[user])
                     {
-                        foreach (var user2 in attributes_users_dict[attribute.Key].Keys.Take(ATTR_SIM_LIMIT_US).ToList())
+                        foreach (var user2 in CB_attributes_users_dict[attribute.Key].Keys.Take(ATTR_SIM_LIMIT_US).ToList())
                         {
                             if (user2 == user)
                                 continue;
@@ -458,7 +459,7 @@ namespace RS_Engine
                             if (RManager.user_items_dictionary.ContainsKey(user2))
                             {
                                 //creating coefficients
-                                double num = users_attributes_dict[user][attribute.Key] * users_attributes_dict[user2][attribute.Key];
+                                double num = CB_users_attributes_dict[user][attribute.Key] * CB_users_attributes_dict[user2][attribute.Key];
 
                                 //storing coefficients
                                 lock (sync)
@@ -476,14 +477,14 @@ namespace RS_Engine
                 });
 
             //for each user, create normalization
-            foreach (var user in users_attributes_dict)
+            foreach (var user in CB_users_attributes_dict)
             {
                 foreach (var attribute in user.Value)
                 {
                     if (CB_uu_sim_dict_norm.ContainsKey(user.Key))
-                        CB_uu_sim_dict_norm[user.Key] += Math.Pow(users_attributes_dict[user.Key][attribute.Key], 2);
+                        CB_uu_sim_dict_norm[user.Key] += Math.Pow(CB_users_attributes_dict[user.Key][attribute.Key], 2);
                     else
-                        CB_uu_sim_dict_norm[user.Key] = Math.Pow(users_attributes_dict[user.Key][attribute.Key], 2);
+                        CB_uu_sim_dict_norm[user.Key] = Math.Pow(CB_users_attributes_dict[user.Key][attribute.Key], 2);
                 }
                 CB_uu_sim_dict_norm[user.Key] = Math.Sqrt(CB_uu_sim_dict_norm[user.Key]);
             }
@@ -519,7 +520,7 @@ namespace RS_Engine
         public static void compute_CB_UB_RecommendationsPredictions()
         {
             //info
-            RManager.outLog("  + predict_CB_UB_Recommendations(): ");
+            RManager.outLog("  + compute_CB_UB_RecommendationsPredictions(): ");
 
             //runtime dictionaries
             IDictionary<int, IDictionary<int, double>> CB_uu_pred_dict = new Dictionary<int, IDictionary<int, double>>();
@@ -647,7 +648,7 @@ namespace RS_Engine
             RManager.outLog("  + compute_CB_ItemItem_Sim Norm Estimation: ");
 
             //foreach items and its attributes
-            foreach (var item in items_attributes_dict)
+            foreach (var item in CB_items_attributes_dict)
             {
                 foreach (var attribute in item.Value)
                 {
@@ -681,15 +682,15 @@ namespace RS_Engine
                         CB_ii_sim_dict_num.Add(item, new Dictionary<int, double>());
 
                     //getting item's attributes, and foreach                
-                    foreach (var attribute in items_attributes_dict[item].Keys.Take(ATTR_SIM_LIMIT_IT).ToList())
+                    foreach (var attribute in CB_items_attributes_dict[item].Keys.Take(ATTR_SIM_LIMIT_IT).ToList())
                     {
-                        foreach (var item2 in attributes_items_dict[attribute].Keys)
+                        foreach (var item2 in CB_attributes_items_dict[attribute].Keys)
                         {
                             if (item == item2)
                                 continue;
 
                             //storing coefficients
-                            double num = items_attributes_dict[item][attribute] * items_attributes_dict[item2][attribute];
+                            double num = CB_items_attributes_dict[item][attribute] * CB_items_attributes_dict[item2][attribute];
 
                             lock (sync)
                                 if (CB_ii_sim_dict_num[item].ContainsKey(item2))
@@ -718,7 +719,7 @@ namespace RS_Engine
         public static void compute_CB_IB_RecommendationsPredictions()
         {
             //info
-            RManager.outLog("  + predict_CB_IB_Recommendations(): ");
+            RManager.outLog("  + compute_CB_IB_RecommendationsPredictions(): ");
 
             //runtime dictionaries
             IDictionary<int, IDictionary<int, double>> CB_uu_pred_dict_num = new Dictionary<int, IDictionary<int, double>>();
@@ -762,7 +763,7 @@ namespace RS_Engine
                                 continue;
 
                             //coefficients
-                            double num = REngineCF_HYBRID.CF_IB_IDF_dictionary[item] * sim_item.Value;
+                            double num = REngineCF_HYBRID.CF_Items_IDF_dictionary[item] * sim_item.Value;
                             double den = sim_item.Value;
 
                             //if the current item is not predicted yet for the user, add it
