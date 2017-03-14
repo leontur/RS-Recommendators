@@ -11,3 +11,6 @@ https://inclass.kaggle.com/c/recommender-system-2016-challenge-polimi
 * Receives as input some csv datasets (of user profiles and interactions)
 * Executes ML algorithms
 * Gives in output a list of predicted jobs of each target user
+
+### Report ###
+* Pdf of the final report available in the related folder
